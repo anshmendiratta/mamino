@@ -123,11 +123,11 @@ mamino_init :: proc() {
 	// https://www.glfw.org/docs/3.3/group__window.html#ga7d9c8c62384b1e2821c4dc48952d2033
 	glfw.WindowHint(glfw.RESIZABLE, 1)
 	// MacOS.
-	when ODIN_OS = Odin_OS_Type.Darwin {
+	if ODIN_OS_STRING == "darwin" {
 		glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, 4)
 		glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, 1)
 		glfw.WindowHint(glfw.OPENGL_FORWARD_COMPAT, gl.TRUE)
-	} else when ODIN_OS = Odin_OS_Type.Linux || ODIN_OS = Odin_OS_Type.Windows  {
+	} else {
 		glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, GL_MAJOR_VERSION)
 		glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, GL_MINOR_VERSION)
 	}
