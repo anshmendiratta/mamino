@@ -6,38 +6,21 @@ import "core:c"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
 
-PROGRAMNAME :: "Program"
+PROGRAMNAME :: "mamino"
 
 GL_MAJOR_VERSION : c.int : 4
 GL_MINOR_VERSION :: 6
 
 running : b32 = true
 
+// NOTE: `defer`s are executed in reverse, like popping from a stack.
 main :: proc() {
-	// Set Window Hints
-	// https://www.glfw.org/docs/3.3/window_guide.html#window_hints
-	// https://www.glfw.org/docs/3.3/group__window.html#ga7d9c8c62384b1e2821c4dc48952d2033
-	glfw.WindowHint(glfw.RESIZABLE, 1)
-	glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR,GL_MAJOR_VERSION) 
-	glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR,GL_MINOR_VERSION)
-	glfw.WindowHint(glfw.OPENGL_PROFILE,glfw.OPENGL_CORE_PROFILE)
-	
-	// Initialize glfw
-	// GLFW_TRUE if successful, or GLFW_FALSE if an error occurred.
-	// GLFW_TRUE = 1
-	// GLFW_FALSE = 0
-	// https://www.glfw.org/docs/latest/group__init.html#ga317aac130a235ab08c6db0834907d85e
-	if(glfw.Init() != true){
-		fmt.println("Failed to initialize GLFW")
-		return
-	}
-	// Deferes are executed in reverse order. So the window will get destroyed first
+	mamino_init()
 	// They can also just be called manually later instead without defer. This way of doing it ensures are terminated.
 	// https://odin-lang.org/docs/overview/#defer-statement
 	// https://www.glfw.org/docs/3.1/group__init.html#gaaae48c0a18607ea4a4ba951d939f0901
 	defer glfw.Terminate()
 
-	// Create the window
 	// Return WindowHandle rawPtr
 	// https://www.glfw.org/docs/3.3/group__window.html#ga3555a418df92ad53f917597fe2f64aeb
 	window := glfw.CreateWindow(512, 512, PROGRAMNAME, nil, nil)
@@ -50,7 +33,6 @@ main :: proc() {
 		return
 	}
 	
-	//
 	// https://www.glfw.org/docs/3.3/group__context.html#ga1c04dc242268f827290fe40aa1c91157
 	glfw.MakeContextCurrent(window)
 	
@@ -75,8 +57,6 @@ main :: proc() {
 	// This is needed because the GL_MAJOR_VERSION has an explicit type of c.int
 	gl.load_up_to(int(GL_MAJOR_VERSION), GL_MINOR_VERSION, glfw.gl_set_proc_address) 
 	
-	init()
-	
 	// There is only one kind of loop in Odin called for
 	// https://odin-lang.org/docs/overview/#for-statement
 	for (!glfw.WindowShouldClose(window) && running) {
@@ -87,6 +67,7 @@ main :: proc() {
 		update()
 		draw()
 
+		// Double buffering I think? - Ansh
 		// This function swaps the front and back buffers of the specified window.
 		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
 		// https://www.glfw.org/docs/3.0/group__context.html#ga15a5a1ee5b3c2ca6b15ca209a12efd14
@@ -98,8 +79,22 @@ main :: proc() {
 }
 
 
-init :: proc(){
-	// Own initialization code there
+mamino_init :: proc(){
+	// Set Window Hints
+	// https://www.glfw.org/docs/3.3/window_guide.html#window_hints
+	// https://www.glfw.org/docs/3.3/group__window.html#ga7d9c8c62384b1e2821c4dc48952d2033
+	glfw.WindowHint(glfw.RESIZABLE, 1)
+	glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR,GL_MAJOR_VERSION) 
+	glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR,GL_MINOR_VERSION)
+	glfw.WindowHint(glfw.OPENGL_PROFILE,glfw.OPENGL_CORE_PROFILE)
+
+	// Initialize glfw
+	// GLFW_TRUE if successful, or GLFW_FALSE if an error occurred.
+	// https://www.glfw.org/docs/latest/group__init.html#ga317aac130a235ab08c6db0834907d85e
+	if !glfw.Init() {
+		fmt.println("Failed to initialize GLFW")
+		return
+	}
 }
 
 update :: proc(){
@@ -107,13 +102,10 @@ update :: proc(){
 }
 
 draw :: proc(){
-	// Set the opengl clear color
-	// 0-1 rgba values
-	gl.ClearColor(0.2, 0.3, 0.3, 1.0)
+	// Clear the screen with some color. RGBA values are normalized to be within [0.0, 1.0].
+	gl.ClearColor(0.1, 0.1, 0.1, 1.0)
 	// Clear the screen with the set clearcolor
 	gl.Clear(gl.COLOR_BUFFER_BIT)
-
-	// Own drawing code here
 }
 
 exit :: proc(){
