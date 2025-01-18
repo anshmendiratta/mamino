@@ -9,6 +9,7 @@ import "vendor:glfw"
 
 PROGRAMNAME :: "mamino"
 
+// Default values for not-MacOS.
 GL_MAJOR_VERSION: c.int : 4
 GL_MINOR_VERSION :: 6
 
@@ -121,8 +122,15 @@ mamino_init :: proc() {
 	// https://www.glfw.org/docs/3.3/window_guide.html#window_hints
 	// https://www.glfw.org/docs/3.3/group__window.html#ga7d9c8c62384b1e2821c4dc48952d2033
 	glfw.WindowHint(glfw.RESIZABLE, 1)
-	glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, GL_MAJOR_VERSION)
-	glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, GL_MINOR_VERSION)
+	// MacOS.
+	when ODIN_OS = Odin_OS_Type.Darwin {
+		glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, 4)
+		glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, 1)
+		glfw.WindowHint(glfw.OPENGL_FORWARD_COMPAT, gl.TRUE)
+	} else when ODIN_OS = Odin_OS_Type.Linux || ODIN_OS = Odin_OS_Type.Windows  {
+		glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, GL_MAJOR_VERSION)
+		glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, GL_MINOR_VERSION)
+	}
 	glfw.WindowHint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 
 	// https://www.glfw.org/docs/latest/group__init.html#ga317aac130a235ab08c6db0834907d85e
@@ -140,7 +148,7 @@ mamino_create_window :: proc() -> glfw.WindowHandle {
 	// If the window pointer is invalid
 	if window == nil {
 		fmt.println("Unable to create window")
-		return nil;
+		return nil
 	}
 
 	// https://www.glfw.org/docs/3.3/group__context.html#ga1c04dc242268f827290fe40aa1c91157
@@ -169,8 +177,10 @@ mamino_create_window :: proc() -> glfw.WindowHandle {
 update :: proc(vertices: []Vertex) -> []Vertex {
 	angle_dt: f32 = 0.001
 	rotation_matrix := glm.mat2 {
-		glm.cos(angle_dt), -glm.sin(angle_dt),
-		glm.sin(angle_dt), glm.cos(angle_dt)
+		glm.cos(angle_dt),
+		-glm.sin(angle_dt),
+		glm.sin(angle_dt),
+		glm.cos(angle_dt),
 	}
 	// Mutable reference to `vertex`.
 	for &vertex, idx in vertices {
@@ -190,7 +200,7 @@ exit :: proc() {
 
 // Called when glfw keystate changes
 key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
-	if key == glfw.KEY_ESCAPE {
+	if key == glfw.KEY_ESCAPE || key == glfw.KEY_Q {
 		running = false
 	}
 }

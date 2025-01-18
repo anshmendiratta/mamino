@@ -1,5 +1,5 @@
 package main
- 
+
 vertex_shader := `
 	#version 330 core
 
@@ -17,6 +17,7 @@ vertex_shader := `
 		f_color = color;
 	}
 `
+
 
 fragment_shader := `
 	#version 330 core
