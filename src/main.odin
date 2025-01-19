@@ -4,11 +4,24 @@ package main
 
 import "core:c"
 import "core:fmt"
-import "core:time"
 import glm "core:math/linalg/glsl"
+import "core:time"
 
 import gl "vendor:OpenGL"
 import "vendor:glfw"
+
+
+// Called when glfw keystate changes
+key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
+	if key == glfw.KEY_ESCAPE || key == glfw.KEY_Q {
+		running = false
+	}
+}
+
+// Called when glfw window changes size
+size_callback :: proc "c" (window: glfw.WindowHandle, width, height: i32) {
+	gl.Viewport(0, 0, width, height)
+}
 
 PROGRAM_NAME :: "mamino"
 
@@ -20,6 +33,11 @@ WINDOW_WIDTH :: 512
 WINDOW_HEIGHT :: 512
 
 running: b32 = true
+
+Vertex :: struct {
+	position: glm.vec4,
+	color:    glm.vec4,
+}
 
 main :: proc() {
 	mamino_init()
@@ -45,47 +63,70 @@ main :: proc() {
 	defer delete(uniforms)
 
 	// Get Vertex arrays.
-	vao: u32
-	gl.GenVertexArrays(1, &vao)
-	defer gl.DeleteVertexArrays(1, &vao)
+	triangle_vao: u32
+	gl.GenVertexArrays(1, &triangle_vao)
+	defer gl.DeleteVertexArrays(1, &triangle_vao)
 
 	// Get Vertex buffer objects, and eto (?).
-	vbo, ebo: u32
-	gl.GenBuffers(1, &vbo)
-	gl.GenBuffers(1, &ebo)
-	defer gl.DeleteBuffers(1, &vbo)
-	defer gl.DeleteBuffers(1, &ebo)
+	triangle_vbo, triangle_ebo: u32
+	gl.GenBuffers(1, &triangle_vbo)
+	gl.GenBuffers(1, &triangle_ebo)
+	defer gl.DeleteBuffers(1, &triangle_vbo)
+	defer gl.DeleteBuffers(1, &triangle_ebo)
 
 	// Initialize polygon.
-	// polygon_n: u32 = 7
-	polygon_color: glm.vec4 = {0.8, 0.3, 0.3, 1.}
-	// polygon_vertices: [dynamic]glm.vec2 = generate_polygon_vertices(polygon_n, 1.0, glm.vec2{0.0, 0.0})
+	polygon_color: [dynamic]glm.vec4 = generate_n_colors(36)
+	vertex_color: glm.vec4 = {0.8, 0.8, 0.8, 1.}
 	vertices: [dynamic]Vertex = {
-		{{0.3, 0.3, 0.3}, polygon_color},
-		{{0.3, 0.3, -0.3}, polygon_color},
-		{{0.3, -0.3, -0.3}, polygon_color},
-		// {{0.3, -0.3, 0.3}, polygon_color},
-		// {{-0.3, 0.3, 0.3}, polygon_color},
-		// {{-0.3, 0.3, -0.3}, polygon_color},
-		// {{-0.3, -0.3, -0.3}, polygon_color},
-		// {{-0.3, -0.3, 0.3}, polygon_color},
+		{{-0.5, -0.5, -0.5, 1.0}, vertex_color},
+		{{-0.5, -0.5, 0.5, 1.0}, vertex_color},
+		{{-0.5, 0.5, 0.5, 1.0}, vertex_color},
+		{{0.5, 0.5, -0.5, 1.0}, vertex_color},
+		{{-0.5, -0.5, -0.5, 1.0}, vertex_color},
+		{{0.5, 0.5, -0.5, 1.0}, vertex_color},
+		{{0.5, -0.5, 0.5, 1.0}, vertex_color},
+		{{-0.5, -0.5, -0.5, 1.0}, vertex_color},
+		{{0.5, -0.5, -0.5, 1.0}, vertex_color},
+		{{0.5, 0.5, -0.5, 1.0}, vertex_color},
+		{{0.5, -0.5, -0.5, 1.0}, vertex_color},
+		{{-0.5, -0.5, -0.5, 1.0}, vertex_color},
+		{{-0.5, -0.5, -0.5, 1.0}, vertex_color},
+		{{0.5, 0.5, 0.5, 1.0}, vertex_color},
+		{{-0.5, 0.5, -0.5, 1.0}, vertex_color},
+		{{0.5, -0.5, 0.5, 1.0}, vertex_color},
+		{{-0.5, -0.5, 0.5, 1.0}, vertex_color},
+		{{-0.5, -0.5, -0.5, 1.0}, vertex_color},
+		{{-0.5, 0.5, 0.5, 1.0}, vertex_color},
+		{{-0.5, -0.5, 0.5, 1.0}, vertex_color},
+		{{0.5, -0.5, 0.5, 1.0}, vertex_color},
+		{{0.5, 0.5, 0.5, 1.0}, vertex_color},
+		{{0.5, -0.5, -0.5, 1.0}, vertex_color},
+		{{0.5, 0.5, -0.5, 1.0}, vertex_color},
+		{{0.5, -0.5, -0.5, 1.0}, vertex_color},
+		{{0.5, 0.5, 0.5, 1.0}, vertex_color},
+		{{0.5, -0.5, 0.5, 1.0}, vertex_color},
+		{{0.5, 0.5, 0.5, 1.0}, vertex_color},
+		{{0.5, 0.5, -0.5, 1.0}, vertex_color},
+		{{-0.5, 0.5, -0.5, 1.0}, vertex_color},
+		{{0.5, 0.5, 0.5, 1.0}, vertex_color},
+		{{-0.5, 0.5, -0.5, 1.0}, vertex_color},
+		{{-0.5, 0.5, 0.5, 1.0}, vertex_color},
+		{{0.5, 0.5, 0.5, 1.0}, vertex_color},
+		{{-0.5, 0.5, 0.5, 1.0}, vertex_color},
+		{{0.5, -0.5, 0.5, 1.0}, vertex_color},
 	}
-	// for vertex in polygon_vertices {
-	// 	append(&vertices, Vertex {vertex, polygon_color})	
-	// }
 
+	for color, idx in polygon_color {
+		vertices[idx].color = color
+	}
 	// Initialize vertex array indices (used to select which vertices are drawn in which order).
-	indices: [dynamic]u16
-	for index in 0..<3 {
-		// if index <= 4 {
-			append(&indices, u16(index))
-		// } else {
-		// 	append(&indices, u16(8 - index))
-		// }
+	vertex_indices: [dynamic]u16
+	for index in 0 ..< 36 {
+		append(&vertex_indices, u16(index))
 	}
 
 	// Bind vertices to vertex buffer.
-	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
+	gl.BindBuffer(gl.ARRAY_BUFFER, triangle_vbo)
 	gl.BufferData(
 		gl.ARRAY_BUFFER,
 		len(vertices) * size_of(Vertex),
@@ -94,32 +135,29 @@ main :: proc() {
 	)
 	gl.EnableVertexAttribArray(0)
 	gl.EnableVertexAttribArray(1)
-	gl.VertexAttribPointer(0, 3, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, position))
+	gl.VertexAttribPointer(0, 4, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, position))
 	gl.VertexAttribPointer(1, 4, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, color))
 
 	// Bind vertex array indices to index buffer.
-	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
+	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangle_ebo)
 	gl.BufferData(
 		gl.ELEMENT_ARRAY_BUFFER,
-		len(vertices) * size_of(u16),
-		raw_data(indices),
+		len(vertex_indices) * size_of(u16),
+		raw_data(vertex_indices),
 		gl.STATIC_DRAW,
 	)
 
-	t_init := time.now()
 	// Check for window events.
 	for (!glfw.WindowShouldClose(window) && running) {
 		// https://www.glfw.org/docs/3.3/group__window.html#ga37bd57223967b4211d60ca1a0bf3c832
 		glfw.PollEvents()
-
-		t_since_init := time.duration_seconds(time.tick_since(time.Tick(t_init)))
 
 		// Clear the screen with some color. RGBA values are normalized to be within [0.0, 1.0].
 		gl.ClearColor(0.1, 0.1, 0.1, 1.0)
 		gl.Clear(gl.COLOR_BUFFER_BIT)
 
 		// Update (rotate) the vertices every frame.
-		vertices = update(vertices, t_since_init)
+		vertices = update(vertices)
 
 		// TODO: Find a way to use `BufferSubData` instead. Using `BufferData` works but reallocates memory.
 		// Rebind the updated vertices to the vertex buffer.
@@ -131,7 +169,7 @@ main :: proc() {
 		)
 
 		// Draw vertices.
-		draw(indices[:])
+		draw(vertex_indices[:])
 
 		// NOTE: Defaults to double buffering I think? - Ansh
 		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
@@ -198,42 +236,26 @@ mamino_create_window :: proc() -> glfw.WindowHandle {
 	return window
 }
 
-update :: proc(vertices: [dynamic]Vertex, time: f64) -> [dynamic]Vertex {
-	time := f32(time)
-	rotation_matrix_x := glm.mat3 {
-		1., 0., 0.,
-		0., glm.cos(time), -glm.sin(time),
-		1., glm.sin(time), glm.cos(time),
-	}
+update :: proc(vertices: [dynamic]Vertex) -> [dynamic]Vertex {
+	angle: f32 = 0.01
+	view := glm.mat4LookAt({0, -1, +1}, {0, 1, 0}, {0, 0, 1})
+	proj := glm.mat4Perspective(45, 1.3, 0.1, 100.0)
 	// Mutable reference to `vertex`.
 	for &vertex, idx in vertices {
-		vertex.position = vertex.position * rotation_matrix_x
+		vertex.position *= glm.mat4Rotate({0.5, 0.5, 1.}, angle)
 	}
 
 	return vertices
 }
 
 draw :: proc(indices: []u16) {
+	// gl.Enable(gl.DEPTH_TEST);
+	// gl.DepthFunc(gl.LESS);
 	gl.DrawElements(gl.TRIANGLES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
+	// gl.Enable(gl.VERTEX_PROGRAM_POINT_SIZE)
+	// gl.DrawElements(gl.POINTS, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 
 // Termination code here
 exit :: proc() {
-}
-
-// Called when glfw keystate changes
-key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
-	if key == glfw.KEY_ESCAPE || key == glfw.KEY_Q {
-		running = false
-	}
-}
-
-// Called when glfw window changes size
-size_callback :: proc "c" (window: glfw.WindowHandle, width, height: i32) {
-	gl.Viewport(0, 0, width, height)
-}
-
-Vertex :: struct {
-	position: glm.vec3,
-	color:    glm.vec4,
 }

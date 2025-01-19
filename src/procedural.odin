@@ -21,3 +21,20 @@ generate_polygon_vertices :: proc(n: u32, radius: f32, center: glm.vec2) -> [dyn
 	
 	return vertices
 }
+
+generate_n_colors :: proc(n: u32) -> [dynamic]glm.vec4 {
+	base_color: glm.vec3 = {1.0, 0.2, 0.0}
+	end_color: glm.vec3 = {0.0, 1.0, 0.2}
+
+	r_step_size: f32 = (end_color.r - base_color.r)/f32(n)
+	g_step_size: f32 = (end_color.g - base_color.g)/f32(n)
+	b_step_size: f32 = (end_color.b - base_color.b)/f32(n)
+	colors: [dynamic]glm.vec4
+	for i in 0..<n {
+		color: glm.vec3 = {base_color.r + r_step_size * f32(i), base_color.g + g_step_size * f32(i), base_color.b + b_step_size * f32(i) }
+
+		append(&colors, glm.vec4{color.r, color.g, color.r, 1.0})
+	}
+
+	return colors
+}
