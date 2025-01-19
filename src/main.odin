@@ -35,8 +35,8 @@ WINDOW_HEIGHT :: 512
 running: b32 = true
 
 Vertex :: struct {
-	position: glm.vec4,
-	color:    glm.vec4,
+	position: glm.vec3,
+	color:    glm.vec3,
 }
 
 main :: proc() {
@@ -75,45 +75,45 @@ main :: proc() {
 	defer gl.DeleteBuffers(1, &triangle_ebo)
 
 	// Initialize polygon.
-	polygon_color: [dynamic]glm.vec4 = generate_n_colors(36)
-	vertex_color: glm.vec4 = {0.8, 0.8, 0.8, 1.}
+	polygon_color: [dynamic]glm.vec3 = generate_n_colors(36)
+	vertex_color: glm.vec3 = {0.8, 0.2, 1.0}
 	vertices: [dynamic]Vertex = {
-		{{-0.5, -0.5, -0.5, 1.0}, vertex_color},
-		{{-0.5, -0.5, 0.5, 1.0}, vertex_color},
-		{{-0.5, 0.5, 0.5, 1.0}, vertex_color},
-		{{0.5, 0.5, -0.5, 1.0}, vertex_color},
-		{{-0.5, -0.5, -0.5, 1.0}, vertex_color},
-		{{0.5, 0.5, -0.5, 1.0}, vertex_color},
-		{{0.5, -0.5, 0.5, 1.0}, vertex_color},
-		{{-0.5, -0.5, -0.5, 1.0}, vertex_color},
-		{{0.5, -0.5, -0.5, 1.0}, vertex_color},
-		{{0.5, 0.5, -0.5, 1.0}, vertex_color},
-		{{0.5, -0.5, -0.5, 1.0}, vertex_color},
-		{{-0.5, -0.5, -0.5, 1.0}, vertex_color},
-		{{-0.5, -0.5, -0.5, 1.0}, vertex_color},
-		{{0.5, 0.5, 0.5, 1.0}, vertex_color},
-		{{-0.5, 0.5, -0.5, 1.0}, vertex_color},
-		{{0.5, -0.5, 0.5, 1.0}, vertex_color},
-		{{-0.5, -0.5, 0.5, 1.0}, vertex_color},
-		{{-0.5, -0.5, -0.5, 1.0}, vertex_color},
-		{{-0.5, 0.5, 0.5, 1.0}, vertex_color},
-		{{-0.5, -0.5, 0.5, 1.0}, vertex_color},
-		{{0.5, -0.5, 0.5, 1.0}, vertex_color},
-		{{0.5, 0.5, 0.5, 1.0}, vertex_color},
-		{{0.5, -0.5, -0.5, 1.0}, vertex_color},
-		{{0.5, 0.5, -0.5, 1.0}, vertex_color},
-		{{0.5, -0.5, -0.5, 1.0}, vertex_color},
-		{{0.5, 0.5, 0.5, 1.0}, vertex_color},
-		{{0.5, -0.5, 0.5, 1.0}, vertex_color},
-		{{0.5, 0.5, 0.5, 1.0}, vertex_color},
-		{{0.5, 0.5, -0.5, 1.0}, vertex_color},
-		{{-0.5, 0.5, -0.5, 1.0}, vertex_color},
-		{{0.5, 0.5, 0.5, 1.0}, vertex_color},
-		{{-0.5, 0.5, -0.5, 1.0}, vertex_color},
-		{{-0.5, 0.5, 0.5, 1.0}, vertex_color},
-		{{0.5, 0.5, 0.5, 1.0}, vertex_color},
-		{{-0.5, 0.5, 0.5, 1.0}, vertex_color},
-		{{0.5, -0.5, 0.5, 1.0}, vertex_color},
+		{{-0.5, -0.5, -0.5}, vertex_color},
+		{{-0.5, -0.5, 0.5}, vertex_color},
+		{{-0.5, 0.5, 0.5}, vertex_color},
+		{{0.5, 0.5, -0.5}, vertex_color},
+		{{-0.5, -0.5, -0.5}, vertex_color},
+		{{-0.5, 0.5, -0.5}, vertex_color},
+		{{0.5, -0.5, 0.5}, vertex_color},
+		{{-0.5, -0.5, -0.5}, vertex_color},
+		{{0.5, -0.5, -0.5}, vertex_color},
+		{{0.5, 0.5, -0.5}, vertex_color},
+		{{0.5, -0.5, -0.5}, vertex_color},
+		{{-0.5, -0.5, -0.5}, vertex_color},
+		{{-0.5, -0.5, -0.5}, vertex_color},
+		{{-0.5, 0.5, 0.5}, vertex_color},
+		{{-0.5, 0.5, -0.5}, vertex_color},
+		{{0.5, -0.5, 0.5}, vertex_color},
+		{{-0.5, -0.5, 0.5}, vertex_color},
+		{{-0.5, -0.5, -0.5}, vertex_color},
+		{{-0.5, 0.5, 0.5}, vertex_color},
+		{{-0.5, -0.5, 0.5}, vertex_color},
+		{{0.5, -0.5, 0.5}, vertex_color},
+		{{0.5, 0.5, 0.5}, vertex_color},
+		{{0.5, -0.5, -0.5}, vertex_color},
+		{{0.5, 0.5, -0.5}, vertex_color},
+		{{0.5, -0.5, -0.5}, vertex_color},
+		{{0.5, 0.5, 0.5}, vertex_color},
+		{{0.5, -0.5, 0.5}, vertex_color},
+		{{0.5, 0.5, 0.5}, vertex_color},
+		{{0.5, 0.5, -0.5}, vertex_color},
+		{{-0.5, 0.5, -0.5}, vertex_color},
+		{{0.5, 0.5, 0.5}, vertex_color},
+		{{-0.5, 0.5, -0.5}, vertex_color},
+		{{-0.5, 0.5, 0.5}, vertex_color},
+		{{0.5, 0.5, 0.5}, vertex_color},
+		{{-0.5, 0.5, 0.5}, vertex_color},
+		{{0.5, -0.5, 0.5}, vertex_color},
 	}
 
 	for color, idx in polygon_color {
@@ -135,8 +135,8 @@ main :: proc() {
 	)
 	gl.EnableVertexAttribArray(0)
 	gl.EnableVertexAttribArray(1)
-	gl.VertexAttribPointer(0, 4, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, position))
-	gl.VertexAttribPointer(1, 4, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, color))
+	gl.VertexAttribPointer(0, 3, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, position))
+	gl.VertexAttribPointer(1, 3, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, color))
 
 	// Bind vertex array indices to index buffer.
 	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangle_ebo)
@@ -154,7 +154,7 @@ main :: proc() {
 
 		// Clear the screen with some color. RGBA values are normalized to be within [0.0, 1.0].
 		gl.ClearColor(0.1, 0.1, 0.1, 1.0)
-		gl.Clear(gl.COLOR_BUFFER_BIT)
+		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 		// Update (rotate) the vertices every frame.
 		vertices = update(vertices)
@@ -168,8 +168,7 @@ main :: proc() {
 			gl.STATIC_DRAW,
 		)
 
-		// Draw vertices.
-		draw(vertex_indices[:])
+		draw(vertices[:])
 
 		// NOTE: Defaults to double buffering I think? - Ansh
 		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
@@ -239,21 +238,21 @@ mamino_create_window :: proc() -> glfw.WindowHandle {
 update :: proc(vertices: [dynamic]Vertex) -> [dynamic]Vertex {
 	angle: f32 = 0.01
 	view := glm.mat4LookAt({0, -1, +1}, {0, 1, 0}, {0, 0, 1})
-	proj := glm.mat4Perspective(45, 1.3, 0.1, 100.0)
+	proj := glm.mat4Perspective(90, 2.0, 0.1, 100.0)
+	scale := glm.mat3{0.5, 0., 0., 0., 0.5, 0., 0., 0., 0.5}
 	// Mutable reference to `vertex`.
 	for &vertex, idx in vertices {
-		vertex.position *= glm.mat4Rotate({0.5, 0.5, 1.}, angle)
+		vertex.position =
+			(glm.vec4{vertex.position.x, vertex.position.y, vertex.position.z, 1.0} * glm.mat4Rotate({0.5, 0.5, 1.}, angle)).xyz
 	}
 
 	return vertices
 }
 
-draw :: proc(indices: []u16) {
-	// gl.Enable(gl.DEPTH_TEST);
-	// gl.DepthFunc(gl.LESS);
-	gl.DrawElements(gl.TRIANGLES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
-	// gl.Enable(gl.VERTEX_PROGRAM_POINT_SIZE)
-	// gl.DrawElements(gl.POINTS, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
+draw :: proc(vertices: []Vertex) {
+	gl.Enable(gl.DEPTH_TEST)
+	gl.DepthFunc(gl.LESS)
+	gl.DrawArrays(gl.TRIANGLES, 0, i32(len(vertices)))
 }
 
 // Termination code here
