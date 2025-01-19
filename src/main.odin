@@ -1,7 +1,10 @@
+#+feature dynamic-literals
+
 package main
 
 import "core:c"
 import "core:fmt"
+import "core:time"
 import glm "core:math/linalg/glsl"
 
 import gl "vendor:OpenGL"
@@ -20,7 +23,7 @@ running: b32 = true
 
 main :: proc() {
 	mamino_init()
-	// NOTE: `defer`s are executed in reverse, like popping from a stack..
+	// NOTE: `defer`s are executed in reverse, like popping from a stack.
 	// https://odin-lang.org/docs/overview/#defer-statement
 	// https://www.glfw.org/docs/3.1/group__init.html#gaaae48c0a18607ea4a4ba951d939f0901
 	defer glfw.Terminate()
@@ -54,18 +57,31 @@ main :: proc() {
 	defer gl.DeleteBuffers(1, &ebo)
 
 	// Initialize polygon.
-	polygon_n: u32 = 7
-	polygon_color: glm.vec4 = {1., 1., 1., 1.}
-	polygon_vertices: [dynamic]glm.vec2 = generate_polygon_vertices(polygon_n, 1.0, glm.vec2{0.0, 0.0})
-	vertices: [dynamic]Vertex
-	for vertex in polygon_vertices {
-		append(&vertices, Vertex {vertex, polygon_color})	
+	// polygon_n: u32 = 7
+	polygon_color: glm.vec4 = {0.8, 0.3, 0.3, 1.}
+	// polygon_vertices: [dynamic]glm.vec2 = generate_polygon_vertices(polygon_n, 1.0, glm.vec2{0.0, 0.0})
+	vertices: [dynamic]Vertex = {
+		{{0.3, 0.3, 0.3}, polygon_color},
+		{{0.3, 0.3, -0.3}, polygon_color},
+		{{0.3, -0.3, -0.3}, polygon_color},
+		// {{0.3, -0.3, 0.3}, polygon_color},
+		// {{-0.3, 0.3, 0.3}, polygon_color},
+		// {{-0.3, 0.3, -0.3}, polygon_color},
+		// {{-0.3, -0.3, -0.3}, polygon_color},
+		// {{-0.3, -0.3, 0.3}, polygon_color},
 	}
+	// for vertex in polygon_vertices {
+	// 	append(&vertices, Vertex {vertex, polygon_color})	
+	// }
 
 	// Initialize vertex array indices (used to select which vertices are drawn in which order).
 	indices: [dynamic]u16
-	for index in 0..<polygon_n {
-		append(&indices, u16(index))
+	for index in 0..<3 {
+		// if index <= 4 {
+			append(&indices, u16(index))
+		// } else {
+		// 	append(&indices, u16(8 - index))
+		// }
 	}
 
 	// Bind vertices to vertex buffer.
@@ -78,7 +94,7 @@ main :: proc() {
 	)
 	gl.EnableVertexAttribArray(0)
 	gl.EnableVertexAttribArray(1)
-	gl.VertexAttribPointer(0, 2, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, position))
+	gl.VertexAttribPointer(0, 3, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, position))
 	gl.VertexAttribPointer(1, 4, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, color))
 
 	// Bind vertex array indices to index buffer.
@@ -90,17 +106,20 @@ main :: proc() {
 		gl.STATIC_DRAW,
 	)
 
+	t_init := time.now()
 	// Check for window events.
 	for (!glfw.WindowShouldClose(window) && running) {
 		// https://www.glfw.org/docs/3.3/group__window.html#ga37bd57223967b4211d60ca1a0bf3c832
 		glfw.PollEvents()
+
+		t_since_init := time.duration_seconds(time.tick_since(time.Tick(t_init)))
 
 		// Clear the screen with some color. RGBA values are normalized to be within [0.0, 1.0].
 		gl.ClearColor(0.1, 0.1, 0.1, 1.0)
 		gl.Clear(gl.COLOR_BUFFER_BIT)
 
 		// Update (rotate) the vertices every frame.
-		vertices = update(vertices)
+		vertices = update(vertices, t_since_init)
 
 		// TODO: Find a way to use `BufferSubData` instead. Using `BufferData` works but reallocates memory.
 		// Rebind the updated vertices to the vertex buffer.
@@ -179,24 +198,23 @@ mamino_create_window :: proc() -> glfw.WindowHandle {
 	return window
 }
 
-update :: proc(vertices: [dynamic]Vertex) -> [dynamic]Vertex {
-	angle_dt: f32 = 0.001
-	rotation_matrix := glm.mat2 {
-		glm.cos(angle_dt),
-		-glm.sin(angle_dt),
-		glm.sin(angle_dt),
-		glm.cos(angle_dt),
+update :: proc(vertices: [dynamic]Vertex, time: f64) -> [dynamic]Vertex {
+	time := f32(time)
+	rotation_matrix_x := glm.mat3 {
+		1., 0., 0.,
+		0., glm.cos(time), -glm.sin(time),
+		1., glm.sin(time), glm.cos(time),
 	}
 	// Mutable reference to `vertex`.
 	for &vertex, idx in vertices {
-		vertex.position = vertex.position * rotation_matrix
+		vertex.position = vertex.position * rotation_matrix_x
 	}
 
 	return vertices
 }
 
 draw :: proc(indices: []u16) {
-	gl.DrawElements(gl.TRIANGLE_FAN, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
+	gl.DrawElements(gl.TRIANGLES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 
 // Termination code here
@@ -216,6 +234,6 @@ size_callback :: proc "c" (window: glfw.WindowHandle, width, height: i32) {
 }
 
 Vertex :: struct {
-	position: glm.vec2,
+	position: glm.vec3,
 	color:    glm.vec4,
 }
