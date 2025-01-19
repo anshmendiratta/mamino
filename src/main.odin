@@ -5,7 +5,6 @@ import "core:fmt"
 import glm "core:math/linalg/glsl"
 
 import gl "vendor:OpenGL"
-import vk "vendor:vulkan"
 import "vendor:glfw"
 
 PROGRAM_NAME :: "mamino"
@@ -20,11 +19,6 @@ WINDOW_HEIGHT :: 512
 running: b32 = true
 
 main :: proc() {
-	// vk_instance_info: vk.InstanceCreateInfo = {}
-	// vk_allocator: vk.AllocationCallbacks = {}
-	// vk_instance: vk.Instance = {}
-	// vk.CreateInstance(&vk_instance_info, &vk_allocator, &vk_instance);
-	
 	mamino_init()
 	// NOTE: `defer`s are executed in reverse, like popping from a stack..
 	// https://odin-lang.org/docs/overview/#defer-statement
