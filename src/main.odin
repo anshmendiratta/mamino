@@ -5,9 +5,10 @@ import "core:fmt"
 import glm "core:math/linalg/glsl"
 
 import gl "vendor:OpenGL"
+import vk "vendor:vulkan"
 import "vendor:glfw"
 
-PROGRAMNAME :: "mamino"
+PROGRAM_NAME :: "mamino"
 
 // Default values for not-MacOS.
 GL_MAJOR_VERSION: c.int : 4
@@ -19,6 +20,11 @@ WINDOW_HEIGHT :: 512
 running: b32 = true
 
 main :: proc() {
+	// vk_instance_info: vk.InstanceCreateInfo = {}
+	// vk_allocator: vk.AllocationCallbacks = {}
+	// vk_instance: vk.Instance = {}
+	// vk.CreateInstance(&vk_instance_info, &vk_allocator, &vk_instance);
+	
 	mamino_init()
 	// NOTE: `defer`s are executed in reverse, like popping from a stack..
 	// https://odin-lang.org/docs/overview/#defer-statement
@@ -53,15 +59,20 @@ main :: proc() {
 	defer gl.DeleteBuffers(1, &vbo)
 	defer gl.DeleteBuffers(1, &ebo)
 
-	// Initialize square vertices.
-	vertices := []Vertex {
-		{{0.5, 0.5}, {1., 1., 1., 1.}},
-		{{-0.5, 0.5}, {1., 1., 1., 1.}},
-		{{-0.5, -0.5}, {1., 1., 1., 1.}},
-		{{0.5, -0.5}, {1., 1., 1., 1.}},
+	// Initialize polygon.
+	polygon_n: u32 = 7
+	polygon_color: glm.vec4 = {1., 1., 1., 1.}
+	polygon_vertices: [dynamic]glm.vec2 = generate_polygon_vertices(polygon_n, 1.0, glm.vec2{0.0, 0.0})
+	vertices: [dynamic]Vertex
+	for vertex in polygon_vertices {
+		append(&vertices, Vertex {vertex, polygon_color})	
 	}
+
 	// Initialize vertex array indices (used to select which vertices are drawn in which order).
-	indices := []u16{0, 1, 2, 3}
+	indices: [dynamic]u16
+	for index in 0..<polygon_n {
+		append(&indices, u16(index))
+	}
 
 	// Bind vertices to vertex buffer.
 	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
@@ -107,7 +118,7 @@ main :: proc() {
 		)
 
 		// Draw vertices.
-		draw(indices)
+		draw(indices[:])
 
 		// NOTE: Defaults to double buffering I think? - Ansh
 		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
@@ -122,16 +133,17 @@ mamino_init :: proc() {
 	// https://www.glfw.org/docs/3.3/window_guide.html#window_hints
 	// https://www.glfw.org/docs/3.3/group__window.html#ga7d9c8c62384b1e2821c4dc48952d2033
 	glfw.WindowHint(glfw.RESIZABLE, 1)
+	glfw.WindowHint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+
 	// MacOS.
 	if ODIN_OS_STRING == "darwin" {
+		glfw.WindowHint(glfw.OPENGL_FORWARD_COMPAT, gl.TRUE)
 		glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, 4)
 		glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, 1)
-		glfw.WindowHint(glfw.OPENGL_FORWARD_COMPAT, gl.TRUE)
 	} else {
 		glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, GL_MAJOR_VERSION)
 		glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, GL_MINOR_VERSION)
 	}
-	glfw.WindowHint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 
 	// https://www.glfw.org/docs/latest/group__init.html#ga317aac130a235ab08c6db0834907d85e
 	if !glfw.Init() {
@@ -143,9 +155,8 @@ mamino_init :: proc() {
 // Return WindowHandle rawPtr
 // https://www.glfw.org/docs/3.3/group__window.html#ga3555a418df92ad53f917597fe2f64aeb
 mamino_create_window :: proc() -> glfw.WindowHandle {
-	window := glfw.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, PROGRAMNAME, nil, nil)
+	window := glfw.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, PROGRAM_NAME, nil, nil)
 	// https://www.glfw.org/docs/latest/group__window.html#gacdf43e51376051d2c091662e9fe3d7b2
-	// If the window pointer is invalid
 	if window == nil {
 		fmt.println("Unable to create window")
 		return nil
@@ -174,7 +185,7 @@ mamino_create_window :: proc() -> glfw.WindowHandle {
 	return window
 }
 
-update :: proc(vertices: []Vertex) -> []Vertex {
+update :: proc(vertices: [dynamic]Vertex) -> [dynamic]Vertex {
 	angle_dt: f32 = 0.001
 	rotation_matrix := glm.mat2 {
 		glm.cos(angle_dt),
