@@ -115,11 +115,11 @@ main :: proc() {
 	defer gl.DeleteBuffers(1, &line_ebo)
 	line_color: glm.vec3 = {1., 1., 1.}
 	line_vertices: [dynamic]render.Vertex = {
-		{{0., 0., 0.}, line_color},
-		{{0., 1., 0.}, line_color},
+		{{0.5, 0.5, 0.5}, line_color},
+		{{-0.5, 0.5, 0.5}, line_color},
 	}
 	line_indices: [dynamic]u16 = {0, 1}
-	
+
 
 	// Check for window events.
 	for (!glfw.WindowShouldClose(window) && render.running) {
@@ -133,30 +133,16 @@ main :: proc() {
 		// Update (rotate) the vertices every frame.
 		cube_vertices = render.update(cube_vertices)
 		point_vertices = render.update(point_vertices)
-		//line_vertices = render.update(line_vertices)
+		line_vertices = render.update(line_vertices)
 
-		// TODO: Find a way to use `BufferSubData` instead. Using `BufferData` works but reallocates memory.
-		// Rebind the updated vertices to the vertex buffer.
-		gl.BufferData(
-			gl.ARRAY_BUFFER,
-			len(cube_vertices) * size_of(render.Vertex),
-			raw_data(cube_vertices),
-			gl.STATIC_DRAW,
-		)
-
+		// CUBE
 		render.bind_data(cube_vao, cube_vbo, cube_ebo, cube_vertices, cube_indices)
 		render.draw_cube(cube_vertices[:])
 
 		gl.DisableVertexAttribArray(0)
 		gl.DisableVertexAttribArray(1)
 
-		gl.BufferData(
-			gl.ARRAY_BUFFER,
-			len(point_vertices) * size_of(render.Vertex),
-			raw_data(point_vertices),
-			gl.STATIC_DRAW,
-		)
-
+		// POINTS
 		render.bind_data(point_vao, point_vbo, point_ebo, point_vertices, cube_indices)
 		render.draw_points(point_vertices[:])
 
@@ -164,15 +150,8 @@ main :: proc() {
 		gl.DisableVertexAttribArray(1)
 
 		// LINES
-		gl.BufferData(
-			gl.ARRAY_BUFFER,
-			len(line_vertices) * size_of(render.Vertex),
-			raw_data(line_vertices),
-			gl.STATIC_DRAW,
-		)
-
 		render.bind_data(line_vao, line_vbo, line_ebo, line_vertices, cube_indices)
-		render.draw_lines(line_vertices[:])
+		render.draw_lines(line_indices[:])
 
 		gl.DisableVertexAttribArray(0)
 		gl.DisableVertexAttribArray(1)

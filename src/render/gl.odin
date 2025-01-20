@@ -39,16 +39,20 @@ draw_points :: proc(vertices: []Vertex) {
 	gl.DrawArrays(gl.POINTS, 0, i32(len(vertices)))
 }
 
-draw_lines :: proc(vertices: []Vertex) {
-	gl.DrawArrays(gl.LINE_STRIP, 0, i32(len(vertices)))
+draw_lines :: proc(vertices: []u16) {
+	gl.Enable(gl.DEPTH_TEST)
+	gl.DepthFunc(gl.LESS)
+	gl.Enable(gl.LINE_SMOOTH)
+	gl.LineWidth(10.)
+	// FIX: Replacing this with gl.DrawElements works, but does not render the lines.
+	gl.DrawArrays(gl.LINES, 0, i32(len(vertices)))
 }
 
 get_cube_objects :: proc() -> (u32, u32, u32) {
 	// Get Vertex arrays.
-	triangle_vao: u32
+	triangle_vao, triangle_vbo, triangle_ebo: u32
 	gl.GenVertexArrays(1, &triangle_vao)
 	// Get Vertex buffer objects, and Element Buffer Objects (?)
-	triangle_vbo, triangle_ebo: u32
 	gl.GenBuffers(1, &triangle_vbo)
 	gl.GenBuffers(1, &triangle_ebo)
 
@@ -57,10 +61,9 @@ get_cube_objects :: proc() -> (u32, u32, u32) {
 
 get_point_objects :: proc() -> (u32, u32, u32) {
 	// Get Vertex arrays.
-	point_vao: u32
+	point_vao, point_vbo, point_ebo: u32
 	gl.GenVertexArrays(1, &point_vao)
 	// Get Vertex buffer objects, and Element Buffer Objects (?)
-	point_vbo, point_ebo: u32
 	gl.GenBuffers(1, &point_vbo)
 	gl.GenBuffers(1, &point_ebo)
 
@@ -69,7 +72,7 @@ get_point_objects :: proc() -> (u32, u32, u32) {
 
 get_line_objects :: proc() -> (u32, u32, u32) {
 	line_vao, line_vbo, line_ebo: u32
-	gl.GenVertexArrays(n=1, arrays = &line_vao)
+	gl.GenVertexArrays(1, &line_vao)
 	gl.GenBuffers(1, &line_vao)
 	gl.GenBuffers(1, &line_ebo)
 
@@ -77,14 +80,10 @@ get_line_objects :: proc() -> (u32, u32, u32) {
 }
 
 // NOTE: VAO unused??? - Henock
-bind_data :: proc(
-	vao: u32,
-	vbo: u32,
-	ebo: u32,
-	data: [dynamic]Vertex,
-	indices: [dynamic]u16,
-) {
+bind_data :: proc(vao: u32, vbo: u32, ebo: u32, data: [dynamic]Vertex, indices: [dynamic]u16) {
 	// Bind vertices to vertex buffer.
+	// TODO: Find a way to use `BufferSubData` instead. Using `BufferData` works but reallocates memory.
+	// Rebind the updated vertices to the vertex buffer.
 	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
 	gl.BufferData(gl.ARRAY_BUFFER, len(data) * size_of(Vertex), raw_data(data), gl.STATIC_DRAW)
 	gl.EnableVertexAttribArray(0)
