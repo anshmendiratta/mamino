@@ -1,5 +1,3 @@
-#+feature dynamic-literals
-
 package render
 
 import "core:c"

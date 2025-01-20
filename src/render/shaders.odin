@@ -1,4 +1,3 @@
-
 package render
 
 vertex_shader := `
