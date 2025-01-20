@@ -39,6 +39,10 @@ draw_points :: proc(vertices: []Vertex) {
 	gl.DrawArrays(gl.POINTS, 0, i32(len(vertices)))
 }
 
+draw_lines :: proc(vertices: []Vertex) {
+	gl.DrawArrays(gl.LINE_STRIP, 0, i32(len(vertices)))
+}
+
 get_cube_objects :: proc() -> (u32, u32, u32) {
 	// Get Vertex arrays.
 	triangle_vao: u32
@@ -63,15 +67,25 @@ get_point_objects :: proc() -> (u32, u32, u32) {
 	return point_vao, point_vbo, point_ebo
 }
 
+get_line_objects :: proc() -> (u32, u32, u32) {
+	line_vao, line_vbo, line_ebo: u32
+	gl.GenVertexArrays(n=1, arrays = &line_vao)
+	gl.GenBuffers(1, &line_vao)
+	gl.GenBuffers(1, &line_ebo)
+
+	return line_vao, line_vbo, line_ebo
+}
+
+// NOTE: VAO unused??? - Henock
 bind_data :: proc(
-	cube_vao: u32,
-	cube_vbo: u32,
-	cube_ebo: u32,
+	vao: u32,
+	vbo: u32,
+	ebo: u32,
 	data: [dynamic]Vertex,
 	indices: [dynamic]u16,
 ) {
 	// Bind vertices to vertex buffer.
-	gl.BindBuffer(gl.ARRAY_BUFFER, cube_vbo)
+	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
 	gl.BufferData(gl.ARRAY_BUFFER, len(data) * size_of(Vertex), raw_data(data), gl.STATIC_DRAW)
 	gl.EnableVertexAttribArray(0)
 	gl.EnableVertexAttribArray(1)
@@ -79,7 +93,7 @@ bind_data :: proc(
 	gl.VertexAttribPointer(1, 3, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, color))
 
 	// Bind vertex array indices to index buffer.
-	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, cube_ebo)
+	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
 	gl.BufferData(
 		gl.ELEMENT_ARRAY_BUFFER,
 		len(indices) * size_of(u16),
