@@ -1,4 +1,5 @@
-package main
+
+package render
 
 vertex_shader := `
 	#version 410
