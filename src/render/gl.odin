@@ -13,29 +13,10 @@ Vertex :: struct {
 }
 
 update :: proc(vertices: []Vertex, uniforms: map[string]gl.Uniform_Info, time_s: f64) {
-	view := glm.mat4LookAt({1, 1, 1}, {0, 0, 0}, {0, 0, 1})
 	proj := glm.mat4Perspective(glm.radians_f32(45), 1.3, 0.1, 100.0)
-	rotation := glm.mat4Rotate({0, 0, 1.}, f32(time_s))
-	scale_scalar := f32(0.3)
-	scale := glm.mat4 {
-		scale_scalar,
-		0.,
-		0.,
-		0.,
-		0.,
-		scale_scalar,
-		0.,
-		0.,
-		0.,
-		0.,
-		scale_scalar,
-		0.,
-		0.,
-		0.,
-		0.,
-		1,
-	}
-	v_transform := proj * view * scale
+	scale := f32(0.3)
+	model := glm.mat4{scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., 1}
+	v_transform := proj * view * model
 	gl.UniformMatrix4fv(uniforms["v_transform"].location, 1, false, &v_transform[0, 0])
 }
 
@@ -60,28 +41,12 @@ draw_lines :: proc(vertices: []u16) {
 	gl.DrawArrays(gl.LINES, 0, i32(len(vertices)))
 }
 
-get_cube_objects :: proc() -> (u32, u32, u32) {
-	triangle_vao, triangle_vbo, triangle_ebo: u32
-	gl.GenVertexArrays(1, &triangle_vao)
-	gl.GenBuffers(1, &triangle_vbo)
-	gl.GenBuffers(1, &triangle_ebo)
-	return triangle_vao, triangle_vbo, triangle_ebo
-}
-
-get_point_objects :: proc() -> (u32, u32, u32) {
-	point_vao, point_vbo, point_ebo: u32
-	gl.GenVertexArrays(1, &point_vao)
-	gl.GenBuffers(1, &point_vbo)
-	gl.GenBuffers(1, &point_ebo)
-	return point_vao, point_vbo, point_ebo
-}
-
-get_line_objects :: proc() -> (u32, u32, u32) {
-	line_vao, line_vbo, line_ebo: u32
-	gl.GenVertexArrays(1, &line_vao)
-	gl.GenBuffers(1, &line_vbo)
-	gl.GenBuffers(1, &line_ebo)
-	return line_vao, line_vbo, line_ebo
+get_buffer_objects :: proc() -> (u32, u32, u32) {
+	vao, vbo, ebo: u32
+	gl.GenVertexArrays(1, &vao)
+	gl.GenBuffers(1, &vbo)
+	gl.GenBuffers(1, &ebo)
+	return vao, vbo, ebo
 }
 
 // NOTE: VAO unused??? - Henock

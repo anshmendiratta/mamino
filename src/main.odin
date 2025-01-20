@@ -35,7 +35,7 @@ main :: proc() {
 	defer delete(uniforms)
 
 	// Initialize cube.
-	cube_vao, cube_vbo, cube_ebo := render.get_cube_objects()
+	cube_vao, cube_vbo, cube_ebo := render.get_buffer_objects()
 	defer gl.DeleteVertexArrays(1, &cube_vao)
 	defer gl.DeleteBuffers(1, &cube_vbo)
 	defer gl.DeleteBuffers(1, &cube_ebo)
@@ -43,13 +43,13 @@ main :: proc() {
 	// Initialize points.
 	// TODO: figure out why points rely on indexed drawing if
 	// draw_points does not rely on EBO
-	point_vao, point_vbo, point_ebo := render.get_point_objects()
+	point_vao, point_vbo, point_ebo := render.get_buffer_objects()
 	defer gl.DeleteVertexArrays(1, &point_vao)
 	defer gl.DeleteBuffers(1, &point_vbo)
 	defer gl.DeleteBuffers(1, &point_ebo)
 
 	// Initialize lines.
-	line_vao, line_vbo, line_ebo := render.get_line_objects()
+	line_vao, line_vbo, line_ebo := render.get_buffer_objects()
 	defer gl.DeleteVertexArrays(1, &line_vao)
 	defer gl.DeleteBuffers(1, &line_vbo)
 	defer gl.DeleteBuffers(1, &line_ebo)
@@ -78,8 +78,8 @@ main :: proc() {
 		render.draw_points(point_vertices[:])
 
 		// Lines.
-		render.bind_data(line_vbo, line_ebo, line_vertices, line_indices)
-		render.draw_lines(line_indices[:])
+		// render.bind_data(line_vbo, line_ebo, line_vertices, line_indices)
+		// render.draw_lines(line_indices[:])
 
 		// NOTE: Defaults to double buffering I think? - Ansh
 		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering

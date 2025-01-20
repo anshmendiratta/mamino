@@ -3,6 +3,7 @@ package render
 import "core:c"
 import "core:fmt"
 
+import glm "core:math/linalg/glsl"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
 
@@ -67,14 +68,24 @@ mamino_create_window :: proc() -> glfw.WindowHandle {
 mamino_exit :: proc() {
 }
 
-// Called when glfw keystate changes
 key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
 	if key == glfw.KEY_ESCAPE || key == glfw.KEY_Q {
 		running = false
 	}
+	if key == glfw.KEY_W || key == glfw.KEY_UP {
+		camera_position += camera_front * camera_speed
+	}
+	if key == glfw.KEY_S || key == glfw.KEY_DOWN {
+		camera_position -= camera_front * camera_speed
+	}
+	if key == glfw.KEY_A || key == glfw.KEY_LEFT {
+		camera_position -= camera_speed * glm.normalize(glm.cross(camera_front, camera_up))
+	}
+	if key == glfw.KEY_D || key == glfw.KEY_RIGHT {
+		camera_position += camera_speed * glm.normalize(glm.cross(camera_front, camera_up))
+	}
 }
 
-// Called when glfw window changes size
 size_callback :: proc "c" (window: glfw.WindowHandle, width, height: i32) {
 	gl.Viewport(0, 0, width, height)
 }

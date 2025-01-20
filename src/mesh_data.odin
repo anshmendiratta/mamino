@@ -65,7 +65,7 @@ cube_indices: []u16 = {
 }
 
 
-point_color: glm.vec3 = rgb_hex_to_color(0xF8_03_FC)
+point_color: glm.vec3 = rgb_hex_to_color(0xFF_FF_FF)
 // assuming LHS (openGL is usually in a RHS but due to device normalization it is in a LHS (?))
 point_vertices: []render.Vertex = {
 	{
