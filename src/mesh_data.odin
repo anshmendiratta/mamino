@@ -105,14 +105,38 @@ point_indices: []u16 = {0, 1, 2, 3, 4, 5, 6, 7}
 
 line_color: glm.vec3 = {1., 1., 1.}
 line_vertices: []render.Vertex = {
-	{{1.0, 1.0, 1.0}, line_color},
-	{{-1.0, 1.0, 1.0}, line_color},
-	{{-1.0, -1.0, 1.0}, line_color},
-	{{1.0, -1.0, 1.0}, line_color},
-	{{1.0, 1.0, -1.0}, line_color},
-	{{-1.0, 1.0, -1.0}, line_color},
-	{{-1.0, -1.0, -1.0}, line_color},
-	{{1.0, -1.0, -1.0}, line_color},
+	{
+		{1.0, 1.0, 1.0},
+		line_color, /* colors[0] */
+	}, // right    top  back
+	{
+		{-1.0, 1.0, 1.0},
+		line_color, /* colors[1] */
+	}, //  left    top  back
+	{
+		{1.0, -1.0, 1.0},
+		line_color, /* colors[2] */
+	}, // right bottom  back
+	{
+		{1.0, 1.0, -1.0},
+		line_color, /* colors[3] */
+	}, // right    top front
+	{
+		{-1.0, -1.0, 1.0},
+		line_color, /* colors[4] */
+	}, //  left bottom  back
+	{
+		{1.0, -1.0, -1.0},
+		line_color, /* colors[5] */
+	}, // right bottom front
+	{
+		{-1.0, 1.0, -1.0},
+		line_color, /* colors[6] */
+	}, //  left    top front
+	{
+		{-1.0, -1.0, -1.0},
+		line_color, /* colors[7] */
+	}, //  left bottom front
 }
-line_indices: []u16 = {0, 1, 2, 3}
+line_indices: []u16 = {0, 1, 2}
 

@@ -14,7 +14,7 @@ Vertex :: struct {
 
 update :: proc(vertices: []Vertex, uniforms: map[string]gl.Uniform_Info, time_s: f64) {
 	view := glm.mat4LookAt({1, 1, 1}, {0, 0, 0}, {0, 0, 1})
-	proj := glm.mat4Perspective(45, 1.3, 0.1, 100.0)
+	proj := glm.mat4Perspective(glm.radians_f32(45), 1.3, 0.1, 100.0)
 	rotation := glm.mat4Rotate({0, 0, 1.}, f32(time_s))
 	scale_scalar := f32(0.3)
 	scale := glm.mat4 {
@@ -35,12 +35,11 @@ update :: proc(vertices: []Vertex, uniforms: map[string]gl.Uniform_Info, time_s:
 		0.,
 		1,
 	}
-	v_transform := proj * view * scale * rotation
+	v_transform := proj * view * scale
 	gl.UniformMatrix4fv(uniforms["v_transform"].location, 1, false, &v_transform[0, 0])
 }
 
 draw_cube :: proc(indices: []u16) {
-	gl.Enable(gl.DEPTH_TEST)
 	// TODO: figure out why setting to gl.GREATER results in no output on screen
 	// NOTE: This is because it checks for the depth that our fragment shader stores to be greater than whatever the incoming depth value is. In our case, we define the depth to be `1.0` in our vertex shader (in the vec4 conversion), which is the max value, so the frag shader always sees that its own depth value is <= the given value, meaning the fragment does not pass the depth check, and so is not rendered.
 	// - Ansh
@@ -55,7 +54,6 @@ draw_points :: proc(vertices: []Vertex) {
 }
 
 draw_lines :: proc(vertices: []u16) {
-	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
 	gl.LineWidth(10.)
