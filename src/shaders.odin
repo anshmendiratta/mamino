@@ -10,6 +10,7 @@ vertex_shader := `
 
 	void main() {
 		gl_Position = vec4(position, 1.0);
+		gl_PointSize = 10.;
 		v_coord = position;
 		f_color = color;
 	}
@@ -27,3 +28,4 @@ fragment_shader := `
 		out_color = f_color;
 	}
 `
+
