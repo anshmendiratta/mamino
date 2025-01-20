@@ -17,23 +17,28 @@ Vertex :: struct {
 update :: proc(vertices: [dynamic]Vertex, uniforms: map[string]gl.Uniform_Info, time_s: f64) {
 	view := glm.mat4LookAt({0, -1, +1}, {0, 1, 0}, {0, 0, 1})
 	proj := glm.mat4Perspective(90, 1.3, 0.1, 100.0)
-	rotation := glm.mat4Rotate({0.5, 0.5, 1.}, f32(time_s))
-	camera_pos := glm.mat4LookAt(
-		glm.vec3{1.0, 1.0, 1.0},
-		glm.vec3{0., 0., 0.},
-		glm.vec3{0.0, 0.0, 1.0},
-	)
-	scale := glm.mat3{0.5, 0., 0., 0., 0.5, 0., 0., 0., 0.5}
-
-	// for &vertex, idx in vertices {
-	// 	x, y, z := vertex.position.x, vertex.position.y, vertex.position.z
-	// 	vertex.position = (glm.vec4{x, y, z, 1.0} * transform).xyz
-	// }
-
-	v_transform := rotation
+	rotation := glm.mat4Rotate({1., 1., 1.}, f32(time_s))
+	scale_scalar := f32(0.2)
+	scale := glm.mat4 {
+		scale_scalar,
+		0.,
+		0.,
+		0.,
+		0.,
+		scale_scalar,
+		0.,
+		0.,
+		0.,
+		0.,
+		scale_scalar,
+		0.,
+		0.,
+		0.,
+		0.,
+		1,
+	}
+	v_transform := rotation * scale
 	gl.UniformMatrix4fv(uniforms["v_transform"].location, 1, false, &v_transform[0, 0])
-
-	// return vertices
 }
 
 draw_cube :: proc(vertices: []Vertex) {
@@ -53,7 +58,6 @@ draw_lines :: proc(vertices: []u16) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
 	gl.LineWidth(10.)
-	// FIX: Replacing this with gl.DrawElements works, but does not render the lines.
 	gl.DrawArrays(gl.LINES, 0, i32(len(vertices)))
 }
 
