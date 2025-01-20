@@ -117,23 +117,32 @@ main :: proc() {
 	line_vertices: [dynamic]render.Vertex = {
 		{{0.5, 0.5, 0.5}, line_color},
 		{{-0.5, 0.5, 0.5}, line_color},
+		{{-0.5, -0.5, 0.5}, line_color},
+		{{0.5, -0.5, 0.5}, line_color},
+		{{0.5, 0.5, -0.5}, line_color},
+		{{-0.5, 0.5, -0.5}, line_color},
+		{{-0.5, -0.5, -0.5}, line_color},
+		{{0.5, -0.5, -0.5}, line_color},
 	}
-	line_indices: [dynamic]u16 = {0, 1}
+	line_indices: [dynamic]u16 = {0, 1, 2, 3}
 
-
+	time_init := time.tick_now()
 	// Check for window events.
 	for (!glfw.WindowShouldClose(window) && render.running) {
 		// https://www.glfw.org/docs/3.3/group__window.html#ga37bd57223967b4211d60ca1a0bf3c832
 		glfw.PollEvents()
+
+		time_ticks := time.tick_since(time_init)
+		time_s := time.duration_seconds(time.Duration(time_ticks))
 
 		// Clear the screen with some color. RGBA values are normalized to be within [0.0, 1.0].
 		gl.ClearColor(0.1, 0.1, 0.1, 1.0)
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 		// Update (rotate) the vertices every frame.
-		cube_vertices = render.update(cube_vertices)
-		point_vertices = render.update(point_vertices)
-		line_vertices = render.update(line_vertices)
+		render.update(cube_vertices, uniforms, time_s)
+		render.update(point_vertices, uniforms, time_s)
+		render.update(line_vertices, uniforms, time_s)
 
 		// CUBE
 		render.bind_data(cube_vao, cube_vbo, cube_ebo, cube_vertices, cube_indices)
@@ -143,14 +152,14 @@ main :: proc() {
 		gl.DisableVertexAttribArray(1)
 
 		// POINTS
-		render.bind_data(point_vao, point_vbo, point_ebo, point_vertices, cube_indices)
+		render.bind_data(point_vao, point_vbo, point_ebo, point_vertices, point_indices)
 		render.draw_points(point_vertices[:])
 
 		gl.DisableVertexAttribArray(0)
 		gl.DisableVertexAttribArray(1)
 
 		// LINES
-		render.bind_data(line_vao, line_vbo, line_ebo, line_vertices, cube_indices)
+		render.bind_data(line_vao, line_vbo, line_ebo, line_vertices, line_indices)
 		render.draw_lines(line_indices[:])
 
 		gl.DisableVertexAttribArray(0)

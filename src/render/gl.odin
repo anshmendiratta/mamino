@@ -14,17 +14,26 @@ Vertex :: struct {
 	color:    glm.vec3,
 }
 
-update :: proc(vertices: [dynamic]Vertex) -> [dynamic]Vertex {
-	angle: f32 = 0.01
+update :: proc(vertices: [dynamic]Vertex, uniforms: map[string]gl.Uniform_Info, time_s: f64) {
 	view := glm.mat4LookAt({0, -1, +1}, {0, 1, 0}, {0, 0, 1})
-	proj := glm.mat4Perspective(90, 2.0, 0.1, 100.0)
+	proj := glm.mat4Perspective(90, 1.3, 0.1, 100.0)
+	rotation := glm.mat4Rotate({0.5, 0.5, 1.}, f32(time_s))
+	camera_pos := glm.mat4LookAt(
+		glm.vec3{1.0, 1.0, 1.0},
+		glm.vec3{0., 0., 0.},
+		glm.vec3{0.0, 0.0, 1.0},
+	)
 	scale := glm.mat3{0.5, 0., 0., 0., 0.5, 0., 0., 0., 0.5}
-	for &vertex, idx in vertices {
-		vertex.position =
-			(glm.vec4{vertex.position.x, vertex.position.y, vertex.position.z, 1.0} * glm.mat4Rotate({0.5, 0.5, 1.}, angle)).xyz
-	}
 
-	return vertices
+	// for &vertex, idx in vertices {
+	// 	x, y, z := vertex.position.x, vertex.position.y, vertex.position.z
+	// 	vertex.position = (glm.vec4{x, y, z, 1.0} * transform).xyz
+	// }
+
+	v_transform := rotation
+	gl.UniformMatrix4fv(uniforms["v_transform"].location, 1, false, &v_transform[0, 0])
+
+	// return vertices
 }
 
 draw_cube :: proc(vertices: []Vertex) {
@@ -60,8 +69,8 @@ get_cube_objects :: proc() -> (u32, u32, u32) {
 }
 
 get_point_objects :: proc() -> (u32, u32, u32) {
-	// Get Vertex arrays.
 	point_vao, point_vbo, point_ebo: u32
+	// Get Vertex arrays.
 	gl.GenVertexArrays(1, &point_vao)
 	// Get Vertex buffer objects, and Element Buffer Objects (?)
 	gl.GenBuffers(1, &point_vbo)
@@ -72,8 +81,10 @@ get_point_objects :: proc() -> (u32, u32, u32) {
 
 get_line_objects :: proc() -> (u32, u32, u32) {
 	line_vao, line_vbo, line_ebo: u32
+	// Get Vertex arrays.
 	gl.GenVertexArrays(1, &line_vao)
-	gl.GenBuffers(1, &line_vao)
+	// Get Vertex buffer objects, and Element Buffer Objects (?)
+	gl.GenBuffers(1, &line_vbo)
 	gl.GenBuffers(1, &line_ebo)
 
 	return line_vao, line_vbo, line_ebo
