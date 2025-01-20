@@ -1,5 +1,3 @@
-#+feature dynamic-literals
-
 package render
 
 import "core:c"
@@ -14,7 +12,7 @@ Vertex :: struct {
 	color:    glm.vec3,
 }
 
-update :: proc(vertices: [dynamic]Vertex) -> [dynamic]Vertex {
+update :: proc(vertices: []Vertex) -> []Vertex {
 	angle: f32 = 0.01
 	view := glm.mat4LookAt({0, -1, +1}, {0, 1, 0}, {0, 0, 1})
 	proj := glm.mat4Perspective(90, 2.0, 0.1, 100.0)
@@ -27,10 +25,11 @@ update :: proc(vertices: [dynamic]Vertex) -> [dynamic]Vertex {
 	return vertices
 }
 
-draw_cube :: proc(vertices: []Vertex) {
+draw_cube :: proc(indices: []u16) {
 	gl.Enable(gl.DEPTH_TEST)
+	// todo: figure out why setting to gl.GREATER results in no output on screen
 	gl.DepthFunc(gl.LESS)
-	gl.DrawArrays(gl.TRIANGLES, 0, i32(len(vertices)))
+	gl.DrawElements(gl.TRIANGLES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 
 draw_points :: proc(vertices: []Vertex) {
@@ -39,38 +38,23 @@ draw_points :: proc(vertices: []Vertex) {
 	gl.DrawArrays(gl.POINTS, 0, i32(len(vertices)))
 }
 
-get_cube_objects :: proc() -> (u32, u32, u32) {
-	// Get Vertex arrays.
-	triangle_vao: u32
-	gl.GenVertexArrays(1, &triangle_vao)
-	// Get Vertex buffer objects, and Element Buffer Objects (?)
-	triangle_vbo, triangle_ebo: u32
-	gl.GenBuffers(1, &triangle_vbo)
-	gl.GenBuffers(1, &triangle_ebo)
-
-	return triangle_vao, triangle_vbo, triangle_ebo
-}
-
-get_point_objects :: proc() -> (u32, u32, u32) {
-	// Get Vertex arrays.
-	point_vao: u32
-	gl.GenVertexArrays(1, &point_vao)
-	// Get Vertex buffer objects, and Element Buffer Objects (?)
-	point_vbo, point_ebo: u32
-	gl.GenBuffers(1, &point_vbo)
-	gl.GenBuffers(1, &point_ebo)
-
-	return point_vao, point_vbo, point_ebo
+get_objects :: proc() -> (vao: u32, vbo: u32, ebo: u32) {
+	gl.GenVertexArrays(1, &vao)
+	gl.GenBuffers(1, &vbo)
+	gl.GenBuffers(1, &ebo)
+	return
 }
 
 bind_data :: proc(
 	cube_vao: u32,
 	cube_vbo: u32,
 	cube_ebo: u32,
-	data: [dynamic]Vertex,
-	indices: [dynamic]u16,
+	data: []Vertex,
+	indices: []u16,
 ) {
 	// Bind vertices to vertex buffer.
+	gl.BindVertexArray(cube_vao)
+
 	gl.BindBuffer(gl.ARRAY_BUFFER, cube_vbo)
 	gl.BufferData(gl.ARRAY_BUFFER, len(data) * size_of(Vertex), raw_data(data), gl.STATIC_DRAW)
 	gl.EnableVertexAttribArray(0)
@@ -78,13 +62,7 @@ bind_data :: proc(
 	gl.VertexAttribPointer(0, 3, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, position))
 	gl.VertexAttribPointer(1, 3, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, color))
 
-	// Bind vertex array indices to index buffer.
 	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, cube_ebo)
-	gl.BufferData(
-		gl.ELEMENT_ARRAY_BUFFER,
-		len(indices) * size_of(u16),
-		raw_data(indices),
-		gl.STATIC_DRAW,
-	)
+	gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(indices) * size_of(u16), raw_data(indices), gl.STATIC_DRAW)
 }
 

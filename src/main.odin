@@ -1,5 +1,3 @@
-#+feature dynamic-literals
-
 package main
 
 import "core:c"
@@ -31,82 +29,75 @@ main :: proc() {
 	gl.UseProgram(program)
 	defer gl.DeleteProgram(program)
 
+	gl.Enable(gl.DEPTH_TEST)
+	// debug to see wireframe of cube
+	// gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
+
+	// TODO: unsure why we are getting uniforms if not using uniforms in shaders currently
 	// Uniforms.
-	uniforms := gl.get_uniforms_from_program(program)
-	defer delete(uniforms)
+	// uniforms := gl.get_uniforms_from_program(program)
+	// defer delete(uniforms)
 
 	// Initialize cube.
-	cube_vao, cube_vbo, cube_ebo := render.get_cube_objects()
+	cube_vao, cube_vbo, cube_ebo := render.get_objects()
 	defer gl.DeleteVertexArrays(1, &cube_vao)
 	defer gl.DeleteBuffers(1, &cube_vbo)
 	defer gl.DeleteBuffers(1, &cube_ebo)
-	cube_colors: [dynamic]glm.vec3 = generate_n_colors(36)
-	vertex_color: glm.vec3
-	cube_indices: [dynamic]u16
-	cube_vertices: [dynamic]render.Vertex = {
-		{{-0.5, -0.5, -0.5}, vertex_color},
-		{{-0.5, -0.5, 0.5}, vertex_color},
-		{{-0.5, 0.5, 0.5}, vertex_color},
-		{{0.5, 0.5, -0.5}, vertex_color},
-		{{-0.5, -0.5, -0.5}, vertex_color},
-		{{-0.5, 0.5, -0.5}, vertex_color},
-		{{0.5, -0.5, 0.5}, vertex_color},
-		{{-0.5, -0.5, -0.5}, vertex_color},
-		{{0.5, -0.5, -0.5}, vertex_color},
-		{{0.5, 0.5, -0.5}, vertex_color},
-		{{0.5, -0.5, -0.5}, vertex_color},
-		{{-0.5, -0.5, -0.5}, vertex_color},
-		{{-0.5, -0.5, -0.5}, vertex_color},
-		{{-0.5, 0.5, 0.5}, vertex_color},
-		{{-0.5, 0.5, -0.5}, vertex_color},
-		{{0.5, -0.5, 0.5}, vertex_color},
-		{{-0.5, -0.5, 0.5}, vertex_color},
-		{{-0.5, -0.5, -0.5}, vertex_color},
-		{{-0.5, 0.5, 0.5}, vertex_color},
-		{{-0.5, -0.5, 0.5}, vertex_color},
-		{{0.5, -0.5, 0.5}, vertex_color},
-		{{0.5, 0.5, 0.5}, vertex_color},
-		{{0.5, -0.5, -0.5}, vertex_color},
-		{{0.5, 0.5, -0.5}, vertex_color},
-		{{0.5, -0.5, -0.5}, vertex_color},
-		{{0.5, 0.5, 0.5}, vertex_color},
-		{{0.5, -0.5, 0.5}, vertex_color},
-		{{0.5, 0.5, 0.5}, vertex_color},
-		{{0.5, 0.5, -0.5}, vertex_color},
-		{{-0.5, 0.5, -0.5}, vertex_color},
-		{{0.5, 0.5, 0.5}, vertex_color},
-		{{-0.5, 0.5, -0.5}, vertex_color},
-		{{-0.5, 0.5, 0.5}, vertex_color},
-		{{0.5, 0.5, 0.5}, vertex_color},
-		{{-0.5, 0.5, 0.5}, vertex_color},
-		{{0.5, -0.5, 0.5}, vertex_color},
-	}
-	{
-		for color, idx in cube_colors {
-			cube_vertices[idx].color = color
-		}
-		for index in 0 ..< 36 {
-			append(&cube_indices, u16(index))
-		}
+
+	colors: []glm.vec3 = {
+		rgb_hex_to_color(0xD3_47_3D), // red
+		rgb_hex_to_color(0xF5_EF_EB), // white
+		rgb_hex_to_color(0xF6_AD_0F), // orange
+		rgb_hex_to_color(0x31_6A_96), // blue
+		rgb_hex_to_color(0x2E_24_3F), // purple
+		rgb_hex_to_color(0x86_BC_D1), // light blue
+		rgb_hex_to_color(0xFC_D7_03), // yellow
+		rgb_hex_to_color(0x03_FC_13), // green
 	}
 
 	// Initialize points.
-	point_vao, point_vbo, point_ebo := render.get_point_objects()
+	point_vao, point_vbo, point_ebo := render.get_objects()
 	defer gl.DeleteVertexArrays(1, &point_vao)
 	defer gl.DeleteBuffers(1, &point_vbo)
 	defer gl.DeleteBuffers(1, &point_ebo)
-	point_color: glm.vec3 = {1., 1., 1.}
-	point_vertices: [dynamic]render.Vertex = {
-		{{0.5, 0.5, 0.5}, point_color},
-		{{-0.5, 0.5, 0.5}, point_color},
-		{{0.5, -0.5, 0.5}, point_color},
-		{{0.5, 0.5, -0.5}, point_color},
-		{{-0.5, -0.5, 0.5}, point_color},
-		{{0.5, -0.5, -0.5}, point_color},
-		{{-0.5, 0.5, -0.5}, point_color},
-		{{-0.5, -0.5, -0.5}, point_color},
+
+	point_color: glm.vec3 = rgb_hex_to_color(0xF8_03_FC)
+	
+	// assuming LHS (openGL is usually in a RHS but due to device normalization it is in a LHS (?))
+	point_vertices: []render.Vertex = {
+		{{ 0.5,  0.5,  0.5}, point_color /* colors[0] */}, // right    top  back
+		{{-0.5,  0.5,  0.5}, point_color /* colors[1] */}, //  left    top  back
+		{{ 0.5, -0.5,  0.5}, point_color /* colors[2] */}, // right bottom  back
+		{{ 0.5,  0.5, -0.5}, point_color /* colors[3] */}, // right    top front
+		{{-0.5, -0.5,  0.5}, point_color /* colors[4] */}, //  left bottom  back
+		{{ 0.5, -0.5, -0.5}, point_color /* colors[5] */}, // right bottom front
+		{{-0.5,  0.5, -0.5}, point_color /* colors[6] */}, //  left    top front
+		{{-0.5, -0.5, -0.5}, point_color /* colors[7] */}, //  left bottom front
 	}
-	point_indices: [dynamic]u16 = {0, 1, 2, 3, 4, 5, 6, 7}
+	// todo: figure out why points rely on indexed drawing if
+	// draw_points does not rely on EBO
+	point_indices: []u16 = {0, 1, 2, 3, 4, 5, 6, 7}
+
+	// assuming LHS (openGL is usually in a RHS but due to device normalization it is in a LHS (?))
+	cube_vertices: []render.Vertex = {
+		{{ 0.5,  0.5,  0.5}, colors[0]}, // right    top  back
+		{{-0.5,  0.5,  0.5}, colors[1]}, //  left    top  back
+		{{ 0.5, -0.5,  0.5}, colors[2]}, // right bottom  back
+		{{ 0.5,  0.5, -0.5}, colors[3]}, // right    top front
+		{{-0.5, -0.5,  0.5}, colors[4]}, //  left bottom  back
+		{{ 0.5, -0.5, -0.5}, colors[5]}, // right bottom front
+		{{-0.5,  0.5, -0.5}, colors[6]}, //  left    top front
+		{{-0.5, -0.5, -0.5}, colors[7]}, //  left bottom front
+	}
+	// creating each face with two triangles and using indexed drawing to do so
+	cube_indices: []u16 = {
+		0, 1, 2, 2, 4, 1, // back face
+		3, 6, 5, 5, 7, 6, // front face
+		0, 1, 3, 3, 6, 1, // top face
+		2, 4, 5, 5, 7, 4, // bottom face
+		1, 6, 4, 4, 7, 6, // left face
+		0, 3, 2, 2, 5, 3, // right face
+	}
 
 	// Check for window events.
 	for (!glfw.WindowShouldClose(window) && render.running) {
@@ -121,27 +112,31 @@ main :: proc() {
 		cube_vertices = render.update(cube_vertices)
 		point_vertices = render.update(point_vertices)
 
+		// TODO: unsure why this is still here as they shouldn't be needed
+		
 		// TODO: Find a way to use `BufferSubData` instead. Using `BufferData` works but reallocates memory.
 		// Rebind the updated vertices to the vertex buffer.
-		gl.BufferData(
-			gl.ARRAY_BUFFER,
-			len(cube_vertices) * size_of(render.Vertex),
-			raw_data(cube_vertices),
-			gl.STATIC_DRAW,
-		)
+		// gl.BufferData(
+		// 	gl.ARRAY_BUFFER,
+		// 	len(cube_vertices) * size_of(render.Vertex),
+		// 	raw_data(cube_vertices),
+		// 	gl.STATIC_DRAW,
+		// )
 
 		render.bind_data(cube_vao, cube_vbo, cube_ebo, cube_vertices, cube_indices)
-		render.draw_cube(cube_vertices[:])
+		render.draw_cube(cube_indices[:])
 
 		gl.DisableVertexAttribArray(0)
 		gl.DisableVertexAttribArray(1)
 
-		gl.BufferData(
-			gl.ARRAY_BUFFER,
-			len(point_vertices) * size_of(render.Vertex),
-			raw_data(point_vertices),
-			gl.STATIC_DRAW,
-		)
+		// TODO: unsure why this is still here as they shouldn't be needed
+
+		// gl.BufferData(
+		// 	gl.ARRAY_BUFFER,
+		// 	len(point_vertices) * size_of(render.Vertex),
+		// 	raw_data(point_vertices),
+		// 	gl.STATIC_DRAW,
+		// )
 
 		render.bind_data(point_vao, point_vbo, point_ebo, point_vertices, cube_indices)
 		render.draw_points(point_vertices[:])
