@@ -45,16 +45,12 @@ get_objects :: proc() -> (vao: u32, vbo: u32, ebo: u32) {
 	return
 }
 
-bind_data :: proc(
-	cube_vao: u32,
-	cube_vbo: u32,
-	cube_ebo: u32,
-	data: []Vertex,
-	indices: []u16,
-) {
+bind_data :: proc(cube_vao: u32, cube_vbo: u32, cube_ebo: u32, data: []Vertex, indices: []u16) {
 	// Bind vertices to vertex buffer.
 	gl.BindVertexArray(cube_vao)
 
+	// TODO: Find a way to use `BufferSubData` instead. Using `BufferData` works but reallocates memory.
+	// Rebind the updated vertices to the vertex buffer.
 	gl.BindBuffer(gl.ARRAY_BUFFER, cube_vbo)
 	gl.BufferData(gl.ARRAY_BUFFER, len(data) * size_of(Vertex), raw_data(data), gl.STATIC_DRAW)
 	gl.EnableVertexAttribArray(0)
@@ -63,6 +59,11 @@ bind_data :: proc(
 	gl.VertexAttribPointer(1, 3, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, color))
 
 	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, cube_ebo)
-	gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(indices) * size_of(u16), raw_data(indices), gl.STATIC_DRAW)
+	gl.BufferData(
+		gl.ELEMENT_ARRAY_BUFFER,
+		len(indices) * size_of(u16),
+		raw_data(indices),
+		gl.STATIC_DRAW,
+	)
 }
 
