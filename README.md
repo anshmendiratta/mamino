@@ -8,7 +8,9 @@ To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and co
 - glfw
 
 ## Goals
-- [ ] Render vertices as points (respecting z-index)
+- [x] Render vertices as points (respecting z-index)
+- [x] Render cubes using indexed drawing
+- [ ] Move to MVP translation matrices
 - [ ] Render edges as lines (respecting z-index)
 - [ ] Render coordinate axes
 - [ ] Add perspective to renders

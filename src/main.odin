@@ -1,5 +1,3 @@
-#+feature dynamic-literals
-
 package main
 
 import "core:c"
@@ -10,47 +8,20 @@ import "core:time"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
 
-
-// Called when glfw keystate changes
-key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
-	if key == glfw.KEY_ESCAPE || key == glfw.KEY_Q {
-		running = false
-	}
-}
-
-// Called when glfw window changes size
-size_callback :: proc "c" (window: glfw.WindowHandle, width, height: i32) {
-	gl.Viewport(0, 0, width, height)
-}
-
-PROGRAM_NAME :: "mamino"
-
-// Default values for not-MacOS.
-GL_MAJOR_VERSION: c.int : 4
-GL_MINOR_VERSION :: 6
-
-WINDOW_WIDTH :: 512
-WINDOW_HEIGHT :: 512
-
-running: b32 = true
-
-Vertex :: struct {
-	position: glm.vec3,
-	color:    glm.vec3,
-}
+import "render"
 
 main :: proc() {
-	mamino_init()
+	render.mamino_init()
 	// NOTE: `defer`s are executed in reverse, like popping from a stack.
 	// https://odin-lang.org/docs/overview/#defer-statement
 	// https://www.glfw.org/docs/3.1/group__init.html#gaaae48c0a18607ea4a4ba951d939f0901
 	defer glfw.Terminate()
 
-	window := mamino_create_window()
+	window := render.mamino_create_window()
 	defer glfw.DestroyWindow(window)
 
 	// Load shaders.
-	program, ok := gl.load_shaders_source(vertex_shader, fragment_shader)
+	program, ok := gl.load_shaders_source(render.vertex_shader, render.fragment_shader)
 	if !ok {
 		fmt.eprintln("Could not load shaders.")
 		return
@@ -58,97 +29,78 @@ main :: proc() {
 	gl.UseProgram(program)
 	defer gl.DeleteProgram(program)
 
+	gl.Enable(gl.DEPTH_TEST)
+	// debug to see wireframe of cube
+	// gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
+
+	// TODO: unsure why we are getting uniforms if not using uniforms in shaders currently
 	// Uniforms.
-	uniforms := gl.get_uniforms_from_program(program)
-	defer delete(uniforms)
+	// uniforms := gl.get_uniforms_from_program(program)
+	// defer delete(uniforms)
 
-	// Get Vertex arrays.
-	triangle_vao: u32
-	gl.GenVertexArrays(1, &triangle_vao)
-	defer gl.DeleteVertexArrays(1, &triangle_vao)
+	// Initialize cube.
+	cube_vao, cube_vbo, cube_ebo := render.get_objects()
+	defer gl.DeleteVertexArrays(1, &cube_vao)
+	defer gl.DeleteBuffers(1, &cube_vbo)
+	defer gl.DeleteBuffers(1, &cube_ebo)
 
-	// Get Vertex buffer objects, and eto (?).
-	triangle_vbo, triangle_ebo: u32
-	gl.GenBuffers(1, &triangle_vbo)
-	gl.GenBuffers(1, &triangle_ebo)
-	defer gl.DeleteBuffers(1, &triangle_vbo)
-	defer gl.DeleteBuffers(1, &triangle_ebo)
-
-	// Initialize polygon.
-	polygon_color: [dynamic]glm.vec3 = generate_n_colors(36)
-	vertex_color: glm.vec3 = {0.8, 0.2, 1.0}
-	vertices: [dynamic]Vertex = {
-		{{-0.5, -0.5, -0.5}, vertex_color},
-		{{-0.5, -0.5, 0.5}, vertex_color},
-		{{-0.5, 0.5, 0.5}, vertex_color},
-		{{0.5, 0.5, -0.5}, vertex_color},
-		{{-0.5, -0.5, -0.5}, vertex_color},
-		{{-0.5, 0.5, -0.5}, vertex_color},
-		{{0.5, -0.5, 0.5}, vertex_color},
-		{{-0.5, -0.5, -0.5}, vertex_color},
-		{{0.5, -0.5, -0.5}, vertex_color},
-		{{0.5, 0.5, -0.5}, vertex_color},
-		{{0.5, -0.5, -0.5}, vertex_color},
-		{{-0.5, -0.5, -0.5}, vertex_color},
-		{{-0.5, -0.5, -0.5}, vertex_color},
-		{{-0.5, 0.5, 0.5}, vertex_color},
-		{{-0.5, 0.5, -0.5}, vertex_color},
-		{{0.5, -0.5, 0.5}, vertex_color},
-		{{-0.5, -0.5, 0.5}, vertex_color},
-		{{-0.5, -0.5, -0.5}, vertex_color},
-		{{-0.5, 0.5, 0.5}, vertex_color},
-		{{-0.5, -0.5, 0.5}, vertex_color},
-		{{0.5, -0.5, 0.5}, vertex_color},
-		{{0.5, 0.5, 0.5}, vertex_color},
-		{{0.5, -0.5, -0.5}, vertex_color},
-		{{0.5, 0.5, -0.5}, vertex_color},
-		{{0.5, -0.5, -0.5}, vertex_color},
-		{{0.5, 0.5, 0.5}, vertex_color},
-		{{0.5, -0.5, 0.5}, vertex_color},
-		{{0.5, 0.5, 0.5}, vertex_color},
-		{{0.5, 0.5, -0.5}, vertex_color},
-		{{-0.5, 0.5, -0.5}, vertex_color},
-		{{0.5, 0.5, 0.5}, vertex_color},
-		{{-0.5, 0.5, -0.5}, vertex_color},
-		{{-0.5, 0.5, 0.5}, vertex_color},
-		{{0.5, 0.5, 0.5}, vertex_color},
-		{{-0.5, 0.5, 0.5}, vertex_color},
-		{{0.5, -0.5, 0.5}, vertex_color},
+	colors: []glm.vec3 = {
+		rgb_hex_to_color(0xD3_47_3D), // red
+		rgb_hex_to_color(0xF5_EF_EB), // white
+		rgb_hex_to_color(0xF6_AD_0F), // orange
+		rgb_hex_to_color(0x31_6A_96), // blue
+		rgb_hex_to_color(0x2E_24_3F), // purple
+		rgb_hex_to_color(0x86_BC_D1), // light blue
+		rgb_hex_to_color(0xFC_D7_03), // yellow
+		rgb_hex_to_color(0x03_FC_13), // green
 	}
 
-	for color, idx in polygon_color {
-		vertices[idx].color = color
-	}
-	// Initialize vertex array indices (used to select which vertices are drawn in which order).
-	vertex_indices: [dynamic]u16
-	for index in 0 ..< 36 {
-		append(&vertex_indices, u16(index))
-	}
+	// Initialize points.
+	point_vao, point_vbo, point_ebo := render.get_objects()
+	defer gl.DeleteVertexArrays(1, &point_vao)
+	defer gl.DeleteBuffers(1, &point_vbo)
+	defer gl.DeleteBuffers(1, &point_ebo)
 
-	// Bind vertices to vertex buffer.
-	gl.BindBuffer(gl.ARRAY_BUFFER, triangle_vbo)
-	gl.BufferData(
-		gl.ARRAY_BUFFER,
-		len(vertices) * size_of(Vertex),
-		raw_data(vertices),
-		gl.STATIC_DRAW,
-	)
-	gl.EnableVertexAttribArray(0)
-	gl.EnableVertexAttribArray(1)
-	gl.VertexAttribPointer(0, 3, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, position))
-	gl.VertexAttribPointer(1, 3, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, color))
+	point_color: glm.vec3 = rgb_hex_to_color(0xF8_03_FC)
+	
+	// assuming LHS (openGL is usually in a RHS but due to device normalization it is in a LHS (?))
+	point_vertices: []render.Vertex = {
+		{{ 0.5,  0.5,  0.5}, point_color /* colors[0] */}, // right    top  back
+		{{-0.5,  0.5,  0.5}, point_color /* colors[1] */}, //  left    top  back
+		{{ 0.5, -0.5,  0.5}, point_color /* colors[2] */}, // right bottom  back
+		{{ 0.5,  0.5, -0.5}, point_color /* colors[3] */}, // right    top front
+		{{-0.5, -0.5,  0.5}, point_color /* colors[4] */}, //  left bottom  back
+		{{ 0.5, -0.5, -0.5}, point_color /* colors[5] */}, // right bottom front
+		{{-0.5,  0.5, -0.5}, point_color /* colors[6] */}, //  left    top front
+		{{-0.5, -0.5, -0.5}, point_color /* colors[7] */}, //  left bottom front
+	}
+	// todo: figure out why points rely on indexed drawing if
+	// draw_points does not rely on EBO
+	point_indices: []u16 = {0, 1, 2, 3, 4, 5, 6, 7}
 
-	// Bind vertex array indices to index buffer.
-	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangle_ebo)
-	gl.BufferData(
-		gl.ELEMENT_ARRAY_BUFFER,
-		len(vertex_indices) * size_of(u16),
-		raw_data(vertex_indices),
-		gl.STATIC_DRAW,
-	)
+	// assuming LHS (openGL is usually in a RHS but due to device normalization it is in a LHS (?))
+	cube_vertices: []render.Vertex = {
+		{{ 0.5,  0.5,  0.5}, colors[0]}, // right    top  back
+		{{-0.5,  0.5,  0.5}, colors[1]}, //  left    top  back
+		{{ 0.5, -0.5,  0.5}, colors[2]}, // right bottom  back
+		{{ 0.5,  0.5, -0.5}, colors[3]}, // right    top front
+		{{-0.5, -0.5,  0.5}, colors[4]}, //  left bottom  back
+		{{ 0.5, -0.5, -0.5}, colors[5]}, // right bottom front
+		{{-0.5,  0.5, -0.5}, colors[6]}, //  left    top front
+		{{-0.5, -0.5, -0.5}, colors[7]}, //  left bottom front
+	}
+	// creating each face with two triangles and using indexed drawing to do so
+	cube_indices: []u16 = {
+		0, 1, 2, 2, 4, 1, // back face
+		3, 6, 5, 5, 7, 6, // front face
+		0, 1, 3, 3, 6, 1, // top face
+		2, 4, 5, 5, 7, 4, // bottom face
+		1, 6, 4, 4, 7, 6, // left face
+		0, 3, 2, 2, 5, 3, // right face
+	}
 
 	// Check for window events.
-	for (!glfw.WindowShouldClose(window) && running) {
+	for (!glfw.WindowShouldClose(window) && render.running) {
 		// https://www.glfw.org/docs/3.3/group__window.html#ga37bd57223967b4211d60ca1a0bf3c832
 		glfw.PollEvents()
 
@@ -157,18 +109,40 @@ main :: proc() {
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 		// Update (rotate) the vertices every frame.
-		vertices = update(vertices)
+		cube_vertices = render.update(cube_vertices)
+		point_vertices = render.update(point_vertices)
 
+		// TODO: unsure why this is still here as they shouldn't be needed
+		
 		// TODO: Find a way to use `BufferSubData` instead. Using `BufferData` works but reallocates memory.
 		// Rebind the updated vertices to the vertex buffer.
-		gl.BufferData(
-			gl.ARRAY_BUFFER,
-			len(vertices) * size_of(Vertex),
-			raw_data(vertices),
-			gl.STATIC_DRAW,
-		)
+		// gl.BufferData(
+		// 	gl.ARRAY_BUFFER,
+		// 	len(cube_vertices) * size_of(render.Vertex),
+		// 	raw_data(cube_vertices),
+		// 	gl.STATIC_DRAW,
+		// )
 
-		draw(vertices[:])
+		render.bind_data(cube_vao, cube_vbo, cube_ebo, cube_vertices, cube_indices)
+		render.draw_cube(cube_indices[:])
+
+		gl.DisableVertexAttribArray(0)
+		gl.DisableVertexAttribArray(1)
+
+		// TODO: unsure why this is still here as they shouldn't be needed
+
+		// gl.BufferData(
+		// 	gl.ARRAY_BUFFER,
+		// 	len(point_vertices) * size_of(render.Vertex),
+		// 	raw_data(point_vertices),
+		// 	gl.STATIC_DRAW,
+		// )
+
+		render.bind_data(point_vao, point_vbo, point_ebo, point_vertices, cube_indices)
+		render.draw_points(point_vertices[:])
+
+		gl.DisableVertexAttribArray(0)
+		gl.DisableVertexAttribArray(1)
 
 		// NOTE: Defaults to double buffering I think? - Ansh
 		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
@@ -176,85 +150,6 @@ main :: proc() {
 		glfw.SwapBuffers(window)
 	}
 
-	exit()
+	render.mamino_exit()
 }
 
-mamino_init :: proc() {
-	// https://www.glfw.org/docs/3.3/window_guide.html#window_hints
-	// https://www.glfw.org/docs/3.3/group__window.html#ga7d9c8c62384b1e2821c4dc48952d2033
-	glfw.WindowHint(glfw.RESIZABLE, 1)
-	glfw.WindowHint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
-
-	// MacOS.
-	if ODIN_OS_STRING == "darwin" {
-		glfw.WindowHint(glfw.OPENGL_FORWARD_COMPAT, gl.TRUE)
-		glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, 4)
-		glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, 1)
-	} else {
-		glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, GL_MAJOR_VERSION)
-		glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, GL_MINOR_VERSION)
-	}
-
-	// https://www.glfw.org/docs/latest/group__init.html#ga317aac130a235ab08c6db0834907d85e
-	if !glfw.Init() {
-		fmt.println("Failed to initialize GLFW")
-		return
-	}
-}
-
-// Return WindowHandle rawPtr
-// https://www.glfw.org/docs/3.3/group__window.html#ga3555a418df92ad53f917597fe2f64aeb
-mamino_create_window :: proc() -> glfw.WindowHandle {
-	window := glfw.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, PROGRAM_NAME, nil, nil)
-	// https://www.glfw.org/docs/latest/group__window.html#gacdf43e51376051d2c091662e9fe3d7b2
-	if window == nil {
-		fmt.println("Unable to create window")
-		return nil
-	}
-
-	// https://www.glfw.org/docs/3.3/group__context.html#ga1c04dc242268f827290fe40aa1c91157
-	glfw.MakeContextCurrent(window)
-	// Enable vsync
-	// https://www.glfw.org/docs/3.3/group__context.html#ga6d4e0cdf151b5e579bd67f13202994ed
-	glfw.SwapInterval(1)
-	// This function sets the key callback of the specified window, which is called when a key is pressed, repeated or released.
-	// https://www.glfw.org/docs/3.3/group__input.html#ga1caf18159767e761185e49a3be019f8d
-	glfw.SetKeyCallback(window, key_callback)
-	// This function sets the framebuffer resize callback of the specified window, which is called when the framebuffer of the specified window is resized.
-	// https://www.glfw.org/docs/3.3/group__window.html#gab3fb7c3366577daef18c0023e2a8591f
-	glfw.SetFramebufferSizeCallback(window, size_callback)
-	// Set OpenGL Context bindings using the helper function
-	// See Odin Vendor source for specifc implementation details
-	// https://github.com/odin-lang/Odin/tree/master/vendor/OpenGL
-	// https://www.glfw.org/docs/3.3/group__context.html#ga35f1837e6f666781842483937612f163
-
-	// casting the c.int to int
-	// This is needed because the GL_MAJOR_VERSION has an explicit type of c.int
-	gl.load_up_to(int(GL_MAJOR_VERSION), GL_MINOR_VERSION, glfw.gl_set_proc_address)
-
-	return window
-}
-
-update :: proc(vertices: [dynamic]Vertex) -> [dynamic]Vertex {
-	angle: f32 = 0.01
-	view := glm.mat4LookAt({0, -1, +1}, {0, 1, 0}, {0, 0, 1})
-	proj := glm.mat4Perspective(90, 2.0, 0.1, 100.0)
-	scale := glm.mat3{0.5, 0., 0., 0., 0.5, 0., 0., 0., 0.5}
-	// Mutable reference to `vertex`.
-	for &vertex, idx in vertices {
-		vertex.position =
-			(glm.vec4{vertex.position.x, vertex.position.y, vertex.position.z, 1.0} * glm.mat4Rotate({0.5, 0.5, 1.}, angle)).xyz
-	}
-
-	return vertices
-}
-
-draw :: proc(vertices: []Vertex) {
-	gl.Enable(gl.DEPTH_TEST)
-	gl.DepthFunc(gl.LESS)
-	gl.DrawArrays(gl.TRIANGLES, 0, i32(len(vertices)))
-}
-
-// Termination code here
-exit :: proc() {
-}
