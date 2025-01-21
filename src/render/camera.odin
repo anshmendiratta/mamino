@@ -11,12 +11,10 @@ camera_direction := -glm.normalize(camera_position)
 camera_speed: f32 = 0.05
 
 // Direction vectors.
-world_front: glm.vec3 = {0., 0., -1.}
 world_up: glm.vec3 = {0., 1., 0.}
 camera_right: glm.vec3 = glm.normalize(glm.cross(world_up, camera_direction))
 
 scaled_delta_angle: f32 = delta_angle * 1e5
-accumulated_angle: f32
 
 camera_y_clockwise_rotation_matrix := glm.mat4Rotate({0., 1., 0.}, -scaled_delta_angle)
 camera_y_cclockwise_rotation_matrix := glm.mat4Rotate({0., 1., 0.}, scaled_delta_angle)
