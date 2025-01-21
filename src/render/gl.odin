@@ -41,12 +41,11 @@ draw_lines :: proc(vertices: []u16) {
 	gl.DrawArrays(gl.LINES, 0, i32(len(vertices)))
 }
 
-get_buffer_objects :: proc() -> (u32, u32, u32) {
-	vao, vbo, ebo: u32
+get_buffer_objects :: proc() -> (vao: u32, vbo: u32, ebo: u32) {
 	gl.GenVertexArrays(1, &vao)
 	gl.GenBuffers(1, &vbo)
 	gl.GenBuffers(1, &ebo)
-	return vao, vbo, ebo
+	return
 }
 
 // NOTE: VAO unused??? - Henock

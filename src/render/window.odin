@@ -40,8 +40,8 @@ mamino_init :: proc() {
 	}
 }
 
-mamino_create_window :: proc() -> glfw.WindowHandle {
-	window := glfw.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, PROGRAM_NAME, nil, nil)
+mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
+	window = glfw.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, PROGRAM_NAME, nil, nil)
 	if window == nil {
 		fmt.println("Unable to create window")
 		return nil
@@ -61,7 +61,7 @@ mamino_create_window :: proc() -> glfw.WindowHandle {
 	// https://www.glfw.org/docs/3.3/group__context.html#ga35f1837e6f666781842483937612f163
 	gl.load_up_to(int(GL_MAJOR_VERSION), GL_MINOR_VERSION, glfw.gl_set_proc_address)
 
-	return window
+	return
 }
 
 // TODO: Termination code here
