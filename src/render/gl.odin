@@ -13,7 +13,6 @@ Vertex :: struct {
 }
 
 update :: proc(vertices: []Vertex, uniforms: map[string]gl.Uniform_Info) {
-	camera_view_matrix = glm.mat4LookAt(camera_position, camera_target, world_up)
 	proj := glm.mat4Perspective(glm.radians_f32(45), 1.3, 0.1, 100.0)
 	scale := f32(0.3)
 	model := glm.mat4{scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., 1}
@@ -42,12 +41,11 @@ draw_lines :: proc(vertices: []u16) {
 	gl.DrawArrays(gl.LINES, 0, i32(len(vertices)))
 }
 
-get_buffer_objects :: proc() -> (u32, u32, u32) {
-	vao, vbo, ebo: u32
+get_buffer_objects :: proc() -> (vao: u32, vbo: u32, ebo: u32) {
 	gl.GenVertexArrays(1, &vao)
 	gl.GenBuffers(1, &vbo)
 	gl.GenBuffers(1, &ebo)
-	return vao, vbo, ebo
+	return
 }
 
 // NOTE: VAO unused??? - Henock
