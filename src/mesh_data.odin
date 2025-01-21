@@ -64,8 +64,8 @@ cube_indices: []u16 = {
 	3, // right face
 }
 
-
 point_color: glm.vec3 = rgb_hex_to_color(0xFF_FF_FF)
+point_colors := generate_n_colors(8)
 // assuming LHS (openGL is usually in a RHS but due to device normalization it is in a LHS (?))
 point_vertices: []render.Vertex = {
 	{
@@ -114,7 +114,7 @@ line_vertices: []render.Vertex = {
 		line_color, /* colors[1] */
 	}, //  left    top  back
 	{
-		{1.0, -1.0, 1.0},
+		{-1.0, 1.0, -1.0},
 		line_color, /* colors[2] */
 	}, // right bottom  back
 	{
@@ -122,15 +122,15 @@ line_vertices: []render.Vertex = {
 		line_color, /* colors[3] */
 	}, // right    top front
 	{
-		{-1.0, -1.0, 1.0},
+		{1.0, -1.0, -1.0},
 		line_color, /* colors[4] */
 	}, //  left bottom  back
 	{
-		{1.0, -1.0, -1.0},
+		{-1.0, -1.0, 1.0},
 		line_color, /* colors[5] */
 	}, // right bottom front
 	{
-		{-1.0, 1.0, -1.0},
+		{1.0, -1.0, 1.0},
 		line_color, /* colors[6] */
 	}, //  left    top front
 	{
@@ -138,5 +138,5 @@ line_vertices: []render.Vertex = {
 		line_color, /* colors[7] */
 	}, //  left bottom front
 }
-line_indices: []u16 = {0, 1, 2}
+line_indices: []u16 = {0, 1, 2, 3, 0}
 

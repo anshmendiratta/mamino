@@ -23,13 +23,13 @@ generate_polygon_vertices :: proc(n: u32, radius: f32, center: glm.vec2) -> [dyn
 
 generate_n_colors :: proc(n: u32) -> [dynamic]glm.vec3 {
 	colors: [dynamic]glm.vec3
-	lower_bound: f32 = 0.
-	upper_bound: f32 = 0.5
+	lower_bound: f32 = 0.4
+	upper_bound: f32 = 1.0
 	for i in 0 ..< n {
 		color: glm.vec3 = {
-			rand.float32_uniform(lower_bound, upper_bound),
-			rand.float32_uniform(lower_bound, upper_bound),
-			rand.float32_uniform(lower_bound, upper_bound),
+			glm.pow_f32(rand.float32_range(lower_bound, upper_bound), 0.52),
+			glm.pow_f32(rand.float32_range(lower_bound, upper_bound), 0.5),
+			glm.pow_f32(rand.float32_range(lower_bound, upper_bound), 0.2),
 		}
 		append(&colors, color)
 	}
