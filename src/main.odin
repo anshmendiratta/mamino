@@ -54,13 +54,15 @@ main :: proc() {
 	defer gl.DeleteBuffers(1, &line_vbo)
 	defer gl.DeleteBuffers(1, &line_ebo)
 
+	logger: Logger = {{}}
+
 	last_frame := glfw.GetTime()
 
 	for (!glfw.WindowShouldClose(window) && render.running) {
 		// Performance stdout logging.
 		time_for_frame := glfw.GetTime() - last_frame
 		last_frame = glfw.GetTime()
-		fmt.println("Time for frame:", time_for_frame, "seconds", "\nFPS:", 1 / time_for_frame)
+		append(&logger.times_per_frame, time_for_frame)
 
 		// Process inputs.
 		glfw.PollEvents()
@@ -93,6 +95,7 @@ main :: proc() {
 		glfw.SwapBuffers(window)
 	}
 
+	fmt.println("Average:", calculate_avg_fps(logger.times_per_frame), "FPS")
 	render.mamino_exit()
 }
 
