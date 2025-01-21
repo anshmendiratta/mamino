@@ -23,5 +23,10 @@ world_up: glm.vec3 = {0., 1., 0.}
 camera_view_matrix := glm.mat4LookAt(camera_position_cartesian, camera_target, world_up)
 
 update_camera :: proc() {
-	camera_view_matrix = glm.mat4LookAt(get_cartesian_coordinates(camera_position_spherical), camera_target, world_up)
+	camera_view_matrix = glm.mat4LookAt(
+		get_cartesian_coordinates(camera_position_spherical),
+		camera_target,
+		world_up,
+	)
 }
+

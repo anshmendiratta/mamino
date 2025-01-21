@@ -15,7 +15,6 @@ GL_MINOR_VERSION :: 6
 WINDOW_WIDTH :: 512
 WINDOW_HEIGHT :: 512
 
-delta_angle: f32
 running: b32 = true
 
 mamino_init :: proc() {
@@ -75,10 +74,18 @@ key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods
 	}
 
 	if key == glfw.KEY_W || key == glfw.KEY_UP {
-		camera_position_spherical.z = glm.clamp(camera_position_spherical.z + rotation_rate, -theta_bound, theta_bound)
+		camera_position_spherical.z = glm.clamp(
+			camera_position_spherical.z + rotation_rate,
+			-theta_bound,
+			theta_bound,
+		)
 	}
 	if key == glfw.KEY_S || key == glfw.KEY_DOWN {
-		camera_position_spherical.z = glm.clamp(camera_position_spherical.z - rotation_rate, -theta_bound, theta_bound)
+		camera_position_spherical.z = glm.clamp(
+			camera_position_spherical.z - rotation_rate,
+			-theta_bound,
+			theta_bound,
+		)
 	}
 	if key == glfw.KEY_A || key == glfw.KEY_LEFT {
 		camera_position_spherical.y += rotation_rate
