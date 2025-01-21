@@ -20,3 +20,4 @@ To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and co
 - [ ] Add "ambient occlusion" to mesh face colors to indicate orientation
 - [ ] Render face normals (respecting z-index)
 - [ ] "Spawn meshes" (and their spawn animation)
+- [ ] Add debug panel with scene information
