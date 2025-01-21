@@ -54,7 +54,15 @@ main :: proc() {
 	defer gl.DeleteBuffers(1, &line_vbo)
 	defer gl.DeleteBuffers(1, &line_ebo)
 
+	last_frame := glfw.GetTime()
+
 	for (!glfw.WindowShouldClose(window) && render.running) {
+		// Performance stdout logging.
+		time_for_frame := glfw.GetTime() - last_frame
+		last_frame = glfw.GetTime()
+		fmt.println("Time for frame:", time_for_frame, "seconds", "\nFPS:", 1 / time_for_frame)
+
+		// Process inputs.
 		glfw.PollEvents()
 
 		gl.ClearColor(0.1, 0.1, 0.1, 1.0)
@@ -69,15 +77,15 @@ main :: proc() {
 
 		// Cube.
 		render.bind_data(cube_vbo, cube_ebo, cube_vertices, cube_indices)
-		render.draw_cube(cube_indices[:])
+		render.draw_cube(cube_vertices, i32(len(cube_indices)))
 
 		// Points.
 		render.bind_data(point_vbo, point_ebo, point_vertices, point_indices)
-		render.draw_points(point_vertices[:])
+		render.draw_points(point_indices)
 
 		// Lines.
-		// render.bind_data(line_vbo, line_ebo, line_vertices, line_indices)
-		// render.draw_lines(line_indices[:])
+		render.bind_data(line_vbo, line_ebo, line_vertices, line_indices)
+		render.draw_lines(line_indices)
 
 		// NOTE: Defaults to double buffering I think? - Ansh
 		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
