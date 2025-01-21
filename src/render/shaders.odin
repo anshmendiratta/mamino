@@ -8,8 +8,10 @@ vertex_shader := `
 	out vec4 f_color;
 	out vec3 v_coord;
 
+	uniform mat4 v_transform;
+
 	void main() {
-		gl_Position = vec4(position, 1.0);
+		gl_Position = v_transform * vec4(position, 1.0);
 		gl_PointSize = 10.;
 		v_coord = position;
 		f_color = color;

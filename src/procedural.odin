@@ -38,12 +38,16 @@ generate_n_colors :: proc(n: u32) -> [dynamic]glm.vec3 {
 }
 
 
-rgb_hex_to_color :: proc(hex_color : int) -> (ret : glm.vec3) {
-	ret = {
-		f32((hex_color & 0x00_FF_00_00) >> 16),
-		f32((hex_color & 0x00_00_FF_00) >> 8 ),
-		f32((hex_color & 0x00_00_00_FF) >> 0 ),
-	} * 1.0/255.0
+rgb_hex_to_color :: proc(hex_color: int) -> (ret: glm.vec3) {
+	ret =
+		{
+			f32((hex_color & 0x00_FF_00_00) >> 16),
+			f32((hex_color & 0x00_00_FF_00) >> 8),
+			f32((hex_color & 0x00_00_00_FF) >> 0),
+		} *
+		1.0 /
+		255.0
 
 	return
 }
+
