@@ -13,7 +13,6 @@ Vertex :: struct {
 }
 
 update :: proc(vertices: []Vertex, uniforms: map[string]gl.Uniform_Info) {
-	camera_view_matrix = glm.mat4LookAt(camera_position, camera_target, world_up)
 	proj := glm.mat4Perspective(glm.radians_f32(45), 1.3, 0.1, 100.0)
 	scale := f32(0.3)
 	model := glm.mat4{scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., 1}

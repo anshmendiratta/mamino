@@ -54,20 +54,11 @@ main :: proc() {
 	defer gl.DeleteBuffers(1, &line_vbo)
 	defer gl.DeleteBuffers(1, &line_ebo)
 
-	last_frame: f64 = glfw.GetTime()
-	time_init := time.tick_now()
-	time_since := time.tick_since(time_init)
-
 	for (!glfw.WindowShouldClose(window) && render.running) {
 		glfw.PollEvents()
 
 		gl.ClearColor(0.1, 0.1, 0.1, 1.0)
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
-		last_frame = glfw.GetTime()
-		render.delta_angle = f32(time.duration_seconds(time_since))
-		time_init = time.tick_now()
-		time_since = time.tick_since(time_init)
 
 		render.update_camera()
 
