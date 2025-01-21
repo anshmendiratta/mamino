@@ -70,28 +70,27 @@ mamino_exit :: proc() {
 }
 
 key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
-	accumulated_angle += scaled_delta_angle
-
 	if key == glfw.KEY_ESCAPE || key == glfw.KEY_Q {
 		running = false
 	}
+
 	if key == glfw.KEY_W || key == glfw.KEY_UP {
-		camera_position = glm.mat3(camera_xz_positive_rotation_matrix) * camera_position
+		camera_position_spherical.z = glm.clamp(camera_position_spherical.z + rotation_rate, -theta_bound, theta_bound)
 	}
 	if key == glfw.KEY_S || key == glfw.KEY_DOWN {
-		camera_position = glm.mat3(camera_xz_negative_rotation_matrix) * camera_position
+		camera_position_spherical.z = glm.clamp(camera_position_spherical.z - rotation_rate, -theta_bound, theta_bound)
 	}
 	if key == glfw.KEY_A || key == glfw.KEY_LEFT {
-		camera_position = glm.mat3(camera_y_clockwise_rotation_matrix) * camera_position
+		camera_position_spherical.y += rotation_rate
 	}
 	if key == glfw.KEY_D || key == glfw.KEY_RIGHT {
-		camera_position = glm.mat3(camera_y_cclockwise_rotation_matrix) * camera_position
+		camera_position_spherical.y -= rotation_rate
 	}
 	if key == glfw.KEY_EQUAL {
-		camera_position += scaled_delta_angle * camera_speed * camera_direction
+		camera_position_spherical.x -= zoom_rate
 	}
 	if key == glfw.KEY_MINUS {
-		camera_position -= scaled_delta_angle * camera_speed * camera_direction
+		camera_position_spherical.x += zoom_rate
 	}
 }
 
