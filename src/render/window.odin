@@ -15,6 +15,7 @@ GL_MINOR_VERSION :: 6
 WINDOW_WIDTH :: 512
 WINDOW_HEIGHT :: 512
 
+delta_angle: f32
 running: b32 = true
 
 mamino_init :: proc() {
@@ -69,20 +70,28 @@ mamino_exit :: proc() {
 }
 
 key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
+	accumulated_angle += scaled_delta_angle
+
 	if key == glfw.KEY_ESCAPE || key == glfw.KEY_Q {
 		running = false
 	}
 	if key == glfw.KEY_W || key == glfw.KEY_UP {
-		camera_position += camera_front * camera_speed
+		camera_position = glm.mat3(camera_xz_positive_rotation_matrix) * camera_position
 	}
 	if key == glfw.KEY_S || key == glfw.KEY_DOWN {
-		camera_position -= camera_front * camera_speed
+		camera_position = glm.mat3(camera_xz_negative_rotation_matrix) * camera_position
 	}
 	if key == glfw.KEY_A || key == glfw.KEY_LEFT {
-		camera_position -= camera_speed * glm.normalize(glm.cross(camera_front, camera_up))
+		camera_position = glm.mat3(camera_y_clockwise_rotation_matrix) * camera_position
 	}
 	if key == glfw.KEY_D || key == glfw.KEY_RIGHT {
-		camera_position += camera_speed * glm.normalize(glm.cross(camera_front, camera_up))
+		camera_position = glm.mat3(camera_y_cclockwise_rotation_matrix) * camera_position
+	}
+	if key == glfw.KEY_EQUAL {
+		camera_position += scaled_delta_angle * camera_speed * camera_direction
+	}
+	if key == glfw.KEY_MINUS {
+		camera_position -= scaled_delta_angle * camera_speed * camera_direction
 	}
 }
 

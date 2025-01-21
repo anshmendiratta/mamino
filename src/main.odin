@@ -54,20 +54,27 @@ main :: proc() {
 	defer gl.DeleteBuffers(1, &line_vbo)
 	defer gl.DeleteBuffers(1, &line_ebo)
 
+	last_frame: f64 = glfw.GetTime()
 	time_init := time.tick_now()
+	time_since := time.tick_since(time_init)
+
 	for (!glfw.WindowShouldClose(window) && render.running) {
 		glfw.PollEvents()
-
-		time_ticks := time.tick_since(time_init)
-		time_s := time.duration_seconds(time.Duration(time_ticks))
 
 		gl.ClearColor(0.1, 0.1, 0.1, 1.0)
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
+		last_frame = glfw.GetTime()
+		render.delta_angle = f32(time.duration_seconds(time_since))
+		time_init = time.tick_now()
+		time_since = time.tick_since(time_init)
+
+		render.update_camera()
+
 		// Update (rotate) the vertices every frame.
-		render.update(cube_vertices, uniforms, time_s)
-		render.update(point_vertices, uniforms, time_s)
-		render.update(line_vertices, uniforms, time_s)
+		render.update(cube_vertices, uniforms)
+		render.update(point_vertices, uniforms)
+		render.update(line_vertices, uniforms)
 
 		// Cube.
 		render.bind_data(cube_vbo, cube_ebo, cube_vertices, cube_indices)
