@@ -14,7 +14,6 @@ camera_speed: f32 = 0.05
 world_front: glm.vec3 = {0., 0., -1.}
 world_up: glm.vec3 = {0., 1., 0.}
 camera_right: glm.vec3 = glm.normalize(glm.cross(world_up, camera_direction))
-// camera_up: glm.vec3
 
 scaled_delta_angle: f32 = delta_angle * 1e5
 accumulated_angle: f32
@@ -36,7 +35,5 @@ update_camera :: proc() {
 	camera_y_cclockwise_rotation_matrix = glm.mat4Rotate({0., 1., 0.}, scaled_delta_angle)
 	camera_xz_positive_rotation_matrix = glm.mat4Rotate(camera_right, scaled_delta_angle)
 	camera_xz_negative_rotation_matrix = glm.mat4Rotate(camera_right, -scaled_delta_angle)
-
-	fmt.println(glm.length(camera_position))
 }
 
