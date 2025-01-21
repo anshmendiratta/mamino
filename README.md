@@ -14,7 +14,7 @@ To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and co
 - [x] Camera rotation with spherical coordinates
 - [ ] Render edges as lines (respecting z-index)
 - [ ] Render coordinate axes
-- [ ] Add perspective to renders
+- [x] Add perspective to renders
 - [ ] Add tiling textures on faces
 - [ ] Add translucency to select faces
 - [ ] Translate meshes w.r.t the origin
