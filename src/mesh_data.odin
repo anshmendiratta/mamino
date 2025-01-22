@@ -16,13 +16,13 @@ cube_colors: []glm.vec3 = {
 }
 cube_vertices: []render.Vertex = {
 	{{1.0, 1.0, 1.0}, cube_colors[0]}, // right    top  back
-	{{-1.0, 1.0, 1.0}, cube_colors[1]}, //  left    top  back
-	{{1.0, -1.0, 1.0}, cube_colors[2]}, // right bottom  back
-	{{1.0, 1.0, -1.0}, cube_colors[3]}, // right    top front
-	{{-1.0, -1.0, 1.0}, cube_colors[4]}, //  left bottom  back
-	{{1.0, -1.0, -1.0}, cube_colors[5]}, // right bottom front
-	{{-1.0, 1.0, -1.0}, cube_colors[6]}, //  left    top front
-	{{-1.0, -1.0, -1.0}, cube_colors[7]}, //  left bottom front
+	{{-1.0, 1.0, 1.0}, cube_colors[0]}, //  left    top  back
+	{{1.0, -1.0, 1.0}, cube_colors[0]}, // right bottom  back
+	{{1.0, 1.0, -1.0}, cube_colors[0]}, // right    top front
+	{{-1.0, -1.0, 1.0}, cube_colors[0]}, //  left bottom  back
+	{{1.0, -1.0, -1.0}, cube_colors[0]}, // right bottom front
+	{{-1.0, 1.0, -1.0}, cube_colors[0]}, //  left    top front
+	{{-1.0, -1.0, -1.0}, cube_colors[0]}, //  left bottom front
 }
 // creating each face with two triangles and using indexed drawing to do so
 cube_indices: []u16 = {
@@ -64,8 +64,8 @@ cube_indices: []u16 = {
 	3, // right face
 }
 
-
 point_color: glm.vec3 = rgb_hex_to_color(0xFF_FF_FF)
+point_colors := generate_n_colors(8)
 // assuming LHS (openGL is usually in a RHS but due to device normalization it is in a LHS (?))
 point_vertices: []render.Vertex = {
 	{
@@ -103,7 +103,7 @@ point_vertices: []render.Vertex = {
 }
 point_indices: []u16 = {0, 1, 2, 3, 4, 5, 6, 7}
 
-line_color: glm.vec3 = {1., 1., 1.}
+line_color: glm.vec3 = rgb_hex_to_color(0xFF_FF_FF)
 line_vertices: []render.Vertex = {
 	{
 		{1.0, 1.0, 1.0},
@@ -138,5 +138,31 @@ line_vertices: []render.Vertex = {
 		line_color, /* colors[7] */
 	}, //  left bottom front
 }
-line_indices: []u16 = {0, 1, 2}
+
+line_indices: []u16 = {
+	0,
+	2,
+	2,
+	5,
+	5,
+	3,
+	3,
+	0, // first face.
+	6,
+	7,
+	7,
+	4,
+	4,
+	1,
+	1,
+	6, // Second face.
+	6,
+	3,
+	5,
+	7,
+	1,
+	0,
+	4,
+	2,
+}
 

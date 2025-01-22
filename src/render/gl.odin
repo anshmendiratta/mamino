@@ -20,25 +20,23 @@ update :: proc(vertices: []Vertex, uniforms: map[string]gl.Uniform_Info) {
 	gl.UniformMatrix4fv(uniforms["v_transform"].location, 1, false, &v_transform[0, 0])
 }
 
-draw_cube :: proc(indices: []u16) {
-	// TODO: figure out why setting to gl.GREATER results in no output on screen
-	// NOTE: This is because it checks for the depth that our fragment shader stores to be greater than whatever the incoming depth value is. In our case, we define the depth to be `1.0` in our vertex shader (in the vec4 conversion), which is the max value, so the frag shader always sees that its own depth value is <= the given value, meaning the fragment does not pass the depth check, and so is not rendered.
-	// - Ansh
+draw_cube :: proc(vertices: []Vertex, indices_count: i32) {
 	gl.DepthFunc(gl.LESS)
-	gl.DrawElements(gl.TRIANGLES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
+	// TODO: figure out why this doesn't work with `gl.DrawArrays`
+	gl.DrawElements(gl.TRIANGLES, indices_count, gl.UNSIGNED_SHORT, nil)
 }
 
-draw_points :: proc(vertices: []Vertex) {
+draw_points :: proc(indices: []u16) {
 	gl.Enable(gl.PROGRAM_POINT_SIZE)
 	gl.Enable(gl.POINT_SMOOTH)
-	gl.DrawArrays(gl.POINTS, 0, i32(len(vertices)))
+	gl.DrawArrays(gl.POINTS, 0, i32(len(indices)))
 }
 
-draw_lines :: proc(vertices: []u16) {
+draw_lines :: proc(indices: []u16) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
-	gl.LineWidth(10.)
-	gl.DrawArrays(gl.LINES, 0, i32(len(vertices)))
+	gl.LineWidth(5.)
+	gl.DrawElements(gl.LINES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 
 get_buffer_objects :: proc() -> (vao: u32, vbo: u32, ebo: u32) {
