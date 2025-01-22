@@ -37,8 +37,9 @@ draw_points :: proc(vertices: []Vertex) {
 draw_lines :: proc(vertices: []u16) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
-	gl.LineWidth(10.)
-	gl.DrawArrays(gl.LINES, 0, i32(len(vertices)))
+	gl.LineWidth(5.)
+	gl.DrawElements(gl.LINES, i32(len(vertices)), gl.UNSIGNED_SHORT, nil)
+	// gl.DrawArrays(gl.LINES, 0, i32(len(vertices)))
 }
 
 get_buffer_objects :: proc() -> (vao: u32, vbo: u32, ebo: u32) {

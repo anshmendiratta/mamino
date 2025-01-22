@@ -76,8 +76,8 @@ main :: proc() {
 		render.draw_points(point_vertices[:])
 
 		// Lines.
-		// render.bind_data(line_vbo, line_ebo, line_vertices, line_indices)
-		// render.draw_lines(line_indices[:])
+		render.bind_data(line_vbo, line_ebo, line_vertices, line_indices)
+		render.draw_lines(line_indices[:])
 
 		// NOTE: Defaults to double buffering I think? - Ansh
 		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering

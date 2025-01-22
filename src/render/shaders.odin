@@ -12,7 +12,7 @@ vertex_shader := `
 
 	void main() {
 		gl_Position = v_transform * vec4(position, 1.0);
-		gl_PointSize = 10.;
+		gl_PointSize = 20.;
 		v_coord = position;
 		f_color = color;
 	}
