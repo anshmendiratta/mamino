@@ -166,3 +166,15 @@ line_indices: []u16 = {
 	2,
 }
 
+axes_color: glm.vec3 = rgb_hex_to_color(0x67_BD_FF)
+axes_vertices: []render.Vertex = {
+	{{-100., 0., 0.}, axes_color}, 
+	{{100., 0., 0.}, axes_color}, // x-axis
+	{{0., -100., 0.}, axes_color}, 
+	{{0., 100., 0.}, axes_color}, // y-axis
+	{{0., 0., -100.}, axes_color}, 
+	{{0., 0., 100.}, axes_color}, // z-axis
+}
+axes_indices: []u16 = {
+	0, 1, 2, 3, 4, 5
+}

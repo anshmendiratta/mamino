@@ -7,6 +7,8 @@ import glm "core:math/linalg/glsl"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
 
+import ft "shared:freetype"
+
 Vertex :: struct {
 	position: glm.vec3,
 	color:    glm.vec3,
@@ -36,6 +38,13 @@ draw_lines :: proc(indices: []u16) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
 	gl.LineWidth(5.)
+	gl.DrawElements(gl.LINES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
+}
+
+draw_axes :: proc(indices: []u16) {
+	gl.DepthFunc(gl.LESS)
+	gl.Enable(gl.LINE_SMOOTH)
+	gl.LineWidth(2.)
 	gl.DrawElements(gl.LINES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 
