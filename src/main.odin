@@ -54,6 +54,12 @@ main :: proc() {
 	defer gl.DeleteBuffers(1, &line_vbo)
 	defer gl.DeleteBuffers(1, &line_ebo)
 
+	// Initialize axes.
+	axes_vao, axes_vbo, axes_ebo := render.get_buffer_objects()
+	defer gl.DeleteVertexArrays(1, &axes_vao)
+	defer gl.DeleteBuffers(1, &axes_vbo)
+	defer gl.DeleteBuffers(1, &axes_ebo)
+
 	last_frame := glfw.GetTime()
 
 	for (!glfw.WindowShouldClose(window) && render.running) {
@@ -74,6 +80,9 @@ main :: proc() {
 		render.update(cube_vertices, uniforms)
 		render.update(point_vertices, uniforms)
 		render.update(line_vertices, uniforms)
+
+		render.bind_data(cube_vbo, cube_ebo, cube_vertices, cube_indices)
+		render.draw_axes(axes_vbo, axes_ebo, , )
 
 		// Cube.
 		render.bind_data(cube_vbo, cube_ebo, cube_vertices, cube_indices)
