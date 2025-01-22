@@ -15,14 +15,14 @@ cube_colors: []glm.vec3 = {
 	rgb_hex_to_color(0x03_FC_13), // green
 }
 cube_vertices: []render.Vertex = {
-	{{1.0, 1.0, 1.0}, cube_colors[0]}, // right    top  back
-	{{-1.0, 1.0, 1.0}, cube_colors[1]}, //  left    top  back
-	{{1.0, -1.0, 1.0}, cube_colors[2]}, // right bottom  back
+	{{1.0, 1.0, 1.0}, cube_colors[3]}, // right    top  back
+	{{-1.0, 1.0, 1.0}, cube_colors[3]}, //  left    top  back
+	{{1.0, -1.0, 1.0}, cube_colors[3]}, // right bottom  back
 	{{1.0, 1.0, -1.0}, cube_colors[3]}, // right    top front
-	{{-1.0, -1.0, 1.0}, cube_colors[4]}, //  left bottom  back
-	{{1.0, -1.0, -1.0}, cube_colors[5]}, // right bottom front
-	{{-1.0, 1.0, -1.0}, cube_colors[6]}, //  left    top front
-	{{-1.0, -1.0, -1.0}, cube_colors[7]}, //  left bottom front
+	{{-1.0, -1.0, 1.0}, cube_colors[3]}, //  left bottom  back
+	{{1.0, -1.0, -1.0}, cube_colors[3]}, // right bottom front
+	{{-1.0, 1.0, -1.0}, cube_colors[3]}, //  left    top front
+	{{-1.0, -1.0, -1.0}, cube_colors[3]}, //  left bottom front
 }
 // creating each face with two triangles and using indexed drawing to do so
 cube_indices: []u16 = {
@@ -103,7 +103,7 @@ point_vertices: []render.Vertex = {
 }
 point_indices: []u16 = {0, 1, 2, 3, 4, 5, 6, 7}
 
-line_color: glm.vec3 = {1., 1., 1.}
+line_color: glm.vec3 = rgb_hex_to_color(0xFF_FF_FF)
 line_vertices: []render.Vertex = {
 	{
 		{1.0, 1.0, 1.0},
@@ -138,5 +138,31 @@ line_vertices: []render.Vertex = {
 		line_color, /* colors[7] */
 	}, //  left bottom front
 }
-line_indices: []u16 = {0, 1, 2, 3, 0}
+
+line_indices: []u16 = {
+	0,
+	2,
+	2,
+	5,
+	5,
+	3,
+	3,
+	0, // First face
+	6,
+	7,
+	7,
+	4,
+	4,
+	1,
+	1,
+	6, // second face
+	6,
+	3,
+	5,
+	7,
+	1,
+	0,
+	4,
+	2,
+}
 

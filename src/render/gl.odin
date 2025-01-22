@@ -35,8 +35,8 @@ draw_points :: proc(indices: []u16) {
 draw_lines :: proc(indices: []u16) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
-	gl.LineWidth(10.)
-	gl.DrawArrays(gl.LINE_STRIP, 0, i32(len(indices)))
+	gl.LineWidth(5.)
+	gl.DrawElements(gl.LINES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 
 get_buffer_objects :: proc() -> (vao: u32, vbo: u32, ebo: u32) {
