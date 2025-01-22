@@ -15,14 +15,14 @@ cube_colors: []glm.vec3 = {
 	rgb_hex_to_color(0x03_FC_13), // green
 }
 cube_vertices: []render.Vertex = {
-	{{1.0, 1.0, 1.0}, cube_colors[3]}, // right    top  back
-	{{-1.0, 1.0, 1.0}, cube_colors[3]}, //  left    top  back
-	{{1.0, -1.0, 1.0}, cube_colors[3]}, // right bottom  back
-	{{1.0, 1.0, -1.0}, cube_colors[3]}, // right    top front
-	{{-1.0, -1.0, 1.0}, cube_colors[3]}, //  left bottom  back
-	{{1.0, -1.0, -1.0}, cube_colors[3]}, // right bottom front
-	{{-1.0, 1.0, -1.0}, cube_colors[3]}, //  left    top front
-	{{-1.0, -1.0, -1.0}, cube_colors[3]}, //  left bottom front
+	{{1.0, 1.0, 1.0}, cube_colors[0]}, // right    top  back
+	{{-1.0, 1.0, 1.0}, cube_colors[0]}, //  left    top  back
+	{{1.0, -1.0, 1.0}, cube_colors[0]}, // right bottom  back
+	{{1.0, 1.0, -1.0}, cube_colors[0]}, // right    top front
+	{{-1.0, -1.0, 1.0}, cube_colors[0]}, //  left bottom  back
+	{{1.0, -1.0, -1.0}, cube_colors[0]}, // right bottom front
+	{{-1.0, 1.0, -1.0}, cube_colors[0]}, //  left    top front
+	{{-1.0, -1.0, -1.0}, cube_colors[0]}, //  left bottom front
 }
 // creating each face with two triangles and using indexed drawing to do so
 cube_indices: []u16 = {
@@ -114,7 +114,7 @@ line_vertices: []render.Vertex = {
 		line_color, /* colors[1] */
 	}, //  left    top  back
 	{
-		{-1.0, 1.0, -1.0},
+		{1.0, -1.0, 1.0},
 		line_color, /* colors[2] */
 	}, // right bottom  back
 	{
@@ -122,15 +122,15 @@ line_vertices: []render.Vertex = {
 		line_color, /* colors[3] */
 	}, // right    top front
 	{
-		{1.0, -1.0, -1.0},
+		{-1.0, -1.0, 1.0},
 		line_color, /* colors[4] */
 	}, //  left bottom  back
 	{
-		{-1.0, -1.0, 1.0},
+		{1.0, -1.0, -1.0},
 		line_color, /* colors[5] */
 	}, // right bottom front
 	{
-		{1.0, -1.0, 1.0},
+		{-1.0, 1.0, -1.0},
 		line_color, /* colors[6] */
 	}, //  left    top front
 	{
@@ -147,7 +147,7 @@ line_indices: []u16 = {
 	5,
 	3,
 	3,
-	0, // First face
+	0, // first face.
 	6,
 	7,
 	7,
@@ -155,7 +155,7 @@ line_indices: []u16 = {
 	4,
 	1,
 	1,
-	6, // second face
+	6, // Second face.
 	6,
 	3,
 	5,
