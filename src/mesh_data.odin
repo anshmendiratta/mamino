@@ -4,15 +4,15 @@ import glm "core:math/linalg/glsl"
 
 import "render"
 
-cube_colors: []glm.vec3 = {
-	rgb_hex_to_color(0xD3_47_3D), // red
-	rgb_hex_to_color(0xF5_EF_EB), // white
-	rgb_hex_to_color(0xF6_AD_0F), // orange
-	rgb_hex_to_color(0x31_6A_96), // blue
-	rgb_hex_to_color(0x2E_24_3F), // purple
-	rgb_hex_to_color(0x86_BC_D1), // light blue
-	rgb_hex_to_color(0xFC_D7_03), // yellow
-	rgb_hex_to_color(0x03_FC_13), // green
+cube_colors: []glm.vec4 = {
+	rgb_hex_to_color(0xD3_47_3D, 1.0), // red
+	rgb_hex_to_color(0xF5_EF_EB, 1.0), // white
+	rgb_hex_to_color(0xF6_AD_0F, 1.0), // orange
+	rgb_hex_to_color(0x31_6A_96, 1.0), // blue
+	rgb_hex_to_color(0x2E_24_3F, 1.0), // purple
+	rgb_hex_to_color(0x86_BC_D1, 1.0), // light blue
+	rgb_hex_to_color(0xFC_D7_03, 1.0), // yellow
+	rgb_hex_to_color(0x03_FC_13, 1.0), // green
 }
 cube_vertices: []render.Vertex = {
 	{{1.0, 1.0, 1.0}, cube_colors[0]}, // right    top  back
@@ -64,7 +64,7 @@ cube_indices: []u16 = {
 	3, // right face
 }
 
-point_color: glm.vec3 = rgb_hex_to_color(0xFF_FF_FF)
+point_color: glm.vec4 = rgb_hex_to_color(0xFF_FF_FF, 1.0)
 point_colors := generate_n_colors(8)
 // assuming LHS (openGL is usually in a RHS but due to device normalization it is in a LHS (?))
 point_vertices: []render.Vertex = {
@@ -103,7 +103,7 @@ point_vertices: []render.Vertex = {
 }
 point_indices: []u16 = {0, 1, 2, 3, 4, 5, 6, 7}
 
-line_color: glm.vec3 = rgb_hex_to_color(0xFF_FF_FF)
+line_color: glm.vec4 = rgb_hex_to_color(0xFF_FF_FF, 1.)
 line_vertices: []render.Vertex = {
 	{
 		{1.0, 1.0, 1.0},
@@ -166,15 +166,14 @@ line_indices: []u16 = {
 	2,
 }
 
-axes_color: glm.vec3 = rgb_hex_to_color(0x67_BD_FF)
+axes_color: glm.vec4 = rgb_hex_to_color(0x67_BD_FF, 0.2)
 axes_vertices: []render.Vertex = {
-	{{-100., 0., 0.}, axes_color}, 
-	{{100., 0., 0.}, axes_color}, // x-axis
-	{{0., -100., 0.}, axes_color}, 
-	{{0., 100., 0.}, axes_color}, // y-axis
-	{{0., 0., -100.}, axes_color}, 
-	{{0., 0., 100.}, axes_color}, // z-axis
+	{{-1000., 0., 0.}, axes_color},
+	{{1000., 0., 0.}, axes_color}, // x-axis
+	{{0., -1000., 0.}, axes_color},
+	{{0., 1000., 0.}, axes_color}, // y-axis
+	{{0., 0., -1000.}, axes_color},
+	{{0., 0., 1000.}, axes_color}, // z-axis
 }
-axes_indices: []u16 = {
-	0, 1, 2, 3, 4, 5
-}
+axes_indices: []u16 = {0, 1, 2, 3, 4, 5}
+

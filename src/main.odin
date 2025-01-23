@@ -8,8 +8,6 @@ import "core:time"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
 
-import ft "shared:freetype"
-
 import "render"
 
 main :: proc() {
@@ -64,49 +62,54 @@ main :: proc() {
 
 	last_frame := glfw.GetTime()
 
-	font := ft.init_free_type(nil)
-	fmt.println(font)
+	// FONT_FILE_NAME :: "HackNerdFontMono-Bold.ttf"
+	// ft_library: ft.Library
+	// ft_ok := ft.init_free_type(&ft_library)
+	// ft_face: ft.Face
+	// ft_ok = ft.new_face(ft_library, FONT_FILE_NAME, 0, &ft_face)
+	// fmt.println(ft_ok)
 
-	// for (!glfw.WindowShouldClose(window) && render.running) {
-	// 	// Performance stdout logging.
-	// 	time_for_frame := glfw.GetTime() - last_frame
-	// 	last_frame = glfw.GetTime()
-	// 	fmt.println("Time for frame:", time_for_frame, "seconds", "\nFPS:", 1 / time_for_frame)
+	for (!glfw.WindowShouldClose(window) && render.running) {
+		// Performance stdout logging.
+		time_for_frame := glfw.GetTime() - last_frame
+		last_frame = glfw.GetTime()
+		fmt.println("Time for frame:", time_for_frame, "seconds", "\nFPS:", 1 / time_for_frame)
 
-	// 	// Process inputs.
-	// 	glfw.PollEvents()
+		// Process inputs.
+		glfw.PollEvents()
 
-	// 	gl.ClearColor(0.1, 0.1, 0.1, 1.0)
-	// 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+		gl.ClearColor(0.1, 0.1, 0.1, 1.0)
+		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-	// 	render.update_camera()
+		render.update_camera()
 
-	// 	// Update (rotate) the vertices every frame.
-	// 	render.update(cube_vertices, uniforms)
-	// 	render.update(point_vertices, uniforms)
-	// 	render.update(line_vertices, uniforms)
-	// 	render.update(axes_vertices, uniforms)
+		// Update (rotate) the vertices every frame.
+		render.update(cube_vertices, uniforms)
+		render.update(point_vertices, uniforms)
+		render.update(line_vertices, uniforms)
+		render.update(axes_vertices, uniforms)
 
-	// 	render.bind_data(axes_vbo, axes_ebo, axes_vertices, axes_indices)
-	// 	render.draw_axes(axes_indices)
+		// Cube.
+		render.bind_data(cube_vbo, cube_ebo, cube_vertices, cube_indices)
+		render.draw_cube(cube_vertices, i32(len(cube_indices)))
 
-	// 	// Cube.
-	// 	render.bind_data(cube_vbo, cube_ebo, cube_vertices, cube_indices)
-	// 	render.draw_cube(cube_vertices, i32(len(cube_indices)))
+		// Points.
+		render.bind_data(point_vbo, point_ebo, point_vertices, point_indices)
+		render.draw_points(point_indices)
 
-	// 	// Points.
-	// 	render.bind_data(point_vbo, point_ebo, point_vertices, point_indices)
-	// 	render.draw_points(point_indices)
+		// Lines.
+		render.bind_data(line_vbo, line_ebo, line_vertices, line_indices)
+		render.draw_lines(line_indices)
 
-	// 	// Lines.
-	// 	render.bind_data(line_vbo, line_ebo, line_vertices, line_indices)
-	// 	render.draw_lines(line_indices)
+		// Axes.
+		render.bind_data(axes_vbo, axes_ebo, axes_vertices, axes_indices)
+		render.draw_axes(axes_indices)
 
-	// 	// NOTE: Defaults to double buffering I think? - Ansh
-	// 	// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
-	// 	// https://www.glfw.org/docs/3.0/group__context.html#ga15a5a1ee5b3c2ca6b15ca209a12efd14
-	// 	glfw.SwapBuffers(window)
-	// }
+		// NOTE: Defaults to double buffering I think? - Ansh
+		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
+		// https://www.glfw.org/docs/3.0/group__context.html#ga15a5a1ee5b3c2ca6b15ca209a12efd14
+		glfw.SwapBuffers(window)
+	}
 
 	render.mamino_exit()
 }

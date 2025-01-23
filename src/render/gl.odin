@@ -7,11 +7,11 @@ import glm "core:math/linalg/glsl"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
 
-import ft "shared:freetype"
+// import ft "shared:freetype"
 
 Vertex :: struct {
 	position: glm.vec3,
-	color:    glm.vec3,
+	color:    glm.vec4,
 }
 
 update :: proc(vertices: []Vertex, uniforms: map[string]gl.Uniform_Info) {
@@ -45,6 +45,8 @@ draw_axes :: proc(indices: []u16) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
 	gl.LineWidth(2.)
+	gl.Enable(gl.BLEND)
+	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 	gl.DrawElements(gl.LINES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 
@@ -63,7 +65,7 @@ bind_data :: proc(vbo: u32, ebo: u32, data: []Vertex, indices: []u16) {
 	gl.EnableVertexAttribArray(0)
 	gl.EnableVertexAttribArray(1)
 	gl.VertexAttribPointer(0, 3, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, position))
-	gl.VertexAttribPointer(1, 3, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, color))
+	gl.VertexAttribPointer(1, 4, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, color))
 	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
 	gl.BufferData(
 		gl.ELEMENT_ARRAY_BUFFER,
