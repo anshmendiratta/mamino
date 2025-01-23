@@ -68,6 +68,8 @@ main :: proc() {
 	// ft_face: ft.Face
 	// ft_ok = ft.new_face(ft_library, FONT_FILE_NAME, 0, &ft_face)
 	// fmt.println(ft_ok)
+	//font := ft.init_free_type(nil)
+	//fmt.println(font)
 
 	for (!glfw.WindowShouldClose(window) && render.running) {
 		// Performance stdout logging.

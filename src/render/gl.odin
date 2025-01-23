@@ -7,8 +7,6 @@ import glm "core:math/linalg/glsl"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
 
-// import ft "shared:freetype"
-
 Vertex :: struct {
 	position: glm.vec3,
 	color:    glm.vec4,
