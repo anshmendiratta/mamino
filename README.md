@@ -9,6 +9,8 @@ To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and co
 - OpenGL 4.1
 - freetype
 
+`freetype` is imported from the `shared/` directory -- this is located in `ODIN_ROOT`. To find out where this is, you can use `odin root`. Place your files inside the `freetype/` directory after creating it, and things should work. For this project, we used [odin-freetype](https://github.com/englerj/odin-freetype)
+
 ## Goals
 - [x] Render vertices as points (respecting z-index)
 - [x] Render cubes using indexed drawing
