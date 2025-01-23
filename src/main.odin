@@ -54,9 +54,24 @@ main :: proc() {
 	defer gl.DeleteBuffers(1, &line_vbo)
 	defer gl.DeleteBuffers(1, &line_ebo)
 
+	// Initialize axes.
+	axes_vao, axes_vbo, axes_ebo := render.get_buffer_objects()
+	defer gl.DeleteVertexArrays(1, &axes_vao)
+	defer gl.DeleteBuffers(1, &axes_vbo)
+	defer gl.DeleteBuffers(1, &axes_ebo)
+
 	logger: Logger = {{}}
 
 	last_frame := glfw.GetTime()
+
+	// FONT_FILE_NAME :: "HackNerdFontMono-Bold.ttf"
+	// ft_library: ft.Library
+	// ft_ok := ft.init_free_type(&ft_library)
+	// ft_face: ft.Face
+	// ft_ok = ft.new_face(ft_library, FONT_FILE_NAME, 0, &ft_face)
+	// fmt.println(ft_ok)
+	//font := ft.init_free_type(nil)
+	//fmt.println(font)
 
 	for (!glfw.WindowShouldClose(window) && render.running) {
 		// Performance stdout logging.
@@ -76,6 +91,7 @@ main :: proc() {
 		render.update(cube_vertices, uniforms)
 		render.update(point_vertices, uniforms)
 		render.update(line_vertices, uniforms)
+		render.update(axes_vertices, uniforms)
 
 		// Cube.
 		render.bind_data(cube_vbo, cube_ebo, cube_vertices, cube_indices)
@@ -88,6 +104,10 @@ main :: proc() {
 		// Lines.
 		render.bind_data(line_vbo, line_ebo, line_vertices, line_indices)
 		render.draw_lines(line_indices)
+
+		// Axes.
+		render.bind_data(axes_vbo, axes_ebo, axes_vertices, axes_indices)
+		render.draw_axes(axes_indices)
 
 		// NOTE: Defaults to double buffering I think? - Ansh
 		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
