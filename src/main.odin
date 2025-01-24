@@ -18,7 +18,11 @@ main :: proc() {
 	defer glfw.DestroyWindow(window)
 
 	// Load shaders.
-	program, ok := gl.load_shaders_source(render.vertex_shader, render.fragment_shader)
+	program, ok := gl.load_shaders_source(
+		render.mamino_vertex_shader,
+		render.mamino_fragment_shader,
+	)
+	// program, ok := gl.load_shaders_source(render.text_vertex_shader, render.text_fragment_shader)
 	if !ok {
 		fmt.eprintln("Could not load shaders.")
 		return
@@ -62,51 +66,59 @@ main :: proc() {
 
 	logger: Logger = {{}}
 	ft_library, ft_face := logger_font_init()
-	logger_render_font(ft_library, ft_face)
+	text: string = "hello world"
+	characters: map[rune]Character = logger_create_characters(ft_library, ft_face, text)
+
+	text_vao, text_vbo, _ := render.get_buffer_objects()
+	render.bind_text_data(text_vao, text_vbo, characters)
+	text_render_info: TextRenderInfo = {25., 25., 1., glm.vec3{0.5, 0.8, 0.2}}
+	logger_render_text(uniforms, characters, text_vao, text_vbo, &text_render_info)
 
 	last_frame := glfw.GetTime()
 
-	// for (!glfw.WindowShouldClose(window) && render.running) {
-	// 	// Performance stdout logging.
-	// 	time_for_frame := glfw.GetTime() - last_frame
-	// 	last_frame = glfw.GetTime()
-	// 	append(&logger.times_per_frame, time_for_frame)
+	for (!glfw.WindowShouldClose(window) && render.running) {
+		// Performance stdout logging.
+		time_for_frame := glfw.GetTime() - last_frame
+		last_frame = glfw.GetTime()
+		append(&logger.times_per_frame, time_for_frame)
 
-	// 	// Process inputs.
-	// 	glfw.PollEvents()
+		// Process inputs.
+		glfw.PollEvents()
 
-	// 	gl.ClearColor(0.1, 0.1, 0.1, 1.0)
-	// 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+		gl.ClearColor(0.1, 0.1, 0.1, 1.0)
+		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-	// 	render.update_camera()
+		logger_render_text(uniforms, characters, text_vao, text_vbo, &text_render_info)
 
-	// 	// Update (rotate) the vertices every frame.
-	// 	render.update(cube_vertices, uniforms)
-	// 	render.update(point_vertices, uniforms)
-	// 	render.update(line_vertices, uniforms)
-	// 	render.update(axes_vertices, uniforms)
+		render.update_camera()
 
-	// 	// Cube.
-	// 	render.bind_data(cube_vbo, cube_ebo, cube_vertices, cube_indices)
-	// 	render.draw_cube(cube_vertices, i32(len(cube_indices)))
+		// Update (rotate) the vertices every frame.
+		render.update(cube_vertices, uniforms)
+		render.update(point_vertices, uniforms)
+		render.update(line_vertices, uniforms)
+		render.update(axes_vertices, uniforms)
 
-	// 	// Points.
-	// 	render.bind_data(point_vbo, point_ebo, point_vertices, point_indices)
-	// 	render.draw_points(point_indices)
+		// Cube.
+		render.bind_data(cube_vbo, cube_ebo, cube_vertices, cube_indices)
+		render.draw_cube(cube_vertices, i32(len(cube_indices)))
 
-	// 	// Lines.
-	// 	render.bind_data(line_vbo, line_ebo, line_vertices, line_indices)
-	// 	render.draw_lines(line_indices)
+		// Points.
+		render.bind_data(point_vbo, point_ebo, point_vertices, point_indices)
+		render.draw_points(point_indices)
 
-	// 	// Axes.
-	// 	render.bind_data(axes_vbo, axes_ebo, axes_vertices, axes_indices)
-	// 	render.draw_axes(axes_indices)
+		// Lines.
+		render.bind_data(line_vbo, line_ebo, line_vertices, line_indices)
+		render.draw_lines(line_indices)
 
-	// 	// NOTE: Defaults to double buffering I think? - Ansh
-	// 	// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
-	// 	// https://www.glfw.org/docs/3.0/group__context.html#ga15a5a1ee5b3c2ca6b15ca209a12efd14
-	// 	glfw.SwapBuffers(window)
-	// }
+		// Axes.
+		render.bind_data(axes_vbo, axes_ebo, axes_vertices, axes_indices)
+		render.draw_axes(axes_indices)
+
+		// NOTE: Defaults to double buffering I think? - Ansh
+		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
+		// https://www.glfw.org/docs/3.0/group__context.html#ga15a5a1ee5b3c2ca6b15ca209a12efd14
+		glfw.SwapBuffers(window)
+	}
 
 	fmt.println("Average:", calculate_avg_fps(logger.times_per_frame), "FPS")
 	render.mamino_exit()

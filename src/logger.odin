@@ -10,6 +10,8 @@ import gl "vendor:OpenGL"
 
 import ft "shared:freetype"
 
+import "render"
+
 Logger :: struct {
 	times_per_frame: [dynamic]f64,
 }
@@ -24,7 +26,7 @@ calculate_avg_fps :: proc(times_per_frame: [dynamic]f64) -> (avg: f64) {
 }
 
 logger_font_init :: proc() -> (ft_library: ft.Library, ft_face: ft.Face) {
-	FONT_FILE_NAME :: "HackNerdFont-Regular.ttf"
+	FONT_FILE_NAME :: "assets/HackNerdFont-Regular.ttf"
 	ft_ok := ft.init_free_type(&ft_library)
 
 	if ft_ok != .Ok {
@@ -52,48 +54,127 @@ Character :: struct {
 	advance:    u32,
 }
 
-characters: map[rune]Character
 
-logger_render_font :: proc(ft_library: ft.Library, ft_face: ft.Face) {
+logger_create_characters :: proc(
+	ft_library: ft.Library,
+	ft_face: ft.Face,
+	text: string,
+) -> (
+	characters: map[rune]Character,
+) {
 	ft_load_flags: ft.Load_Flags
 	ft_error := ft.load_char(ft_face, 'X', ft_load_flags)
 	assert(ft_error == .Ok)
 	ft_error = ft.render_glyph(ft_face.glyph, .Normal)
 	assert(ft_error == .Ok)
 
-	texture: u32
-	gl.GenTextures(1, &texture)
-	gl.BindTexture(gl.TEXTURE_2D, texture)
-	gl.TexImage2D(
-		gl.TEXTURE_2D,
-		0,
-		gl.RED,
-		i32(ft_face.glyph.bitmap.width),
-		i32(ft_face.glyph.bitmap.rows),
-		0,
-		gl.RED,
-		gl.UNSIGNED_BYTE,
-		ft_face.glyph.bitmap.buffer,
-	)
+	for r in text {
+		texture: u32
+		gl.GenTextures(1, &texture)
+		gl.BindTexture(gl.TEXTURE_2D, texture)
+		gl.TexImage2D(
+			gl.TEXTURE_2D,
+			0,
+			gl.RED,
+			i32(ft_face.glyph.bitmap.width),
+			i32(ft_face.glyph.bitmap.rows),
+			0,
+			gl.RED,
+			gl.UNSIGNED_BYTE,
+			ft_face.glyph.bitmap.buffer,
+		)
 
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
 
-	character: Character = {
-		texture,
-		glm.ivec2{i32(ft_face.glyph.bitmap.width), i32(ft_face.glyph.bitmap.rows)},
-		glm.ivec2{i32(ft_face.glyph.bitmap.width), i32(ft_face.glyph.bitmap.rows)},
-		u32(ft_face.glyph.advance.x),
+		character: Character = {
+			texture,
+			glm.ivec2{i32(ft_face.glyph.bitmap.width), i32(ft_face.glyph.bitmap.rows)},
+			glm.ivec2{i32(ft_face.glyph.bitmap.width), i32(ft_face.glyph.bitmap.rows)},
+			u32(ft_face.glyph.advance.x),
+		}
+
+		characters[r] = character
 	}
-	characters['X'] = character
 
 	ft.done_face(ft_face)
 	ft.done_free_type(ft_library)
+
+	return
 }
 
-logger_render :: proc() {
+TextRenderInfo :: struct {
+	x:     f32,
+	y:     f32,
+	scale: f32,
+	color: glm.vec3,
+}
 
+logger_render_text :: proc(
+	uniforms: map[string]gl.Uniform_Info,
+	characters: map[rune]Character,
+	vao: u32,
+	vbo: u32,
+	text_render_info: ^TextRenderInfo,
+) -> Maybe(u32) {
+	text_transformation := glm.mat4Ortho3d(
+		0.,
+		render.WINDOW_WIDTH,
+		0.,
+		render.WINDOW_HEIGHT,
+		0.,
+		1.,
+	)
+	gl.UniformMatrix4fv(uniforms["text_transform"].location, 1, false, &text_transformation[0, 0])
+
+	program, ok := gl.load_shaders_source(render.text_vertex_shader, render.text_fragment_shader)
+	if !ok {
+		fmt.eprintln("Could not load shaders.")
+		return program
+	}
+	gl.UseProgram(program)
+	gl.VertexAttribPointer(0, 4, gl.FLOAT, false, size_of(f32), 0.)
+
+	gl.Uniform3f(
+		gl.GetUniformLocation(program, "text_color"),
+		text_render_info.color.x,
+		text_render_info.color.y,
+		text_render_info.color.z,
+	)
+	gl.ActiveTexture(gl.TEXTURE0)
+	gl.BindVertexArray(vao)
+
+	for r, char in characters {
+		x_pos: f32 = text_render_info.x + f32(char.bearing.x) * text_render_info.scale
+		y_pos: f32 =
+			text_render_info.y - f32(char.size.y - char.bearing.y) * text_render_info.scale
+
+		w: f32 = f32(char.size.x) * text_render_info.scale
+		h: f32 = f32(char.size.y) * text_render_info.scale
+
+		vertices: []glm.vec4 = {
+			{x_pos, y_pos + h, 0., 0.},
+			{x_pos, y_pos, 0., 1.},
+			{x_pos + w, y_pos + h, 1., 1.},
+			{x_pos, y_pos + h, 0., 0.},
+			{x_pos + w, y_pos, 1., 1.},
+			{x_pos + w, y_pos + h, 1., 0.},
+		}
+
+		gl.BindTexture(gl.TEXTURE_2D, char.texture_id)
+		gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
+		gl.BufferSubData(gl.ARRAY_BUFFER, 0, size_of(vertices), raw_data(vertices))
+		gl.BindBuffer(gl.ARRAY_BUFFER, 0)
+		gl.DrawArrays(gl.TRIANGLES, 0, 6)
+
+		text_render_info.x += f32(char.advance >> 6) * text_render_info.scale
+	}
+
+	gl.BindVertexArray(0)
+	gl.BindTexture(gl.TEXTURE_2D, 0)
+
+	return program
 }
 

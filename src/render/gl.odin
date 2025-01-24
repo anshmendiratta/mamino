@@ -55,8 +55,6 @@ get_buffer_objects :: proc() -> (vao: u32, vbo: u32, ebo: u32) {
 	return
 }
 
-// NOTE: VAO unused??? - Henock
-// NOTE: Seems like it. Removed from func def. - Ansh
 bind_data :: proc(vbo: u32, ebo: u32, data: []Vertex, indices: []u16) {
 	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
 	gl.BufferData(gl.ARRAY_BUFFER, len(data) * size_of(Vertex), raw_data(data), gl.STATIC_DRAW)
@@ -78,5 +76,15 @@ bind_data :: proc(vbo: u32, ebo: u32, data: []Vertex, indices: []u16) {
 		raw_data(indices),
 		gl.STATIC_DRAW,
 	)
+}
+
+bind_text_data :: proc(vao: u32, vbo: u32, data: any) {
+	gl.BindVertexArray(vao)
+	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
+	gl.BufferData(gl.ARRAY_BUFFER, 6 * 4 * size_of(f32), nil, gl.DYNAMIC_DRAW)
+	gl.EnableVertexAttribArray(0)
+	gl.VertexAttribPointer(0, 4, gl.FLOAT, gl.FALSE, 4 * size_of(f32), 0)
+	gl.BindBuffer(gl.ARRAY_BUFFER, 0)
+	gl.BindVertexArray(0)
 }
 
