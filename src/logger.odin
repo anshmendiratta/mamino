@@ -28,21 +28,15 @@ calculate_avg_fps :: proc(times_per_frame: [dynamic]f64) -> (avg: f64) {
 logger_font_init :: proc() -> (ft_library: ft.Library, ft_face: ft.Face) {
 	FONT_FILE_NAME :: "assets/HackNerdFont-Regular.ttf"
 	ft_ok := ft.init_free_type(&ft_library)
-
 	if ft_ok != .Ok {
 		fmt.println("Logging: Could not init ft.")
 		return
 	}
-
 	ft_ok = ft.new_face(ft_library, FONT_FILE_NAME, 0, &ft_face)
-
 	if ft_ok != .Ok {
 		fmt.println("Logging: Could not init font file.")
 		return
 	}
-
-	ft.set_pixel_sizes(ft_face, 0, 48)
-	gl.PixelStorei(gl.UNPACK_ALIGNMENT, 1) // disable byte-alignment restriction
 
 	return
 }
@@ -54,7 +48,6 @@ Character :: struct {
 	advance:    u32,
 }
 
-
 logger_create_characters :: proc(
 	ft_library: ft.Library,
 	ft_face: ft.Face,
@@ -62,13 +55,17 @@ logger_create_characters :: proc(
 ) -> (
 	characters: map[rune]Character,
 ) {
+	ft.set_pixel_sizes(ft_face, 0, 48)
+	gl.PixelStorei(gl.UNPACK_ALIGNMENT, 1) // disable byte-alignment restriction
+
 	ft_load_flags: ft.Load_Flags
-	ft_error := ft.load_char(ft_face, 'X', ft_load_flags)
-	assert(ft_error == .Ok)
-	ft_error = ft.render_glyph(ft_face.glyph, .Normal)
-	assert(ft_error == .Ok)
 
 	for r in text {
+		ft_ok := ft.load_char(ft_face, u64(r), ft_load_flags)
+		if ft_ok != .Ok {
+			fmt.println("Logger: Could not load char:", r)
+		}
+
 		texture: u32
 		gl.GenTextures(1, &texture)
 		gl.BindTexture(gl.TEXTURE_2D, texture)
@@ -98,7 +95,7 @@ logger_create_characters :: proc(
 
 		characters[r] = character
 	}
-
+	gl.BindTexture(gl.TEXTURE_2D, 0)
 	ft.done_face(ft_face)
 	ft.done_free_type(ft_library)
 
@@ -124,8 +121,8 @@ logger_render_text :: proc(
 		render.WINDOW_WIDTH,
 		0.,
 		render.WINDOW_HEIGHT,
-		0.,
-		1.,
+		0.1,
+		100.,
 	)
 	gl.UniformMatrix4fv(uniforms["text_transform"].location, 1, false, &text_transformation[0, 0])
 

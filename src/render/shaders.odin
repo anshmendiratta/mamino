@@ -45,8 +45,8 @@ text_vertex_shader := `
 	uniform mat4 text_transform;
 
 	void main() {
-		tex_coords = glyph_data.zw;
 		gl_Position = text_transform * vec4(glyph_data.xy, 0., 1.0);
+		tex_coords = glyph_data.zw;
 	}
 `
 
