@@ -11,7 +11,8 @@ Scale :: struct {
 	z: f32,
 }
 
-// `x`, `y`, `z` are angles (radians). Each corresponds to the angle the object's #-axis is rotated relative to the standard axis.
+// See: https://en.wikipedia.org/wiki/Euler%27s_rotation_theorem
+// Stores the orientation of an object as some rotation around the `norm`(al vector) by some `angle` radians.
 Orientation :: struct {
 	norm:  glm.vec3,
 	angle: f32,
