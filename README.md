@@ -6,6 +6,7 @@ To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and co
 
 ## Dependencies
 - glfw
+- OpenGL 4.1
 
 ## Goals
 - [x] Render vertices as points (respecting z-index)
