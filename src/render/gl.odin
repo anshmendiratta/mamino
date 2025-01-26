@@ -12,12 +12,13 @@ Vertex :: struct {
 	color:    glm.vec4,
 }
 
-update_view :: proc(uniforms: map[string]gl.Uniform_Info) {
+update_shader :: proc(uniforms: map[string]gl.Uniform_Info) {
 	proj := glm.mat4Perspective(glm.radians_f32(45), 1.3, 0.1, 100.0)
 	scale := f32(0.3)
 	model := glm.mat4{scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., 1}
-	v_transform := proj * camera_view_matrix * model
-	gl.UniformMatrix4fv(uniforms["v_transform"].location, 1, false, &v_transform[0, 0])
+	gl.UniformMatrix4fv(uniforms["proj"].location, 1, false, &proj[0, 0])
+	gl.UniformMatrix4fv(uniforms["view"].location, 1, false, &camera_view_matrix[0, 0])
+	gl.UniformMatrix4fv(uniforms["model"].location, 1, false, &model[0, 0])
 }
 
 draw_cube :: proc(vertices: []Vertex, indices_count: i32) {

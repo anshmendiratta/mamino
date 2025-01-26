@@ -87,12 +87,12 @@ main :: proc() {
 				objects.color_vertices(cube_vertices, objects.line_color)
 				render.bind_data(line_vbo, line_ebo, cube_vertices, objects.line_indices)
 				render.draw_lines(cube_vertices, objects.line_indices)
-
-				// Update (rotate) the vertices every frame.
-				render.update_view(uniforms)
 			case:
 			}
 		}
+
+		// Update (rotate) the vertices every frame.
+		render.update_shader(uniforms)
 
 		// Axes.
 		render.bind_data(axes_vbo, axes_ebo, objects.axes_vertices, objects.axes_indices)

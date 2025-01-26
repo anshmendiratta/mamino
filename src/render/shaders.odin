@@ -8,9 +8,12 @@ vertex_shader := `
 	out vec4 f_color;
 	out vec3 v_coord;
 
-	uniform mat4 v_transform;
+	uniform mat4 proj;
+	uniform mat4 view;
+	uniform mat4 model;
 
 	void main() {
+		mat4 v_transform = proj * view * model;
 		gl_Position = v_transform * vec4(position, 1.0);
 		gl_PointSize = 20.;
 		v_coord = position;
