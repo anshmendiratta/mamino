@@ -14,11 +14,11 @@ To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and co
 - [x] Camera rotation with spherical coordinates
 - [x] Render edges as lines (respecting z-index)
 - [x] Add perspective to renders
-- [ ] Move to MVP translation matrices in shader
-- [ ] Render coordinate axes
+- [x] Move to MVP translation matrices in shader
+- [x] Render coordinate axes
+- [x] Translate meshes w.r.t the origin
 - [ ] Add tiling textures on faces
 - [ ] Add translucency to select faces
-- [ ] Translate meshes w.r.t the origin
 - [ ] Add "ambient occlusion" to mesh face colors to indicate orientation
 - [ ] Render face normals (respecting z-index)
 - [ ] "Spawn meshes" (and their spawn animation)
