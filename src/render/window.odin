@@ -69,33 +69,28 @@ mamino_exit :: proc() {
 }
 
 key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
-	if key == glfw.KEY_ESCAPE || key == glfw.KEY_Q {
+	switch key {
+	case glfw.KEY_ESCAPE, glfw.KEY_Q:
 		running = false
-	}
-	if key == glfw.KEY_W || key == glfw.KEY_UP {
+	case glfw.KEY_W, glfw.KEY_UP:
 		camera_position_spherical.z = glm.clamp(
 			camera_position_spherical.z + rotation_rate,
 			-theta_bound,
 			theta_bound,
 		)
-	}
-	if key == glfw.KEY_S || key == glfw.KEY_DOWN {
+	case glfw.KEY_A, glfw.KEY_LEFT:
+		camera_position_spherical.y += rotation_rate
+	case glfw.KEY_S, glfw.KEY_DOWN:
 		camera_position_spherical.z = glm.clamp(
 			camera_position_spherical.z - rotation_rate,
 			-theta_bound,
 			theta_bound,
 		)
-	}
-	if key == glfw.KEY_A || key == glfw.KEY_LEFT {
-		camera_position_spherical.y += rotation_rate
-	}
-	if key == glfw.KEY_D || key == glfw.KEY_RIGHT {
+	case glfw.KEY_D, glfw.KEY_RIGHT:
 		camera_position_spherical.y -= rotation_rate
-	}
-	if key == glfw.KEY_EQUAL {
+	case glfw.KEY_EQUAL:
 		camera_position_spherical.x -= zoom_rate
-	}
-	if key == glfw.KEY_MINUS {
+	case glfw.KEY_MINUS:
 		camera_position_spherical.x += zoom_rate
 	}
 }
