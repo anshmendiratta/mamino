@@ -5,6 +5,7 @@ package main
 import "core:c"
 import "core:fmt"
 import glm "core:math/linalg/glsl"
+import "core:mem"
 import "core:time"
 
 import gl "vendor:OpenGL"
@@ -49,13 +50,14 @@ main :: proc() {
 	defer gl.DeleteBuffers(1, &axes_ebo)
 
 	logger: Logger = {{}}
+	defer delete(logger.times_per_frame)
 
 	last_frame := glfw.GetTime()
 
 	for (!glfw.WindowShouldClose(window) && render.running) {
 		// Performance stdout logging.
 		time_for_frame := glfw.GetTime() - last_frame
-		fmt.println(1 / time_for_frame)
+		// fmt.println(1 / time_for_frame)
 		last_frame = glfw.GetTime()
 		append(&logger.times_per_frame, time_for_frame)
 
@@ -72,8 +74,9 @@ main :: proc() {
 			case objects.Cube:
 				// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
 				cube_vertices := objects.get_vertices(object)
-				cube_vao, cube_vbo, cube_ebo := render.get_buffer_objects()
+				defer delete(cube_vertices)
 				// Cube.
+				cube_vao, cube_vbo, cube_ebo := render.get_buffer_objects()
 				render.bind_data(cube_vbo, cube_ebo, cube_vertices, objects.cube_indices)
 				render.draw_cube(cube_vertices, i32(len(objects.cube_indices)))
 				// Points.
@@ -86,6 +89,16 @@ main :: proc() {
 				objects.color_vertices(cube_vertices, objects.line_color)
 				render.bind_data(line_vbo, line_ebo, cube_vertices, objects.line_indices)
 				render.draw_lines(cube_vertices, objects.line_indices)
+
+				gl.DeleteVertexArrays(1, &cube_vao)
+				gl.DeleteVertexArrays(1, &point_vao)
+				gl.DeleteVertexArrays(1, &line_vao)
+				gl.DeleteBuffers(1, &cube_vbo)
+				gl.DeleteBuffers(1, &cube_ebo)
+				gl.DeleteBuffers(1, &point_vbo)
+				gl.DeleteBuffers(1, &point_ebo)
+				gl.DeleteBuffers(1, &line_vbo)
+				gl.DeleteBuffers(1, &line_ebo)
 			case:
 			}
 		}
@@ -103,7 +116,7 @@ main :: proc() {
 		glfw.SwapBuffers(window)
 	}
 
-	fmt.println("Average:", calculate_avg_fps(logger.times_per_frame), "FPS")
+	// fmt.println("Average:", calculate_avg_fps(logger.times_per_frame), "FPS")
 	render.mamino_exit()
 }
 

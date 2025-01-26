@@ -1,6 +1,7 @@
 package objects
 
 import glm "core:math/linalg/glsl"
+import "core:mem"
 
 import "../render"
 
