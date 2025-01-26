@@ -1,3 +1,5 @@
+#+feature dynamic-literals
+
 package main
 
 import "core:c"
@@ -8,6 +10,7 @@ import "core:time"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
 
+import objects "objects"
 import "render"
 
 main :: proc() {
@@ -26,35 +29,20 @@ main :: proc() {
 	gl.UseProgram(program)
 	defer gl.DeleteProgram(program)
 
-	gl.Enable(gl.DEPTH_TEST)
-	// debug to see wireframe of cube
-	// gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
-
 	// Uniforms.
 	uniforms := gl.get_uniforms_from_program(program)
 	defer delete(uniforms)
 
-	// Initialize cube.
-	cube_vao, cube_vbo, cube_ebo := render.get_buffer_objects()
-	defer gl.DeleteVertexArrays(1, &cube_vao)
-	defer gl.DeleteBuffers(1, &cube_vbo)
-	defer gl.DeleteBuffers(1, &cube_ebo)
+	gl.Enable(gl.DEPTH_TEST)
+	// Debug to see wireframe of cube.
+	// gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
 
-	// Initialize points.
-	// TODO: figure out why points rely on indexed drawing if
-	// draw_points does not rely on EBO
-	point_vao, point_vbo, point_ebo := render.get_buffer_objects()
-	defer gl.DeleteVertexArrays(1, &point_vao)
-	defer gl.DeleteBuffers(1, &point_vbo)
-	defer gl.DeleteBuffers(1, &point_ebo)
+	render_objects: []union {
+		objects.Cube,
+	} =
+		{objects.Cube{center = {1., 1., 1.}, scale = {3., 1., 1.}, orientation = {glm.vec3{0., 1., 0.}, glm.radians(f32(45.))}}}
 
-	// Initialize lines.
-	line_vao, line_vbo, line_ebo := render.get_buffer_objects()
-	defer gl.DeleteVertexArrays(1, &line_vao)
-	defer gl.DeleteBuffers(1, &line_vbo)
-	defer gl.DeleteBuffers(1, &line_ebo)
-
-	// Initialize axes.
+	// Initialize axes. Done outside the loop because this will always be done and rendered.
 	axes_vao, axes_vbo, axes_ebo := render.get_buffer_objects()
 	defer gl.DeleteVertexArrays(1, &axes_vao)
 	defer gl.DeleteBuffers(1, &axes_vbo)
@@ -64,15 +52,6 @@ main :: proc() {
 
 	last_frame := glfw.GetTime()
 
-	// FONT_FILE_NAME :: "HackNerdFontMono-Bold.ttf"
-	// ft_library: ft.Library
-	// ft_ok := ft.init_free_type(&ft_library)
-	// ft_face: ft.Face
-	// ft_ok = ft.new_face(ft_library, FONT_FILE_NAME, 0, &ft_face)
-	// fmt.println(ft_ok)
-	//font := ft.init_free_type(nil)
-	//fmt.println(font)
-
 	for (!glfw.WindowShouldClose(window) && render.running) {
 		// Performance stdout logging.
 		time_for_frame := glfw.GetTime() - last_frame
@@ -81,33 +60,43 @@ main :: proc() {
 
 		// Process inputs.
 		glfw.PollEvents()
+		// Update cameras if necessary.
+		render.update_camera()
 
 		gl.ClearColor(0.1, 0.1, 0.1, 1.0)
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-		render.update_camera()
+		for generic_object in render_objects {
+			#partial switch object in generic_object {
+			case objects.Cube:
+				// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
+				cube_vertices := objects.get_vertices(object)
+				fmt.println(cube_vertices)
 
-		// Update (rotate) the vertices every frame.
-		render.update(cube_vertices, uniforms)
-		render.update(point_vertices, uniforms)
-		render.update(line_vertices, uniforms)
-		render.update(axes_vertices, uniforms)
+				cube_vao, cube_vbo, cube_ebo := render.get_buffer_objects()
+				// Cube.
+				render.bind_data(cube_vbo, cube_ebo, cube_vertices, objects.cube_indices)
+				render.draw_cube(cube_vertices, i32(len(objects.cube_indices)))
+				// Points.
+				point_vao, point_vbo, point_ebo := render.get_buffer_objects()
+				objects.color_vertices(cube_vertices, objects.point_color)
+				render.bind_data(point_vbo, point_ebo, cube_vertices, objects.point_indices)
+				render.draw_points(cube_vertices, objects.point_indices)
+				// Lines.
+				line_vao, line_vbo, line_ebo := render.get_buffer_objects()
+				objects.color_vertices(cube_vertices, objects.line_color)
+				render.bind_data(line_vbo, line_ebo, cube_vertices, objects.line_indices)
+				render.draw_lines(cube_vertices, objects.line_indices)
 
-		// Cube.
-		render.bind_data(cube_vbo, cube_ebo, cube_vertices, cube_indices)
-		render.draw_cube(cube_vertices, i32(len(cube_indices)))
-
-		// Points.
-		render.bind_data(point_vbo, point_ebo, point_vertices, point_indices)
-		render.draw_points(point_indices)
-
-		// Lines.
-		render.bind_data(line_vbo, line_ebo, line_vertices, line_indices)
-		render.draw_lines(line_indices)
+				// Update (rotate) the vertices every frame.
+				render.update_view(uniforms)
+			case:
+			}
+		}
 
 		// Axes.
-		render.bind_data(axes_vbo, axes_ebo, axes_vertices, axes_indices)
-		render.draw_axes(axes_indices)
+		render.bind_data(axes_vbo, axes_ebo, objects.axes_vertices, objects.axes_indices)
+		render.draw_axes(objects.axes_indices)
 
 		// NOTE: Defaults to double buffering I think? - Ansh
 		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering

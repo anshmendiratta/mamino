@@ -12,7 +12,7 @@ Vertex :: struct {
 	color:    glm.vec4,
 }
 
-update :: proc(vertices: []Vertex, uniforms: map[string]gl.Uniform_Info) {
+update_view :: proc(uniforms: map[string]gl.Uniform_Info) {
 	proj := glm.mat4Perspective(glm.radians_f32(45), 1.3, 0.1, 100.0)
 	scale := f32(0.3)
 	model := glm.mat4{scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., 1}
@@ -26,13 +26,13 @@ draw_cube :: proc(vertices: []Vertex, indices_count: i32) {
 	gl.DrawElements(gl.TRIANGLES, indices_count, gl.UNSIGNED_SHORT, nil)
 }
 
-draw_points :: proc(indices: []u16) {
+draw_points :: proc(vertices: []Vertex, indices: []u16) {
 	gl.Enable(gl.PROGRAM_POINT_SIZE)
 	gl.Enable(gl.POINT_SMOOTH)
-	gl.DrawArrays(gl.POINTS, 0, i32(len(indices)))
+	gl.DrawElements(gl.POINTS, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 
-draw_lines :: proc(indices: []u16) {
+draw_lines :: proc(vertices: []Vertex, indices: []u16) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
 	gl.LineWidth(5.)
@@ -55,8 +55,6 @@ get_buffer_objects :: proc() -> (vao: u32, vbo: u32, ebo: u32) {
 	return
 }
 
-// NOTE: VAO unused??? - Henock
-// NOTE: Seems like it. Removed from func def. - Ansh
 bind_data :: proc(vbo: u32, ebo: u32, data: []Vertex, indices: []u16) {
 	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
 	gl.BufferData(gl.ARRAY_BUFFER, len(data) * size_of(Vertex), raw_data(data), gl.STATIC_DRAW)
