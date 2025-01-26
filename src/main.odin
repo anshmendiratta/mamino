@@ -40,7 +40,7 @@ main :: proc() {
 	render_objects: []union {
 		objects.Cube,
 	} =
-		{objects.Cube{center = {1., 1., 1.}, scale = {3., 1., 1.}, orientation = {glm.vec3{0., 1., 0.}, glm.radians(f32(45.))}}}
+		{objects.Cube{center = {1., 1., 1.}, scale = {3., 1., 1.}, orientation = {glm.vec3{0., 1., 0.}, glm.radians(f32(45.))}}, objects.Cube{center = {-1., 1., -1.}, scale = {1., 2., 1.}, orientation = {glm.vec3{1., 1., 1.}, glm.radians(f32(35.))}}, objects.Cube{center = {0., 3., 2.}, scale = {0.5, 0.5, 0.5}, orientation = {glm.vec3{1., 0., 0.}, glm.radians(f32(60.))}}}
 
 	// Initialize axes. Done outside the loop because this will always be done and rendered.
 	axes_vao, axes_vbo, axes_ebo := render.get_buffer_objects()
@@ -55,6 +55,7 @@ main :: proc() {
 	for (!glfw.WindowShouldClose(window) && render.running) {
 		// Performance stdout logging.
 		time_for_frame := glfw.GetTime() - last_frame
+		fmt.println(1 / time_for_frame)
 		last_frame = glfw.GetTime()
 		append(&logger.times_per_frame, time_for_frame)
 
@@ -71,8 +72,6 @@ main :: proc() {
 			case objects.Cube:
 				// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
 				cube_vertices := objects.get_vertices(object)
-				fmt.println(cube_vertices)
-
 				cube_vao, cube_vbo, cube_ebo := render.get_buffer_objects()
 				// Cube.
 				render.bind_data(cube_vbo, cube_ebo, cube_vertices, objects.cube_indices)
