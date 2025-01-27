@@ -69,26 +69,28 @@ main :: proc() {
 		gl.ClearColor(0.1, 0.1, 0.1, 1.0)
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
+		vertices: []render.Vertex
+		defer delete(vertices)
+
 		for generic_object in render_objects {
 			#partial switch object in generic_object {
 			case objects.Cube:
 				// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
-				cube_vertices := objects.get_vertices(object)
-				defer delete(cube_vertices)
+				vertices = objects.get_vertices(object)
 				// Cube.
 				cube_vao, cube_vbo, cube_ebo := render.get_buffer_objects()
-				render.bind_data(cube_vbo, cube_ebo, cube_vertices, objects.cube_indices)
-				render.draw_cube(cube_vertices, i32(len(objects.cube_indices)))
+				render.bind_data(cube_vbo, cube_ebo, vertices, objects.cube_indices)
+				render.draw_cube(vertices, i32(len(objects.cube_indices)))
 				// Points.
 				point_vao, point_vbo, point_ebo := render.get_buffer_objects()
-				objects.color_vertices(cube_vertices, objects.point_color)
-				render.bind_data(point_vbo, point_ebo, cube_vertices, objects.point_indices)
-				render.draw_points(cube_vertices, objects.point_indices)
+				objects.color_vertices(vertices, objects.point_color)
+				render.bind_data(point_vbo, point_ebo, vertices, objects.point_indices)
+				render.draw_points(vertices, objects.point_indices)
 				// Lines.
 				line_vao, line_vbo, line_ebo := render.get_buffer_objects()
-				objects.color_vertices(cube_vertices, objects.line_color)
-				render.bind_data(line_vbo, line_ebo, cube_vertices, objects.line_indices)
-				render.draw_lines(cube_vertices, objects.line_indices)
+				objects.color_vertices(vertices, objects.line_color)
+				render.bind_data(line_vbo, line_ebo, vertices, objects.line_indices)
+				render.draw_lines(vertices, objects.line_indices)
 
 				gl.DeleteVertexArrays(1, &cube_vao)
 				gl.DeleteVertexArrays(1, &point_vao)

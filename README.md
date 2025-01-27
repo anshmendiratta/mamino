@@ -15,7 +15,7 @@ To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and co
 - [x] Render edges as lines (respecting z-index)
 - [x] Add perspective to renders
 - [x] Move to MVP translation matrices in shader
-- [x] Render coordinate axes
+- [x] Render coordinate axes (color-coded and labelled)
 - [x] Translate meshes w.r.t the origin
 - [ ] Add tiling textures on faces
 - [ ] Add translucency to select faces

@@ -5,11 +5,14 @@ import glm "core:math/linalg/glsl"
 import "../render"
 
 // Colors.
-axes_color: glm.vec4 = rgb_hex_to_color(0x67_BD_FF, 0.2)
+x_axis_color: glm.vec4 = rgb_hex_to_color(0xeb_3a_34, 0.2)
+y_axis_color: glm.vec4 = rgb_hex_to_color(0x46_eb_34, 0.2)
+z_axis_color: glm.vec4 = rgb_hex_to_color(0x34_65_eb, 0.2)
 point_color: glm.vec4 = rgb_hex_to_color(0xFF_FF_FF)
-line_color: glm.vec4 = rgb_hex_to_color(0xFF_FF_FF, 1.)
-cube_color: glm.vec4 = rgb_hex_to_color(0xD3_47_3D) // red
+line_color: glm.vec4 = rgb_hex_to_color(0xFF_FF_FF)
+cube_color: glm.vec4 = rgb_hex_to_color(0xD3_47_3D)
 
+// Uses indexed drawing.
 cube_vertices: []render.Vertex = {
 	{{1.0, 1.0, 1.0}, cube_color}, // right    top  back
 	{{-1.0, 1.0, 1.0}, cube_color}, //  left    top  back
@@ -19,14 +22,14 @@ cube_vertices: []render.Vertex = {
 	{{1.0, -1.0, -1.0}, cube_color}, // right bottom front
 	{{-1.0, 1.0, -1.0}, cube_color}, //  left    top front
 	{{-1.0, -1.0, -1.0}, cube_color}, //  left bottom front
-} // creating each face with two triangles and using indexed drawing to do so
+}
 axes_vertices: []render.Vertex = {
-	{{-1000., 0., 0.}, axes_color},
-	{{1000., 0., 0.}, axes_color}, // x-axis
-	{{0., -1000., 0.}, axes_color},
-	{{0., 1000., 0.}, axes_color}, // y-axis
-	{{0., 0., -1000.}, axes_color},
-	{{0., 0., 1000.}, axes_color}, // z-axis
+	{{-1000., 0., 0.}, x_axis_color},
+	{{1000., 0., 0.}, x_axis_color}, // x-axis
+	{{0., -1000., 0.}, y_axis_color},
+	{{0., 1000., 0.}, y_axis_color}, // y-axis
+	{{0., 0., -1000.}, z_axis_color},
+	{{0., 0., 1000.}, z_axis_color}, // z-axis
 }
 
 axes_indices: []u16 = {0, 1, 2, 3, 4, 5}
