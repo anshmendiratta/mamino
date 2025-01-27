@@ -11,7 +11,7 @@ import "core:time"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
 
-import objects "objects"
+import "objects"
 import "render"
 
 main :: proc() {
@@ -91,16 +91,24 @@ main :: proc() {
 				objects.color_vertices(vertices, objects.line_color)
 				render.bind_data(line_vbo, line_ebo, vertices, objects.line_indices)
 				render.draw_lines(vertices, objects.line_indices)
+				// Normals of faces.
+				normal_vao, normal_vbo, normal_ebo := render.get_buffer_objects()
+				face_normals := objects.get_cube_normals_coordinates(object)
+				render.bind_data(normal_vbo, line_ebo, face_normals, {0, 1, 2, 3, 4, 5})
+				render.draw_lines(face_normals, {0, 1, 2, 3, 4, 5})
 
 				gl.DeleteVertexArrays(1, &cube_vao)
-				gl.DeleteVertexArrays(1, &point_vao)
-				gl.DeleteVertexArrays(1, &line_vao)
 				gl.DeleteBuffers(1, &cube_vbo)
 				gl.DeleteBuffers(1, &cube_ebo)
+				gl.DeleteVertexArrays(1, &point_vao)
 				gl.DeleteBuffers(1, &point_vbo)
 				gl.DeleteBuffers(1, &point_ebo)
+				gl.DeleteVertexArrays(1, &line_vao)
 				gl.DeleteBuffers(1, &line_vbo)
 				gl.DeleteBuffers(1, &line_ebo)
+				gl.DeleteVertexArrays(1, &normal_vao)
+				gl.DeleteBuffers(1, &normal_vbo)
+				gl.DeleteBuffers(1, &normal_ebo)
 			case:
 			}
 		}
