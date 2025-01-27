@@ -12,12 +12,13 @@ Vertex :: struct {
 	color:    glm.vec4,
 }
 
-update :: proc(vertices: []Vertex, uniforms: map[string]gl.Uniform_Info) {
+update_shader :: proc(uniforms: map[string]gl.Uniform_Info) {
 	proj := glm.mat4Perspective(glm.radians_f32(45), 1.3, 0.1, 100.0)
 	scale := f32(0.3)
 	model := glm.mat4{scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., 1}
-	v_transform := proj * camera_view_matrix * model
-	gl.UniformMatrix4fv(uniforms["v_transform"].location, 1, false, &v_transform[0, 0])
+	gl.UniformMatrix4fv(uniforms["proj"].location, 1, false, &proj[0, 0])
+	gl.UniformMatrix4fv(uniforms["view"].location, 1, false, &camera_view_matrix[0, 0])
+	gl.UniformMatrix4fv(uniforms["model"].location, 1, false, &model[0, 0])
 }
 
 draw_cube :: proc(vertices: []Vertex, indices_count: i32) {
@@ -26,13 +27,13 @@ draw_cube :: proc(vertices: []Vertex, indices_count: i32) {
 	gl.DrawElements(gl.TRIANGLES, indices_count, gl.UNSIGNED_SHORT, nil)
 }
 
-draw_points :: proc(indices: []u16) {
+draw_points :: proc(vertices: []Vertex, indices: []u16) {
 	gl.Enable(gl.PROGRAM_POINT_SIZE)
 	gl.Enable(gl.POINT_SMOOTH)
-	gl.DrawArrays(gl.POINTS, 0, i32(len(indices)))
+	gl.DrawElements(gl.POINTS, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 
-draw_lines :: proc(indices: []u16) {
+draw_lines :: proc(vertices: []Vertex, indices: []u16) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
 	gl.LineWidth(5.)

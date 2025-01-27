@@ -17,12 +17,15 @@ To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and co
 - [x] Camera rotation with spherical coordinates
 - [x] Render edges as lines (respecting z-index)
 - [x] Add perspective to renders
-- [x] Render coordinate axes
-- [ ] Move to MVP translation matrices in shader
+- [x] Move to MVP translation matrices in shader
+- [x] Render coordinate axes (color-coded and labelled)
+- [x] Translate meshes w.r.t the origin
+- [x] Render face normals (respecting z-index)
 - [ ] Add tiling textures on faces
 - [ ] Add translucency to select faces
-- [ ] Translate meshes w.r.t the origin
 - [ ] Add "ambient occlusion" to mesh face colors to indicate orientation
-- [ ] Render face normals (respecting z-index)
 - [ ] "Spawn meshes" (and their spawn animation)
 - [ ] Add debug panel with scene information
+- [ ] Smooth camera movements
+- [ ] Allow a sequence of animations/movements to be programmed and ran
+- [ ] "Capture" frames from OpenGL/GLFW and composite them into a video

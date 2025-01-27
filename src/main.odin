@@ -1,13 +1,17 @@
+#+feature dynamic-literals
+
 package main
 
 import "core:c"
 import "core:fmt"
 import glm "core:math/linalg/glsl"
+import "core:mem"
 import "core:time"
 
 import gl "vendor:OpenGL"
 import "vendor:glfw"
 
+import "objects"
 import "render"
 
 main :: proc() {
@@ -30,41 +34,28 @@ main :: proc() {
 	gl.UseProgram(program)
 	defer gl.DeleteProgram(program)
 
-	gl.Enable(gl.DEPTH_TEST)
-	// debug to see wireframe of cube
-	// gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
-
 	// Uniforms.
 	uniforms := gl.get_uniforms_from_program(program)
 	defer delete(uniforms)
 
-	// Initialize cube.
-	cube_vao, cube_vbo, cube_ebo := render.get_buffer_objects()
-	defer gl.DeleteVertexArrays(1, &cube_vao)
-	defer gl.DeleteBuffers(1, &cube_vbo)
-	defer gl.DeleteBuffers(1, &cube_ebo)
+	gl.Enable(gl.DEPTH_TEST)
+	// Debug to see wireframe of cube.
+	// gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
 
-	// Initialize points.
-	// TODO: figure out why points rely on indexed drawing if
-	// draw_points does not rely on EBO
-	point_vao, point_vbo, point_ebo := render.get_buffer_objects()
-	defer gl.DeleteVertexArrays(1, &point_vao)
-	defer gl.DeleteBuffers(1, &point_vbo)
-	defer gl.DeleteBuffers(1, &point_ebo)
+	render_objects: []union {
+		objects.Cube,
+	} =
+		{objects.Cube{center = {1., 1., 1.}, scale = {3., 1., 1.}, orientation = {glm.vec3{0., 1., 0.}, glm.radians(f32(45.))}}, objects.Cube{center = {-1., 1., -1.}, scale = {1., 2., 1.}, orientation = {glm.vec3{1., 1., 1.}, glm.radians(f32(35.))}}, objects.Cube{center = {0., 3., 2.}, scale = {0.5, 0.5, 0.5}, orientation = {glm.vec3{1., 0., 0.}, glm.radians(f32(60.))}}}
 
-	// Initialize lines.
-	line_vao, line_vbo, line_ebo := render.get_buffer_objects()
-	defer gl.DeleteVertexArrays(1, &line_vao)
-	defer gl.DeleteBuffers(1, &line_vbo)
-	defer gl.DeleteBuffers(1, &line_ebo)
-
-	// Initialize axes.
+	// Initialize axes. Done outside the loop because this will always be done and rendered.
 	axes_vao, axes_vbo, axes_ebo := render.get_buffer_objects()
 	defer gl.DeleteVertexArrays(1, &axes_vao)
 	defer gl.DeleteBuffers(1, &axes_vbo)
 	defer gl.DeleteBuffers(1, &axes_ebo)
 
 	logger: Logger = {{}}
+	defer delete(logger.times_per_frame)
+
 	ft_library, ft_face := logger_font_init()
 	text: string = "WORK THIS TIME. IT IS NECESARY."
 	characters: map[rune]Character = logger_create_characters(ft_library, ft_face, text)
@@ -79,40 +70,73 @@ main :: proc() {
 	for (!glfw.WindowShouldClose(window) && render.running) {
 		// Performance stdout logging.
 		time_for_frame := glfw.GetTime() - last_frame
+		// fmt.println(1 / time_for_frame)
 		last_frame = glfw.GetTime()
 		append(&logger.times_per_frame, time_for_frame)
 
 		// Process inputs.
 		glfw.PollEvents()
+		// Update cameras if necessary.
+		render.update_camera()
 
 		gl.ClearColor(0.1, 0.1, 0.1, 1.0)
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 		logger_render_text(uniforms, characters, text_vao, text_vbo, &text_render_info)
 
-		// render.update_camera()
+		vertices: []render.Vertex
+		defer delete(vertices)
+
+		for generic_object in render_objects {
+			#partial switch object in generic_object {
+			case objects.Cube:
+				// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
+				vertices = objects.get_vertices(object)
+				// Cube.
+				cube_vao, cube_vbo, cube_ebo := render.get_buffer_objects()
+				render.bind_data(cube_vbo, cube_ebo, vertices, objects.cube_indices)
+				render.draw_cube(vertices, i32(len(objects.cube_indices)))
+				// Points.
+				point_vao, point_vbo, point_ebo := render.get_buffer_objects()
+				objects.color_vertices(vertices, objects.point_color)
+				render.bind_data(point_vbo, point_ebo, vertices, objects.point_indices)
+				render.draw_points(vertices, objects.point_indices)
+				// Lines.
+				line_vao, line_vbo, line_ebo := render.get_buffer_objects()
+				objects.color_vertices(vertices, objects.line_color)
+				render.bind_data(line_vbo, line_ebo, vertices, objects.line_indices)
+				render.draw_lines(vertices, objects.line_indices)
+				// Normals of faces.
+				when ODIN_DEBUG {
+					normal_vao, normal_vbo, normal_ebo := render.get_buffer_objects()
+					face_normals := objects.get_cube_normals_coordinates(object)
+					render.bind_data(normal_vbo, line_ebo, face_normals, {0, 1, 2, 3, 4, 5})
+					render.draw_lines(face_normals, {0, 1, 2, 3, 4, 5})
+
+					gl.DeleteVertexArrays(1, &normal_vao)
+					gl.DeleteBuffers(1, &normal_vbo)
+					gl.DeleteBuffers(1, &normal_ebo)
+				}
+
+				gl.DeleteVertexArrays(1, &cube_vao)
+				gl.DeleteBuffers(1, &cube_vbo)
+				gl.DeleteBuffers(1, &cube_ebo)
+				gl.DeleteVertexArrays(1, &point_vao)
+				gl.DeleteBuffers(1, &point_vbo)
+				gl.DeleteBuffers(1, &point_ebo)
+				gl.DeleteVertexArrays(1, &line_vao)
+				gl.DeleteBuffers(1, &line_vbo)
+				gl.DeleteBuffers(1, &line_ebo)
+			case:
+			}
+		}
 
 		// Update (rotate) the vertices every frame.
-		// render.update(cube_vertices, uniforms)
-		// render.update(point_vertices, uniforms)
-		// render.update(line_vertices, uniforms)
-		// render.update(axes_vertices, uniforms)
-
-		// Cube.
-		// render.bind_data(cube_vbo, cube_ebo, cube_vertices, cube_indices)
-		// render.draw_cube(cube_vertices, i32(len(cube_indices)))
-
-		// Points.
-		// render.bind_data(point_vbo, point_ebo, point_vertices, point_indices)
-		// render.draw_points(point_indices)
-
-		// Lines.
-		// render.bind_data(line_vbo, line_ebo, line_vertices, line_indices)
-		// render.draw_lines(line_indices)
+		render.update_shader(uniforms)
 
 		// Axes.
-		// render.bind_data(axes_vbo, axes_ebo, axes_vertices, axes_indices)
-		// render.draw_axes(axes_indices)
+		render.bind_data(axes_vbo, axes_ebo, objects.axes_vertices, objects.axes_indices)
+		render.draw_axes(objects.axes_indices)
 
 		// NOTE: Defaults to double buffering I think? - Ansh
 		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
@@ -120,7 +144,7 @@ main :: proc() {
 		glfw.SwapBuffers(window)
 	}
 
-	fmt.println("Average:", calculate_avg_fps(logger.times_per_frame), "FPS")
+	// fmt.println("Average:", calculate_avg_fps(logger.times_per_frame), "FPS")
 	render.mamino_exit()
 }
 
