@@ -23,3 +23,6 @@ To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and co
 - [ ] Render face normals (respecting z-index)
 - [ ] "Spawn meshes" (and their spawn animation)
 - [ ] Add debug panel with scene information
+- [ ] Smooth camera movements
+- [ ] Allow a sequence of animations/movements to be programmed and ran
+- [ ] "Capture" frames from OpenGL/GLFW and composite them into a video
