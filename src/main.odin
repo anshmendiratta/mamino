@@ -92,10 +92,16 @@ main :: proc() {
 				render.bind_data(line_vbo, line_ebo, vertices, objects.line_indices)
 				render.draw_lines(vertices, objects.line_indices)
 				// Normals of faces.
-				normal_vao, normal_vbo, normal_ebo := render.get_buffer_objects()
-				face_normals := objects.get_cube_normals_coordinates(object)
-				render.bind_data(normal_vbo, line_ebo, face_normals, {0, 1, 2, 3, 4, 5})
-				render.draw_lines(face_normals, {0, 1, 2, 3, 4, 5})
+				when ODIN_DEBUG {
+					normal_vao, normal_vbo, normal_ebo := render.get_buffer_objects()
+					face_normals := objects.get_cube_normals_coordinates(object)
+					render.bind_data(normal_vbo, line_ebo, face_normals, {0, 1, 2, 3, 4, 5})
+					render.draw_lines(face_normals, {0, 1, 2, 3, 4, 5})
+
+					gl.DeleteVertexArrays(1, &normal_vao)
+					gl.DeleteBuffers(1, &normal_vbo)
+					gl.DeleteBuffers(1, &normal_ebo)
+				}
 
 				gl.DeleteVertexArrays(1, &cube_vao)
 				gl.DeleteBuffers(1, &cube_vbo)
@@ -106,9 +112,6 @@ main :: proc() {
 				gl.DeleteVertexArrays(1, &line_vao)
 				gl.DeleteBuffers(1, &line_vbo)
 				gl.DeleteBuffers(1, &line_ebo)
-				gl.DeleteVertexArrays(1, &normal_vao)
-				gl.DeleteBuffers(1, &normal_vbo)
-				gl.DeleteBuffers(1, &normal_ebo)
 			case:
 			}
 		}
