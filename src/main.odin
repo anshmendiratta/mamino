@@ -15,13 +15,11 @@ import "objects"
 import "render"
 
 main :: proc() {
+	// Setup.
 	render.mamino_init()
 	defer glfw.Terminate()
-
 	window := render.mamino_create_window()
 	defer glfw.DestroyWindow(window)
-
-	// Load shaders.
 	program, ok := gl.load_shaders_source(render.vertex_shader, render.fragment_shader)
 	if !ok {
 		fmt.eprintln("Could not load shaders.")
@@ -29,11 +27,8 @@ main :: proc() {
 	}
 	gl.UseProgram(program)
 	defer gl.DeleteProgram(program)
-
-	// Uniforms.
 	uniforms := gl.get_uniforms_from_program(program)
 	defer delete(uniforms)
-
 	gl.Enable(gl.DEPTH_TEST)
 	// Debug to see wireframe of cube.
 	// gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
@@ -53,7 +48,6 @@ main :: proc() {
 	defer delete(logger.times_per_frame)
 
 	last_frame := glfw.GetTime()
-
 	for (!glfw.WindowShouldClose(window) && render.running) {
 		// Performance stdout logging.
 		time_for_frame := glfw.GetTime() - last_frame
@@ -115,6 +109,8 @@ main :: proc() {
 			case:
 			}
 		}
+		pixels := render.get_framebuffer()
+		fmt.println(pixels)
 
 		// Update (rotate) the vertices every frame.
 		render.update_shader(uniforms)

@@ -13,7 +13,7 @@ Vertex :: struct {
 }
 
 update_shader :: proc(uniforms: map[string]gl.Uniform_Info) {
-	proj := glm.mat4Perspective(glm.radians_f32(45), 1.3, 0.1, 100.0)
+	proj := glm.mat4Perspective(glm.radians_f32(60), 1.0, 0.1, 100.0)
 	scale := f32(0.3)
 	model := glm.mat4{scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., 1}
 	gl.UniformMatrix4fv(uniforms["proj"].location, 1, false, &proj[0, 0])
@@ -77,5 +77,10 @@ bind_data :: proc(vbo: u32, ebo: u32, data: []Vertex, indices: []u16) {
 		raw_data(indices),
 		gl.STATIC_DRAW,
 	)
+}
+
+get_framebuffer :: proc() -> (pixels: [WINDOW_WIDTH * WINDOW_HEIGHT]int) {
+	gl.ReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, gl.RGB, gl.UNSIGNED_BYTE, raw_data(&pixels))
+	return
 }
 
