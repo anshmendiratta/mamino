@@ -26,3 +26,4 @@ To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and co
 - [ ] Smooth camera movements
 - [ ] Allow a sequence of animations/movements to be programmed and ran
 - [ ] "Capture" frames from OpenGL/GLFW and composite them into a video
+- [ ] Change rendering scaling/aspect ratio to be independent of window size
