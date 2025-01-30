@@ -119,15 +119,18 @@ main :: proc() {
 		render.draw_axes(objects.axes_indices)
 
 		// Get framebuffers and draw image.
-		pixels := animation.get_framebuffer()
+		pixels: []u32 = animation.get_framebuffer()
 		animation.write_png(
 			"test_img.png",
 			render.WINDOW_WIDTH,
 			render.WINDOW_HEIGHT,
 			4,
-			raw_data(pixels[:]),
+			pixels,
 			render.WINDOW_WIDTH * 4,
 		)
+
+		// Update window sizes.
+		render.WINDOW_WIDTH, render.WINDOW_HEIGHT = glfw.GetWindowSize(window)
 
 		// NOTE: Defaults to double buffering I think? - Ansh
 		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
