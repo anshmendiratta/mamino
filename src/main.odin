@@ -120,6 +120,7 @@ main :: proc() {
 
 		// Get framebuffers and draw image.
 		pixels: []u32 = animation.get_framebuffer()
+		defer delete(pixels)
 		animation.write_png(
 			"test_img.png",
 			render.WINDOW_WIDTH,

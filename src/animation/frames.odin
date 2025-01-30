@@ -19,6 +19,7 @@ write_png :: #force_inline proc(
 ) -> int {
 	assert(comp >= 0 && comp <= 4)
 	flipped_image: []u32 = make([]u32, len(data))
+	defer delete(flipped_image)
 
 	for row in 0 ..< window_height {
 		for column in 0 ..< window_width {
@@ -50,6 +51,7 @@ get_framebuffer :: proc() -> (pixels: []u32) {
 		gl.UNSIGNED_BYTE,
 		raw_data(pixels),
 	)
+
 	return
 }
 
