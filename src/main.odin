@@ -13,6 +13,21 @@ import "vendor:glfw"
 
 import "objects"
 import "render"
+import "core:strings"
+
+WINDOW_WIDTH :: 400
+WINDOW_HEIGHT :: 512
+
+
+foreign import stbiw "lib/stb_image_write.a"
+
+foreign stbiw  {
+	stbi_write_png :: proc(filename: cstring, w, h, comp: i32, data: rawptr, stride_in_bytes: i32) -> i32 ---;
+}
+
+write_png :: #force_inline proc(filename: string, w, h, comp: int, data: []u8, stride_in_bytes: int) -> int {
+	return cast(int)stbi_write_png(strings.unsafe_string_to_cstring(filename), i32(w), i32(h), i32(comp), &data[0], i32(stride_in_bytes));
+}
 
 main :: proc() {
 	// Setup.
@@ -109,8 +124,7 @@ main :: proc() {
 			case:
 			}
 		}
-		pixels := render.get_framebuffer()
-		fmt.println(pixels)
+		
 
 		// Update (rotate) the vertices every frame.
 		render.update_shader(uniforms)
@@ -119,10 +133,23 @@ main :: proc() {
 		render.bind_data(axes_vbo, axes_ebo, objects.axes_vertices, objects.axes_indices)
 		render.draw_axes(objects.axes_indices)
 
+		pixels := render.get_framebuffer()
+		tmp: [dynamic]u8;
+
+		for pixel in pixels {
+			append(&tmp, cast(u8)pixel);
+		}
+
+		fmt.println(pixels)
+		write_png("test_img.png", WINDOW_WIDTH, WINDOW_HEIGHT, 4, tmp[:], WINDOW_WIDTH*4);
+		
+
 		// NOTE: Defaults to double buffering I think? - Ansh
 		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
 		// https://www.glfw.org/docs/3.0/group__context.html#ga15a5a1ee5b3c2ca6b15ca209a12efd14
 		glfw.SwapBuffers(window)
+
+		
 	}
 
 	// fmt.println("Average:", calculate_avg_fps(logger.times_per_frame), "FPS")
