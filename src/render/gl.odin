@@ -79,8 +79,3 @@ bind_data :: proc(vbo: u32, ebo: u32, data: []Vertex, indices: []u16) {
 	)
 }
 
-get_framebuffer :: proc() -> (pixels: [WINDOW_WIDTH * WINDOW_HEIGHT]int) {
-	gl.ReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, gl.RGB, gl.UNSIGNED_BYTE, raw_data(&pixels))
-	return
-}
-
