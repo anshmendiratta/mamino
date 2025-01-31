@@ -60,6 +60,9 @@ get_framebuffer :: proc() -> (pixels: []u32) {
 }
 
 make_frames_directory :: proc() {
+	if os2.is_directory("frames") {
+		os.remove_directory("frames")
+	}
 	directory_name :: "frames"
 	ok := os.make_directory(directory_name)
 	if ok != nil {
@@ -68,6 +71,12 @@ make_frames_directory :: proc() {
 }
 
 ffmpeg_composite_video :: proc() -> os2.Error {
+	if os.is_file_path("vid.mp4") {
+		remove_ok := os.remove("vid.mp4")
+		if remove_ok != nil {
+			fmt.println("Error: could not remove vid.mp4")
+		}
+	}
 	os2.set_working_directory("~/development/mamino/")
 	process_description: os2.Process_Desc
 	process_description.command = {
