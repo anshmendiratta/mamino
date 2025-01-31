@@ -103,8 +103,7 @@ main :: proc() {
 	fmt.println("Average:", avg_framerate, "FPS")
 
 	// Composite video using ffmpeg.
-	ffmpeg_avg_framerate := calculate_weighted_avg_fps(logger.times_per_frame)
-	animation.ffmpeg_composite_video(ffmpeg_avg_framerate)
+	animation.ffmpeg_composite_video(avg_framerate)
 
 	render.mamino_exit()
 }
