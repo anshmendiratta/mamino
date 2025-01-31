@@ -1,6 +1,10 @@
 package animation
 
 import "core:fmt"
+import "core:os"
+import "core:os/os2"
+
+import "base:runtime"
 
 import gl "vendor:OpenGL"
 
@@ -53,5 +57,39 @@ get_framebuffer :: proc() -> (pixels: []u32) {
 	)
 
 	return
+}
+
+make_frames_directory :: proc() {
+	directory_name :: "frames"
+	ok := os.make_directory(directory_name)
+	if ok != nil {
+		fmt.printfln("Error: Could not make a frames/ directory. {}", ok)
+	}
+}
+
+ffmpeg_composite_video :: proc() -> os2.Error {
+	os2.set_working_directory("~/development/mamino/")
+	process_description: os2.Process_Desc
+	process_description.command = {
+		"ffmpeg",
+		"-framerate",
+		"30",
+		"-pattern_type",
+		"glob",
+		"-i",
+		`frames/img_*.png`,
+		"-c:v",
+		"libx264",
+		"vid.mp4",
+	}
+	allocator: runtime.Allocator
+	process_state, stdout, stderr, ok := os2.process_exec(process_description, allocator)
+	if !process_state.success {
+		fmt.printfln("Error: could not run ffmpeg. {}", ok)
+		fmt.printfln("stderr of command: {}", string(stderr))
+	}
+	fmt.println(#directory)
+
+	return ok
 }
 

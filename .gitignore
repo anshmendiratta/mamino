@@ -1,4 +1,5 @@
 .git/
+frames/
 ./src/src.bin
 ./src/src
 ./src.bin

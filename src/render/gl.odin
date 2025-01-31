@@ -7,10 +7,7 @@ import glm "core:math/linalg/glsl"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
 
-Vertex :: struct {
-	position: glm.vec3,
-	color:    glm.vec4,
-}
+import "../objects"
 
 update_shader :: proc(uniforms: map[string]gl.Uniform_Info) {
 	proj := glm.mat4Perspective(glm.radians_f32(60), 1.0, 0.1, 100.0)
@@ -21,19 +18,19 @@ update_shader :: proc(uniforms: map[string]gl.Uniform_Info) {
 	gl.UniformMatrix4fv(uniforms["model"].location, 1, false, &model[0, 0])
 }
 
-draw_cube :: proc(vertices: []Vertex, indices_count: i32) {
+draw_cube :: proc(vertices: []objects.Vertex, indices_count: i32) {
 	gl.DepthFunc(gl.LESS)
 	// TODO: figure out why this doesn't work with `gl.DrawArrays`
 	gl.DrawElements(gl.TRIANGLES, indices_count, gl.UNSIGNED_SHORT, nil)
 }
 
-draw_points :: proc(vertices: []Vertex, indices: []u16) {
+draw_points :: proc(vertices: []objects.Vertex, indices: []u16) {
 	gl.Enable(gl.PROGRAM_POINT_SIZE)
 	gl.Enable(gl.POINT_SMOOTH)
 	gl.DrawElements(gl.POINTS, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 
-draw_lines :: proc(vertices: []Vertex, indices: []u16) {
+draw_lines :: proc(vertices: []objects.Vertex, indices: []u16) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
 	gl.LineWidth(5.)
@@ -56,13 +53,32 @@ get_buffer_objects :: proc() -> (vao: u32, vbo: u32, ebo: u32) {
 	return
 }
 
-bind_data :: proc(vbo: u32, ebo: u32, data: []Vertex, indices: []u16) {
+bind_data :: proc(vbo: u32, ebo: u32, data: []objects.Vertex, indices: []u16) {
 	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
-	gl.BufferData(gl.ARRAY_BUFFER, len(data) * size_of(Vertex), raw_data(data), gl.STATIC_DRAW)
+	gl.BufferData(
+		gl.ARRAY_BUFFER,
+		len(data) * size_of(objects.Vertex),
+		raw_data(data),
+		gl.STATIC_DRAW,
+	)
 	gl.EnableVertexAttribArray(0)
 	gl.EnableVertexAttribArray(1)
-	gl.VertexAttribPointer(0, 3, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, position))
-	gl.VertexAttribPointer(1, 4, gl.FLOAT, false, size_of(Vertex), offset_of(Vertex, color))
+	gl.VertexAttribPointer(
+		0,
+		3,
+		gl.FLOAT,
+		false,
+		size_of(objects.Vertex),
+		offset_of(objects.Vertex, position),
+	)
+	gl.VertexAttribPointer(
+		1,
+		4,
+		gl.FLOAT,
+		false,
+		size_of(objects.Vertex),
+		offset_of(objects.Vertex, color),
+	)
 	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
 	gl.BufferData(
 		gl.ELEMENT_ARRAY_BUFFER,
