@@ -100,14 +100,19 @@ ffmpeg_composite_video :: proc(framerate: f64) -> os2.Error {
 	process_description: os2.Process_Desc
 	process_description.command = {
 		"ffmpeg",
+		"-hwaccel",
+		"vulkan",
 		"-framerate",
 		ffmpeg_framerate,
 		"-pattern_type",
 		"glob",
 		"-i",
 		`frames/img_*.png`,
+		"-init_hw_device",
+		"vulkan=vk:0",
 		"-c:v",
-		"libx264",
+		"av1",
+		// "libx264",
 		"vid.mp4",
 	}
 	allocator: runtime.Allocator
