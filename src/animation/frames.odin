@@ -59,30 +59,49 @@ get_framebuffer :: proc() -> (pixels: []u32) {
 	return
 }
 
-make_frames_directory :: proc() {
-	if os2.is_directory("frames") {
-		os.remove_directory("frames")
+delete_previous_frames :: proc() {
+	if !os2.is_directory("frames") {
+		return
 	}
-	directory_name :: "frames"
-	ok := os.make_directory(directory_name)
-	if ok != nil {
-		fmt.printfln("Error: Could not make a frames/ directory. {}", ok)
+
+	allocator: runtime.Allocator
+	frames_directory, open_ok := os.open("frames")
+	directory_file_infos, read_ok := os.read_dir(frames_directory, -1)
+	if read_ok != nil {
+		fmt.eprintln("Error: could not open frames/ even though it exists.")
+	}
+	for file in directory_file_infos {
+		os.remove(file.fullpath)
 	}
 }
 
-ffmpeg_composite_video :: proc() -> os2.Error {
+make_frames_directory :: proc() {
+	directory_name :: "frames"
+	if os2.is_directory("frames") {
+		return
+	}
+
+	ok := os.make_directory(directory_name)
+	if ok != nil {
+		fmt.eprintfln("Error: Could not make a frames/ directory. {}", ok)
+	}
+}
+
+ffmpeg_composite_video :: proc(framerate: f64) -> os2.Error {
 	if os.is_file_path("vid.mp4") {
 		remove_ok := os.remove("vid.mp4")
 		if remove_ok != nil {
-			fmt.println("Error: could not remove vid.mp4")
+			fmt.eprintln("Error: could not remove vid.mp4")
 		}
 	}
 	os2.set_working_directory("~/development/mamino/")
+
+	ffmpeg_framerate := fmt.aprintf("%d", int(framerate))
 	process_description: os2.Process_Desc
 	process_description.command = {
 		"ffmpeg",
 		"-framerate",
-		"30",
+		ffmpeg_framerate,
 		"-pattern_type",
 		"glob",
 		"-i",

@@ -5,8 +5,11 @@ package main
 import "core:c"
 import "core:fmt"
 import glm "core:math/linalg/glsl"
+import "core:os/os2"
 import "core:strings"
 import "core:time"
+
+import "base:runtime"
 
 import gl "vendor:OpenGL"
 import "vendor:glfw"
@@ -44,7 +47,14 @@ main :: proc() {
 
 	last_frame := glfw.GetTime()
 
+	// Reset the `frames/` directory. Create it if it doesn't exist.
+	{
+		allocator: runtime.Allocator
+		animation.delete_previous_frames()
+		animation.make_frames_directory()
+	}
 	frame_count := 0
+
 	for (!glfw.WindowShouldClose(window) && render.running) {
 		// Performance stdout logging.
 		time_for_frame := glfw.GetTime() - last_frame
@@ -68,7 +78,8 @@ main :: proc() {
 		// Get framebuffers and draw image.
 		pixels: []u32 = animation.get_framebuffer()
 		defer delete(pixels)
-		image_name := fmt.aprintf("frames/img_{}.png", frame_count)
+		padded_frame_count := fmt.aprintf("%04d", frame_count)
+		image_name := fmt.aprintf("frames/img_{}.png", padded_frame_count)
 		animation.write_png(
 			strings.clone_to_cstring(image_name),
 			render.WINDOW_WIDTH,
@@ -82,16 +93,19 @@ main :: proc() {
 		// Update window sizes.
 		render.WINDOW_WIDTH, render.WINDOW_HEIGHT = glfw.GetWindowSize(window)
 
-		// NOTE: Defaults to double buffering I think? - Ansh
+		// NOTE(Ansh): Defaults to double buffering I think? 
 		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
 		// https://www.glfw.org/docs/3.0/group__context.html#ga15a5a1ee5b3c2ca6b15ca209a12efd14
 		glfw.SwapBuffers(window)
 	}
 
-	// Composite video using ffmpeg.
-	animation.ffmpeg_composite_video()
+	avg_framerate := calculate_avg_fps(logger.times_per_frame)
+	fmt.println("Average:", avg_framerate, "FPS")
 
-	fmt.println("Average:", calculate_avg_fps(logger.times_per_frame), "FPS")
+	// Composite video using ffmpeg.
+	ffmpeg_avg_framerate := calculate_weighted_avg_fps(logger.times_per_frame)
+	animation.ffmpeg_composite_video(ffmpeg_avg_framerate)
+
 	render.mamino_exit()
 }
 
