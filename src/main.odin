@@ -81,7 +81,7 @@ main :: proc() {
 		padded_frame_count := fmt.aprintf("%04d", frame_count)
 		image_name := fmt.aprintf("frames/img_{}.png", padded_frame_count)
 		animation.write_png(
-			strings.clone_to_cstring(image_name),
+			image_name,
 			render.WINDOW_WIDTH,
 			render.WINDOW_HEIGHT,
 			4,

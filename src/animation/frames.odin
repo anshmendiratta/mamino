@@ -3,6 +3,7 @@ package animation
 import "core:fmt"
 import "core:os"
 import "core:os/os2"
+import "core:strings"
 
 import "base:runtime"
 
@@ -16,7 +17,7 @@ foreign stbiw {
 }
 
 write_png :: #force_inline proc(
-	filename: cstring,
+	filename: string,
 	window_width, window_height, comp: i32,
 	data: []u32,
 	stride_in_bytes: i32,
@@ -34,7 +35,7 @@ write_png :: #force_inline proc(
 
 	return int(
 		stbi_write_png(
-			filename,
+			strings.clone_to_cstring(filename),
 			window_width,
 			window_height,
 			comp,
@@ -55,7 +56,6 @@ get_framebuffer :: proc() -> (pixels: []u32) {
 		gl.UNSIGNED_BYTE,
 		raw_data(pixels),
 	)
-
 	return
 }
 
