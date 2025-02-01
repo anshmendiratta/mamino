@@ -3,8 +3,6 @@ package objects
 import glm "core:math/linalg/glsl"
 import "core:mem"
 
-import "../render"
-
 Cube :: struct {
 	// Geometric center.
 	center:      glm.vec3,
@@ -12,8 +10,8 @@ Cube :: struct {
 	orientation: Orientation,
 }
 
-get_cube_vertices :: proc(cube: Cube) -> (vertices: []render.Vertex) {
-	vertices = make([]render.Vertex, len(cube_vertices))
+get_cube_vertices :: proc(cube: Cube) -> (vertices: []Vertex) {
+	vertices = make([]Vertex, len(cube_vertices))
 	copy(vertices, cube_vertices)
 	for &vertex in vertices {
 		vertex.position.x *= cube.scale.x
@@ -34,7 +32,7 @@ get_cube_vertices :: proc(cube: Cube) -> (vertices: []render.Vertex) {
 }
 
 // `normals` returns a flattened list of line endpoints. They are to be rendered two at a time using `gl.LINES`.
-get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []render.Vertex) {
+get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []Vertex) {
 	standard_x_axis: glm.vec4 = {1., 0., 0., 0.}
 	standard_y_axis: glm.vec4 = {0., 1., 0., 0.}
 	standard_z_axis: glm.vec4 = {0., 0., 1., 0.}
