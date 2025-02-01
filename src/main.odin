@@ -23,7 +23,7 @@ main :: proc() {
 	render.mamino_init()
 	defer glfw.Terminate()
 	window := render.mamino_create_window()
-	defer glfw.DestroyWindow(window)
+	// Window destruction happens a bit before the ending of main so that the window closes before the video is being encoded.
 	program, ok := gl.load_shaders_source(render.vertex_shader, render.fragment_shader)
 	if !ok {
 		fmt.eprintln("Could not load shaders.")
@@ -98,12 +98,13 @@ main :: proc() {
 		// https://www.glfw.org/docs/3.0/group__context.html#ga15a5a1ee5b3c2ca6b15ca209a12efd14
 		glfw.SwapBuffers(window)
 	}
+	glfw.DestroyWindow(window)
 
 	avg_framerate := calculate_avg_fps(logger.times_per_frame)
 	fmt.println("Average:", avg_framerate, "FPS")
 
 	// Composite video using ffmpeg.
-	animation.ffmpeg_composite_video(avg_framerate)
+	// animation.ffmpeg_composite_video(avg_framerate)
 
 	render.mamino_exit()
 }

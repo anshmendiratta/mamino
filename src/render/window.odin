@@ -12,8 +12,8 @@ PROGRAM_NAME :: "mamino"
 GL_MAJOR_VERSION: c.int : 4
 GL_MINOR_VERSION :: 6
 
-WINDOW_WIDTH := i32(512)
-WINDOW_HEIGHT := i32(512)
+WINDOW_WIDTH := i32(1024)
+WINDOW_HEIGHT := i32(1024)
 
 running: b32 = true
 
@@ -50,7 +50,7 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 	// https://www.glfw.org/docs/3.3/group__context.html#ga1c04dc242268f827290fe40aa1c91157
 	glfw.MakeContextCurrent(window)
 	// https://www.glfw.org/docs/3.3/group__context.html#ga6d4e0cdf151b5e579bd67f13202994ed
-	glfw.SwapInterval(1)
+	glfw.SwapInterval(0)
 	// https://www.glfw.org/docs/3.3/group__input.html#ga1caf18159767e761185e49a3be019f8d
 	glfw.SetKeyCallback(window, key_callback)
 	// https://www.glfw.org/docs/3.3/group__window.html#gab3fb7c3366577daef18c0023e2a8591f
