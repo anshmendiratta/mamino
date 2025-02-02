@@ -48,12 +48,11 @@ main :: proc() {
 	last_frame := glfw.GetTime()
 
 	// Reset the `frames/` directory. Create it if it doesn't exist.
-	{
-		allocator: runtime.Allocator
-		animation.delete_previous_frames()
-		animation.make_frames_directory()
-	}
-	frame_count := 0
+	allocator: runtime.Allocator
+	animation.delete_previous_frames()
+	animation.make_frames_directory()
+
+	stored_frames: [dynamic][]u32
 
 	for (!glfw.WindowShouldClose(window) && render.running) {
 		// Performance stdout logging.
@@ -75,25 +74,17 @@ main :: proc() {
 		render.render_objects(render_objects)
 		render.render_axes()
 
-		// Get framebuffers and draw image.
-		pixels: []u32 = animation.get_framebuffer()
-		defer delete(pixels)
-		padded_frame_count := fmt.aprintf("%04d", frame_count)
-		image_name := fmt.aprintf("frames/img_{}.png", padded_frame_count)
-		animation.write_png(
-			image_name,
-			render.WINDOW_WIDTH,
-			render.WINDOW_HEIGHT,
-			4,
-			pixels,
-			render.WINDOW_WIDTH * 4,
-		)
-		frame_count += 1
+		// Get data throuugh a PBO from the framebuffer and write it to an image. `frame_count` needed for file naming.
+		current_pbo_idx := 0
+		image_data := animation.capture_frame(current_pbo_idx)
+		// defer free(image_data)
+		append(&stored_frames, image_data)
+		current_pbo_idx = 1 - current_pbo_idx
 
 		// Update window sizes.
 		render.WINDOW_WIDTH, render.WINDOW_HEIGHT = glfw.GetWindowSize(window)
 
-		// NOTE(Ansh): Defaults to double buffering I think? 
+		// NOTE(Ansh): Defaults to double buffering. 
 		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
 		// https://www.glfw.org/docs/3.0/group__context.html#ga15a5a1ee5b3c2ca6b15ca209a12efd14
 		glfw.SwapBuffers(window)
@@ -103,6 +94,25 @@ main :: proc() {
 	avg_framerate := calculate_avg_fps(logger.times_per_frame)
 	fmt.println("Average:", avg_framerate, "FPS")
 
+	// Write images.
+	for frame, idx in stored_frames {
+		// fmt.println("At frame =", idx)
+		defer delete(frame)
+		padded_frame_count := fmt.aprintf("%04d", idx)
+		image_name := fmt.aprintf("frames/img_{}.png", padded_frame_count)
+		success := animation.write_png(
+			image_name,
+			render.WINDOW_WIDTH,
+			render.WINDOW_HEIGHT,
+			4,
+			raw_data(frame),
+			render.WINDOW_WIDTH * 4,
+		)
+		if success != 1 {
+			// Failure.
+			fmt.eprintln("Error: could not write frame.")
+		}
+	}
 	// Composite video using ffmpeg.
 	// animation.ffmpeg_composite_video(avg_framerate)
 

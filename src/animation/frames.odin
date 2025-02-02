@@ -1,6 +1,7 @@
 package animation
 
 import "core:fmt"
+import "core:mem"
 import "core:os"
 import "core:os/os2"
 import "core:strings"
@@ -14,6 +15,7 @@ import "../render"
 foreign import stbiw "../../lib/stb_image_write.a"
 foreign stbiw {
 	stbi_write_png :: proc(filename: cstring, w, h, comp: i32, data: rawptr, stride_in_bytes: i32) -> i32 ---
+	// stbi_write_png_flip :: proc(filename: string, w, h: int, $comp: int, data: []u8, stride_in_bytes: int) -> int ---
 }
 
 write_png :: #force_inline proc(
@@ -45,8 +47,22 @@ write_png :: #force_inline proc(
 	)
 }
 
-get_framebuffer :: proc() -> (pixels: []u32) {
+capture_frame :: proc(current_pbo_idx: int) -> (pixels: []u32) {
 	pixels = make([]u32, render.WINDOW_WIDTH * render.WINDOW_HEIGHT)
+	// Read displayed/front buffer.
+	gl.ReadBuffer(gl.FRONT)
+
+	/* TODO: Fix this PBO (Pixel Buffer Object) reading so the frames are not just black and white.
+		// Generate OpenGL buffers and bind them to the pack pixel buffer.
+		// pixels_pbos: [2]u32
+		// gl.GenBuffers(1, &pixels_pbos[0])
+		// gl.GenBuffers(1, &pixels_pbos[1])
+		// defer gl.DeleteBuffers(1, &pixels_pbos[0])
+		// defer gl.DeleteBuffers(1, &pixels_pbos[1])
+		// gl.BindBuffer(gl.PIXEL_PACK_BUFFER, pixels_pbos[current_pbo_idx])
+		// Should return immediately.
+	*/
+
 	gl.ReadPixels(
 		0,
 		0,
@@ -56,6 +72,21 @@ get_framebuffer :: proc() -> (pixels: []u32) {
 		gl.UNSIGNED_BYTE,
 		raw_data(pixels),
 	)
+
+	/* PBO Continued: 
+		// Binds and copies data from the pack pixel buffer to our CPU buffer.
+		// other_pbo_idx := 1 - current_pbo_idx
+		// gl.BindBuffer(gl.PIXEL_PACK_BUFFER, pixels_pbos[other_pbo_idx])
+		// read_pixels_ptr := gl.MapBuffer(gl.PIXEL_PACK_BUFFER, gl.READ_ONLY)
+		// if read_pixels_ptr != nil {
+		// 	// Success.
+		// 	pixels = read_pixels_ptr
+		// 	gl.UnmapBuffer(gl.PIXEL_PACK_BUFFER)
+		// }
+		// // Removes the bind from our CPU pbo.
+		// gl.BindBuffer(gl.PIXEL_PACK_BUFFER, 0)
+	*/
+
 	return
 }
 
