@@ -77,7 +77,7 @@ main :: proc() {
 		// Get data throuugh a PBO from the framebuffer and write it to an image. `frame_count` needed for file naming.
 		current_pbo_idx := 0
 		image_data := animation.capture_frame(current_pbo_idx)
-		// defer free(image_data)
+		defer delete(image_data)
 		append(&stored_frames, image_data)
 		current_pbo_idx = 1 - current_pbo_idx
 
@@ -95,24 +95,24 @@ main :: proc() {
 	fmt.println("Average:", avg_framerate, "FPS")
 
 	// Write images.
-	for frame, idx in stored_frames {
-		// fmt.println("At frame =", idx)
-		defer delete(frame)
-		padded_frame_count := fmt.aprintf("%04d", idx)
-		image_name := fmt.aprintf("frames/img_{}.png", padded_frame_count)
-		success := animation.write_png(
-			image_name,
-			render.WINDOW_WIDTH,
-			render.WINDOW_HEIGHT,
-			4,
-			raw_data(frame),
-			render.WINDOW_WIDTH * 4,
-		)
-		if success != 1 {
-			// Failure.
-			fmt.eprintln("Error: could not write frame.")
-		}
-	}
+	// for frame, idx in stored_frames {
+	// 	// fmt.println("At frame =", idx)
+	// 	defer delete(frame)
+	// 	padded_frame_count := fmt.aprintf("%04d", idx)
+	// 	image_name := fmt.aprintf("frames/img_{}.png", padded_frame_count)
+	// 	success := animation.write_png(
+	// 		image_name,
+	// 		render.WINDOW_WIDTH,
+	// 		render.WINDOW_HEIGHT,
+	// 		4,
+	// 		frame,
+	// 		render.WINDOW_WIDTH * 4,
+	// 	)
+	// 	if success != 1 {
+	// 		// Failure.
+	// 		fmt.eprintln("Error: could not write frame.")
+	// 	}
+	// }
 	// Composite video using ffmpeg.
 	// animation.ffmpeg_composite_video(avg_framerate)
 
