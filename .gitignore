@@ -1,7 +1,10 @@
 .git/
+frames/
 ./src/src.bin
 ./src/src
 ./src.bin
 src.bin
 src/bin
 src.exe
+.idea
+vid.mp4

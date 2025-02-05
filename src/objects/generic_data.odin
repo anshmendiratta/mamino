@@ -2,7 +2,11 @@ package objects
 
 import glm "core:math/linalg/glsl"
 
-import "../render"
+// Vertex used for drawing. Mapped directly from vertices of objects.
+Vertex :: struct {
+	position: glm.vec3,
+	color:    glm.vec4,
+}
 
 // `x`, `y`, `z` are scalars (1.0 = "standard" size).
 Scale :: struct {
@@ -22,7 +26,7 @@ get_vertices :: proc {
 	get_cube_vertices,
 }
 
-color_vertices :: proc(vertices: []render.Vertex, color: glm.vec4 = {1., 1., 1., 1.}) {
+color_vertices :: proc(vertices: []Vertex, color: glm.vec4 = {1., 1., 1., 1.}) {
 	for &vertex in vertices {
 		vertex.color = color
 	}

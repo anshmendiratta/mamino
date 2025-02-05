@@ -2,8 +2,6 @@ package objects
 
 import glm "core:math/linalg/glsl"
 
-import "../render"
-
 // Colors.
 x_axis_color: glm.vec4 = rgb_hex_to_color(0xeb_3a_34, 0.2)
 y_axis_color: glm.vec4 = rgb_hex_to_color(0x46_eb_34, 0.2)
@@ -13,7 +11,7 @@ line_color: glm.vec4 = rgb_hex_to_color(0xFF_FF_FF)
 cube_color: glm.vec4 = rgb_hex_to_color(0xD3_47_3D)
 
 // Uses indexed drawing.
-cube_vertices: []render.Vertex = {
+cube_vertices: []Vertex = {
 	{{1.0, 1.0, 1.0}, cube_color}, // right    top  back
 	{{-1.0, 1.0, 1.0}, cube_color}, //  left    top  back
 	{{1.0, -1.0, 1.0}, cube_color}, // right bottom  back
@@ -23,7 +21,7 @@ cube_vertices: []render.Vertex = {
 	{{-1.0, 1.0, -1.0}, cube_color}, //  left    top front
 	{{-1.0, -1.0, -1.0}, cube_color}, //  left bottom front
 }
-axes_vertices: []render.Vertex = {
+axes_vertices: []Vertex = {
 	{{-1000., 0., 0.}, x_axis_color},
 	{{1000., 0., 0.}, x_axis_color}, // x-axis
 	{{0., -1000., 0.}, y_axis_color},
