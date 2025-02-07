@@ -24,7 +24,10 @@ main :: proc() {
 	defer glfw.Terminate()
 	window := render.mamino_create_window()
 	// Window destruction happens a bit before the ending of main so that the window closes before the video is being encoded.
-	program, ok := gl.load_shaders_source(render.vertex_shader, render.fragment_shader)
+	program, ok := gl.load_shaders_source(
+		render.mamino_vertex_shader,
+		render.mamino_fragment_shader,
+	)
 	if !ok {
 		fmt.eprintln("Could not load shaders.")
 		return
@@ -72,62 +75,6 @@ main :: proc() {
 		// Process inputs and update the camera if necessary.
 		glfw.PollEvents()
 		render.update_camera()
-<<<<<<< HEAD
-
-		gl.ClearColor(0.1, 0.1, 0.1, 1.0)
-		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
-		logger_render_text(uniforms, characters, text_vao, text_vbo, &text_render_info)
-
-		vertices: []render.Vertex
-		defer delete(vertices)
-
-		for generic_object in render_objects {
-			#partial switch object in generic_object {
-			case objects.Cube:
-				// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
-				vertices = objects.get_vertices(object)
-				// Cube.
-				cube_vao, cube_vbo, cube_ebo := render.get_buffer_objects()
-				render.bind_data(cube_vbo, cube_ebo, vertices, objects.cube_indices)
-				render.draw_cube(vertices, i32(len(objects.cube_indices)))
-				// Points.
-				point_vao, point_vbo, point_ebo := render.get_buffer_objects()
-				objects.color_vertices(vertices, objects.point_color)
-				render.bind_data(point_vbo, point_ebo, vertices, objects.point_indices)
-				render.draw_points(vertices, objects.point_indices)
-				// Lines.
-				line_vao, line_vbo, line_ebo := render.get_buffer_objects()
-				objects.color_vertices(vertices, objects.line_color)
-				render.bind_data(line_vbo, line_ebo, vertices, objects.line_indices)
-				render.draw_lines(vertices, objects.line_indices)
-				// Normals of faces.
-				when ODIN_DEBUG {
-					normal_vao, normal_vbo, normal_ebo := render.get_buffer_objects()
-					face_normals := objects.get_cube_normals_coordinates(object)
-					render.bind_data(normal_vbo, line_ebo, face_normals, {0, 1, 2, 3, 4, 5})
-					render.draw_lines(face_normals, {0, 1, 2, 3, 4, 5})
-
-					gl.DeleteVertexArrays(1, &normal_vao)
-					gl.DeleteBuffers(1, &normal_vbo)
-					gl.DeleteBuffers(1, &normal_ebo)
-				}
-
-				gl.DeleteVertexArrays(1, &cube_vao)
-				gl.DeleteBuffers(1, &cube_vbo)
-				gl.DeleteBuffers(1, &cube_ebo)
-				gl.DeleteVertexArrays(1, &point_vao)
-				gl.DeleteBuffers(1, &point_vbo)
-				gl.DeleteBuffers(1, &point_ebo)
-				gl.DeleteVertexArrays(1, &line_vao)
-				gl.DeleteBuffers(1, &line_vbo)
-				gl.DeleteBuffers(1, &line_ebo)
-			case:
-			}
-		}
-
-=======
->>>>>>> dev
 		// Update (rotate) the vertices every frame.
 		render.update_shader(uniforms)
 
@@ -138,6 +85,11 @@ main :: proc() {
 		// Render all scene objects and axes. Axes rendered after objects to minimize its overdraw.
 		render.render_objects(render_objects)
 		render.render_axes()
+
+		// pixels := make([]u32, render.WINDOW_WIDTH * render.WINDOW_HEIGHT)
+		// defer delete(pixels)
+		// text_texture_id := render.get_texture_id(pixels)
+		// gl.BindTexture(gl.TEXTURE_2D, text_texture_id)
 
 		// Get data throuugh a PBO from the framebuffer and write it to an image. `frame_count` needed for file naming.
 		current_pbo_idx := 0

@@ -118,9 +118,9 @@ logger_render_text :: proc(
 ) -> Maybe(u32) {
 	text_transformation := glm.mat4Ortho3d(
 		0.,
-		render.WINDOW_WIDTH,
+		f32(render.WINDOW_WIDTH),
 		0.,
-		render.WINDOW_HEIGHT,
+		f32(render.WINDOW_HEIGHT),
 		0.1,
 		100.,
 	)

@@ -53,6 +53,24 @@ get_buffer_objects :: proc() -> (vao: u32, vbo: u32, ebo: u32) {
 	return
 }
 
+get_texture_id :: proc(pixels: []u32) -> (texture_id: u32) {
+	gl.GenTextures(1, &texture_id)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+	gl.TexImage2D(
+		gl.TEXTURE_2D,
+		0,
+		gl.RGBA,
+		WINDOW_WIDTH,
+		WINDOW_HEIGHT,
+		0,
+		gl.BGRA,
+		gl.UNSIGNED_BYTE,
+		raw_data(pixels),
+	)
+	return
+}
+
 bind_data :: proc(vbo: u32, ebo: u32, data: []objects.Vertex, indices: []u16) {
 	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
 	gl.BufferData(
