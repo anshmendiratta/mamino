@@ -48,15 +48,6 @@ main :: proc() {
 	logger: Logger = {{}}
 	defer delete(logger.times_per_frame)
 
-	ft_library, ft_face := logger_font_init()
-	text: string = "WORK THIS TIME. IT IS NECESARY."
-	characters: map[rune]Character = logger_create_characters(ft_library, ft_face, text)
-
-	text_vao, text_vbo, _ := render.get_buffer_objects()
-	render.bind_text_data(text_vao, text_vbo, characters)
-	text_render_info: TextRenderInfo = {50., 50., 1., glm.vec3{1.0, 0.8, 0.2}}
-	logger_render_text(uniforms, characters, text_vao, text_vbo, &text_render_info)
-
 	last_frame := glfw.GetTime()
 
 	// Reset the `frames/` directory. Create it if it doesn't exist.
@@ -112,26 +103,9 @@ main :: proc() {
 	fmt.println("Average:", avg_framerate, "FPS")
 
 	// Write images.
-	// for frame, idx in stored_frames {
-	// 	// fmt.println("At frame =", idx)
-	// 	defer delete(frame)
-	// 	padded_frame_count := fmt.aprintf("%04d", idx)
-	// 	image_name := fmt.aprintf("frames/img_{}.png", padded_frame_count)
-	// 	success := animation.write_png(
-	// 		image_name,
-	// 		render.WINDOW_WIDTH,
-	// 		render.WINDOW_HEIGHT,
-	// 		4,
-	// 		frame,
-	// 		render.WINDOW_WIDTH * 4,
-	// 	)
-	// 	if success != 1 {
-	// 		// Failure.
-	// 		fmt.eprintln("Error: could not write frame.")
-	// 	}
-	// }
+	animation.write_frames(stored_frames)
 	// Composite video using ffmpeg.
-	// animation.ffmpeg_composite_video(avg_framerate)
+	animation.ffmpeg_composite_video(avg_framerate)
 
 	render.mamino_exit()
 }

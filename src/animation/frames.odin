@@ -18,6 +18,27 @@ foreign stbiw {
 	// stbi_write_png_flip :: proc(filename: string, w, h: int, $comp: int, data: []u8, stride_in_bytes: int) -> int ---
 }
 
+write_frames :: proc(frames: [dynamic][]u32) {
+	for frame, idx in frames {
+		// fmt.println("At frame =", idx)
+		defer delete(frame)
+		padded_frame_count := fmt.aprintf("%04d", idx)
+		image_name := fmt.aprintf("frames/img_{}.png", padded_frame_count)
+		success := write_png(
+			image_name,
+			render.WINDOW_WIDTH,
+			render.WINDOW_HEIGHT,
+			4,
+			frame,
+			render.WINDOW_WIDTH * 4,
+		)
+		if success != 1 {
+			// Failure.
+			fmt.eprintln("Error: could not write frame.")
+		}
+	}
+}
+
 write_png :: #force_inline proc(
 	filename: string,
 	window_width, window_height, comp: i32,

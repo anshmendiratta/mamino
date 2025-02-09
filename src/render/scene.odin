@@ -1,4 +1,3 @@
-
 package render
 
 import gl "vendor:OpenGL"
@@ -6,6 +5,16 @@ import gl "vendor:OpenGL"
 import "../objects"
 
 render_objects :: proc(render_objects: []union {
+		objects.Cube,
+	}) {
+	when ODIN_OS == .Darwin {
+		render_mtl_objects(render_objects)
+	} else {
+		render_gl_objects()
+	}
+}
+
+render_gl_objects :: proc(render_objects: []union {
 		objects.Cube,
 	}) {
 	vertices: []objects.Vertex
@@ -56,7 +65,19 @@ render_objects :: proc(render_objects: []union {
 	}
 }
 
+render_mtl_objects :: proc(render_objects: []union {
+		objects.Cube,
+	}) {}
+
 render_axes :: proc() {
+	when ODIN_OS == .Darwin {
+		render_mtl_axes()
+	} else {
+		render_gl_axes()
+	}
+}
+
+render_gl_axes :: proc() {
 	axes_vao, axes_vbo, axes_ebo := get_buffer_objects()
 	bind_data(axes_vbo, axes_ebo, objects.axes_vertices, objects.axes_indices)
 	draw_axes(objects.axes_indices)
@@ -64,4 +85,6 @@ render_axes :: proc() {
 	gl.DeleteBuffers(1, &axes_vbo)
 	gl.DeleteBuffers(1, &axes_ebo)
 }
+
+render_mtl_axes :: proc() {}
 

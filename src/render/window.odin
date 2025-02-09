@@ -3,9 +3,15 @@ package render
 import "core:c"
 import "core:fmt"
 
+// OpenGL/Math.
 import glm "core:math/linalg/glsl"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
+
+// Darwin.
+import NS "core:sys/darwin/Foundation"
+import MTL "vendor:darwin/Metal"
+import CA "vendor:darwin/QuartzCore"
 
 PROGRAM_NAME :: "mamino"
 // Default values for not-MacOS.
@@ -18,6 +24,15 @@ WINDOW_HEIGHT := i32(1024)
 running: b32 = true
 
 mamino_init :: proc() {
+	when ODIN_OS == .Darwin {
+		mamino_mtl_init()
+	} else {
+		mamino_gl_init()
+	}
+}
+
+@(cold)
+mamino_gl_init :: proc() {
 	// https://www.glfw.org/docs/3.3/window_guide.html#window_hints
 	// https://www.glfw.org/docs/3.3/group__window.html#ga7d9c8c62384b1e2821c4dc48952d2033
 	glfw.WindowHint(glfw.RESIZABLE, 1)
@@ -39,6 +54,13 @@ mamino_init :: proc() {
 		return
 	}
 }
+
+@(cold)
+mamino_mtl_init :: proc() {
+	device := MTL.CreateSystemDefaultDevice()
+	fmt.println(device->name()->odinString())
+}
+
 
 mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 	window = glfw.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, PROGRAM_NAME, nil, nil)
