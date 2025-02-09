@@ -5,6 +5,7 @@ frames/
 ./src.bin
 src.bin
 src/bin
+src.o
 src.exe
 .idea
 vid.mp4
