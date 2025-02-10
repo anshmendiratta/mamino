@@ -10,7 +10,7 @@ render_objects :: proc(render_objects: []union {
 	when ODIN_OS == .Darwin {
 		render_mtl_objects(render_objects)
 	} else {
-		render_gl_objects()
+		render_gl_objects(render_objects)
 	}
 }
 

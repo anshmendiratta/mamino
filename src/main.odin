@@ -83,11 +83,11 @@ main :: proc() {
 		// gl.BindTexture(gl.TEXTURE_2D, text_texture_id)
 
 		// Get data throuugh a PBO from the framebuffer and write it to an image. `frame_count` needed for file naming.
-		current_pbo_idx := 0
-		image_data := animation.capture_frame(current_pbo_idx)
-		defer delete(image_data)
-		append(&stored_frames, image_data)
-		current_pbo_idx = 1 - current_pbo_idx
+		// current_pbo_idx := 0
+		// image_data := animation.capture_frame(current_pbo_idx)
+		// defer delete(image_data)
+		// append(&stored_frames, image_data)
+		// current_pbo_idx = 1 - current_pbo_idx
 
 		// Update window sizes.
 		render.WINDOW_WIDTH, render.WINDOW_HEIGHT = glfw.GetWindowSize(window)
@@ -103,9 +103,9 @@ main :: proc() {
 	fmt.println("Average:", avg_framerate, "FPS")
 
 	// Write images.
-	animation.write_frames(stored_frames)
+	// animation.write_frames(stored_frames)
 	// Composite video using ffmpeg.
-	animation.ffmpeg_composite_video(avg_framerate)
+	// animation.ffmpeg_composite_video(avg_framerate)
 
 	render.mamino_exit()
 }
