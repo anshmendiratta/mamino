@@ -55,20 +55,31 @@ render_objects :: proc(render_objects: []union {
 	}
 }
 
-render_axes :: proc() {
-	when ODIN_OS == .Darwin {
-		render_mtl_axes()
-	} else {
-		render_gl_axes()
-	}
-}
-
-render_gl_axes :: proc() {
+render_coordinate_axes :: proc() {
 	axes_vao, axes_vbo, axes_ebo := get_buffer_objects()
-	bind_data(axes_vbo, axes_ebo, objects.axes_vertices, objects.axes_indices)
-	draw_axes(objects.axes_indices)
+	bind_data(
+		axes_vbo,
+		axes_ebo,
+		objects.coordinate_axes_vertices,
+		objects.coordinate_axes_indices,
+	)
+	draw_axes(objects.coordinate_axes_indices)
 	gl.DeleteVertexArrays(1, &axes_vao)
 	gl.DeleteBuffers(1, &axes_vbo)
 	gl.DeleteBuffers(1, &axes_ebo)
+}
+
+render_subgrid_axes :: proc() {
+	subgrid_axes_vao, subgrid_axes_vbo, subgrid_axes_ebo := get_buffer_objects()
+	bind_data(
+		subgrid_axes_vbo,
+		subgrid_axes_ebo,
+		objects.subgrid_axes_vertices,
+		objects.subgrid_axes_indices,
+	)
+	draw_axes(objects.subgrid_axes_indices)
+	gl.DeleteVertexArrays(1, &subgrid_axes_vao)
+	gl.DeleteBuffers(1, &subgrid_axes_vbo)
+	gl.DeleteBuffers(1, &subgrid_axes_ebo)
 }
 

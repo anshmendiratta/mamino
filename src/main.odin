@@ -75,7 +75,8 @@ main :: proc() {
 
 		// Render all scene objects and axes. Axes rendered after objects to minimize its overdraw.
 		render.render_objects(render_objects)
-		render.render_axes()
+		render.render_coordinate_axes()
+		render.render_subgrid_axes()
 
 		// pixels := make([]u32, render.WINDOW_WIDTH * render.WINDOW_HEIGHT)
 		// defer delete(pixels)
