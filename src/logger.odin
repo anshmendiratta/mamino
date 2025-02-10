@@ -3,7 +3,14 @@
 package main
 
 import "core:fmt"
+import glm "core:math/linalg/glsl"
 import "core:time"
+
+import gl "vendor:OpenGL"
+
+// import ft "shared:freetype"
+
+import "render"
 
 Logger :: struct {
 	times_per_frame: [dynamic]f64,
