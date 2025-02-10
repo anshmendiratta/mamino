@@ -7,16 +7,6 @@ import "../objects"
 render_objects :: proc(render_objects: []union {
 		objects.Cube,
 	}) {
-	when ODIN_OS == .Darwin {
-		render_mtl_objects(render_objects)
-	} else {
-		render_gl_objects(render_objects)
-	}
-}
-
-render_gl_objects :: proc(render_objects: []union {
-		objects.Cube,
-	}) {
 	vertices: []objects.Vertex
 	defer delete(vertices)
 
@@ -65,10 +55,6 @@ render_gl_objects :: proc(render_objects: []union {
 	}
 }
 
-render_mtl_objects :: proc(render_objects: []union {
-		objects.Cube,
-	}) {}
-
 render_axes :: proc() {
 	when ODIN_OS == .Darwin {
 		render_mtl_axes()
@@ -85,6 +71,4 @@ render_gl_axes :: proc() {
 	gl.DeleteBuffers(1, &axes_vbo)
 	gl.DeleteBuffers(1, &axes_ebo)
 }
-
-render_mtl_axes :: proc() {}
 
