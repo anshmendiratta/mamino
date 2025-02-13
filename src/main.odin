@@ -55,6 +55,12 @@ main :: proc() {
 	animation.delete_previous_frames()
 	animation.make_frames_directory()
 
+	pixels_pbos: [2]u32
+	gl.GenBuffers(1, &pixels_pbos[0])
+	gl.GenBuffers(1, &pixels_pbos[1])
+	defer gl.DeleteBuffers(1, &pixels_pbos[0])
+	defer gl.DeleteBuffers(1, &pixels_pbos[1])
+	current_pbo_idx := 0
 	stored_frames: [dynamic][]u32
 
 	for (!glfw.WindowShouldClose(window) && render.running) {
@@ -78,17 +84,11 @@ main :: proc() {
 		render.render_coordinate_axes()
 		render.render_subgrid_axes()
 
-		// pixels := make([]u32, render.WINDOW_WIDTH * render.WINDOW_HEIGHT)
-		// defer delete(pixels)
-		// text_texture_id := render.get_texture_id(pixels)
-		// gl.BindTexture(gl.TEXTURE_2D, text_texture_id)
-
 		// Get data throuugh a PBO from the framebuffer and write it to an image. `frame_count` needed for file naming.
-		// current_pbo_idx := 0
-		// image_data := animation.capture_frame(current_pbo_idx)
-		// defer delete(image_data)
-		// append(&stored_frames, image_data)
-		// current_pbo_idx = 1 - current_pbo_idx
+		image_data := animation.capture_frame(pixels_pbos[current_pbo_idx])
+		defer delete(image_data)
+		append(&stored_frames, image_data)
+		current_pbo_idx = current_pbo_idx ~ 1
 
 		// Update window sizes.
 		render.WINDOW_WIDTH, render.WINDOW_HEIGHT = glfw.GetWindowSize(window)

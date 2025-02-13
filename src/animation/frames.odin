@@ -62,51 +62,41 @@ write_png :: #force_inline proc(
 			window_width,
 			window_height,
 			comp,
-			raw_data(flipped_image),
+			raw_data(data),
 			stride_in_bytes,
 		),
 	)
 }
 
-capture_frame :: proc(current_pbo_idx: int) -> (pixels: []u32) {
+// FIX: this PBO (Pixel Buffer Object) reading so the frames are not just black and white.
+capture_frame :: proc(pixel_pbo: u32) -> (pixels: []u32) {
+	pixel_pbo := pixel_pbo
 	pixels = make([]u32, render.WINDOW_WIDTH * render.WINDOW_HEIGHT)
-	// Read displayed/front buffer.
 	gl.ReadBuffer(gl.FRONT)
 
-	/* TODO: Fix this PBO (Pixel Buffer Object) reading so the frames are not just black and white.
-		// Generate OpenGL buffers and bind them to the pack pixel buffer.
-		// pixels_pbos: [2]u32
-		// gl.GenBuffers(1, &pixels_pbos[0])
-		// gl.GenBuffers(1, &pixels_pbos[1])
-		// defer gl.DeleteBuffers(1, &pixels_pbos[0])
-		// defer gl.DeleteBuffers(1, &pixels_pbos[1])
-		// gl.BindBuffer(gl.PIXEL_PACK_BUFFER, pixels_pbos[current_pbo_idx])
-		// Should return immediately.
-	*/
-
-	gl.ReadPixels(
-		0,
-		0,
-		render.WINDOW_WIDTH,
-		render.WINDOW_HEIGHT,
-		gl.RGBA,
-		gl.UNSIGNED_BYTE,
-		raw_data(pixels),
+	// Generate OpenGL buffers and bind them to the pack pixel buffer.
+	gl.BindBuffer(gl.PIXEL_PACK_BUFFER, pixel_pbo)
+	gl.BufferData(
+		gl.PIXEL_PACK_BUFFER,
+		int(render.WINDOW_WIDTH * render.WINDOW_HEIGHT),
+		nil,
+		gl.STREAM_READ,
 	)
-
-	/* PBO Continued: 
-		// Binds and copies data from the pack pixel buffer to our CPU buffer.
-		// other_pbo_idx := 1 - current_pbo_idx
-		// gl.BindBuffer(gl.PIXEL_PACK_BUFFER, pixels_pbos[other_pbo_idx])
-		// read_pixels_ptr := gl.MapBuffer(gl.PIXEL_PACK_BUFFER, gl.READ_ONLY)
-		// if read_pixels_ptr != nil {
-		// 	// Success.
-		// 	pixels = read_pixels_ptr
-		// 	gl.UnmapBuffer(gl.PIXEL_PACK_BUFFER)
-		// }
-		// // Removes the bind from our CPU pbo.
-		// gl.BindBuffer(gl.PIXEL_PACK_BUFFER, 0)
-	*/
+	gl.ReadPixels(0, 0, render.WINDOW_WIDTH, render.WINDOW_HEIGHT, gl.RGBA, gl.UNSIGNED_BYTE, nil)
+	gl.MapBuffer(gl.PIXEL_PACK_BUFFER, gl.READ_ONLY)
+	fmt.println(pixels)
+	pbo_ptr := gl.MapBuffer(pixel_pbo, gl.READ_ONLY)
+	if pbo_ptr != nil {
+		pixels = ([^]u32)(pbo_ptr)[:render.WINDOW_WIDTH * render.WINDOW_HEIGHT]
+		unmap_success := gl.UnmapBuffer(gl.PIXEL_PACK_BUFFER)
+		if !unmap_success {
+			fmt.eprintln("frames.odin: Failed to unmap the PBO.")
+		}
+	}
+	// Removes the bind from our CPU pbo.
+	gl.BindBuffer(gl.PIXEL_PACK_BUFFER, 0)
+	// Waits for the Fence.
+	// gl.FenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0)
 
 	return
 }
