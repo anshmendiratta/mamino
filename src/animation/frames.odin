@@ -10,14 +10,9 @@ import "core:strings"
 import "base:runtime"
 
 import gl "vendor:OpenGL"
+import stbi "vendor:stb/image"
 
 import "../render"
-
-foreign import stbiw "../../lib/stb_image_write.a"
-foreign stbiw {
-	stbi_write_png :: proc(filename: cstring, w, h, comp: i32, data: rawptr, stride_in_bytes: i32) -> i32 ---
-	// stbi_write_png_flip :: proc(filename: string, w, h: int, $comp: int, data: []u8, stride_in_bytes: int) -> int ---
-}
 
 write_frames :: proc(frames: [dynamic][]u32) {
 	for frame, idx in frames {
@@ -58,7 +53,7 @@ write_png :: #force_inline proc(
 	}
 
 	return int(
-		stbi_write_png(
+		stbi.write_png(
 			strings.clone_to_cstring(filename),
 			window_width,
 			window_height,
