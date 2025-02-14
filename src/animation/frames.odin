@@ -4,6 +4,7 @@ import "core:fmt"
 import "core:mem"
 import "core:os"
 import "core:os/os2"
+import "core:slice"
 import "core:strings"
 
 import "base:runtime"
@@ -20,8 +21,7 @@ foreign stbiw {
 
 write_frames :: proc(frames: [dynamic][]u32) {
 	for frame, idx in frames {
-		// fmt.println("At frame =", idx)
-		defer delete(frame)
+		// defer delete(frame)
 		padded_frame_count := fmt.aprintf("%04d", idx)
 		image_name := fmt.aprintf("frames/img_{}.png", padded_frame_count)
 		success := write_png(
@@ -37,6 +37,8 @@ write_frames :: proc(frames: [dynamic][]u32) {
 			fmt.eprintln("Error: could not write frame.")
 		}
 	}
+
+	fmt.println("Wrote", len(frames), "frames.")
 }
 
 write_png :: #force_inline proc(
@@ -46,8 +48,7 @@ write_png :: #force_inline proc(
 	stride_in_bytes: i32,
 ) -> int {
 	assert(comp >= 0 && comp <= 4)
-	flipped_image: []u32 = make([]u32, len(data))
-	defer delete(flipped_image)
+	flipped_image: []u32 = make([]u32, len(data), context.temp_allocator)
 
 	for row in 0 ..< window_height {
 		for column in 0 ..< window_width {
@@ -62,7 +63,7 @@ write_png :: #force_inline proc(
 			window_width,
 			window_height,
 			comp,
-			raw_data(data),
+			raw_data(flipped_image),
 			stride_in_bytes,
 		),
 	)
@@ -70,33 +71,35 @@ write_png :: #force_inline proc(
 
 // FIX: this PBO (Pixel Buffer Object) reading so the frames are not just black and white.
 capture_frame :: proc(pixel_pbo: u32) -> (pixels: []u32) {
-	pixel_pbo := pixel_pbo
-	pixels = make([]u32, render.WINDOW_WIDTH * render.WINDOW_HEIGHT)
 	gl.ReadBuffer(gl.FRONT)
-
 	// Generate OpenGL buffers and bind them to the pack pixel buffer.
 	gl.BindBuffer(gl.PIXEL_PACK_BUFFER, pixel_pbo)
+	// Allocating the space.
 	gl.BufferData(
 		gl.PIXEL_PACK_BUFFER,
-		int(render.WINDOW_WIDTH * render.WINDOW_HEIGHT),
+		int(render.WINDOW_WIDTH * render.WINDOW_HEIGHT * 4),
 		nil,
 		gl.STREAM_READ,
 	)
+
+	gl.BindBuffer(gl.PIXEL_PACK_BUFFER, pixel_pbo)
 	gl.ReadPixels(0, 0, render.WINDOW_WIDTH, render.WINDOW_HEIGHT, gl.RGBA, gl.UNSIGNED_BYTE, nil)
-	gl.MapBuffer(gl.PIXEL_PACK_BUFFER, gl.READ_ONLY)
-	fmt.println(pixels)
-	pbo_ptr := gl.MapBuffer(pixel_pbo, gl.READ_ONLY)
+	pbo_ptr := ([^]u32)(gl.MapBuffer(gl.PIXEL_PACK_BUFFER, gl.READ_ONLY))
+	// defer free(pbo_ptr)
 	if pbo_ptr != nil {
-		pixels = ([^]u32)(pbo_ptr)[:render.WINDOW_WIDTH * render.WINDOW_HEIGHT]
-		unmap_success := gl.UnmapBuffer(gl.PIXEL_PACK_BUFFER)
-		if !unmap_success {
-			fmt.eprintln("frames.odin: Failed to unmap the PBO.")
-		}
+		pbo_pixels := pbo_ptr[:render.WINDOW_WIDTH * render.WINDOW_HEIGHT]
+		pixels = make([]u32, len(pbo_pixels), context.temp_allocator)
+		// pixels = slice.clone(pbo_pixels)
+		copy(pixels, pbo_pixels)
 	}
 	// Removes the bind from our CPU pbo.
+	unmap_success := gl.UnmapBuffer(gl.PIXEL_PACK_BUFFER)
+	if !unmap_success {
+		fmt.eprintln("frames.odin: Failed to unmap the PBO.")
+	}
 	gl.BindBuffer(gl.PIXEL_PACK_BUFFER, 0)
 	// Waits for the Fence.
-	// gl.FenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0)
+	gl.FenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0)
 
 	return
 }

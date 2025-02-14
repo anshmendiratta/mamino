@@ -51,17 +51,18 @@ main :: proc() {
 	last_frame := glfw.GetTime()
 
 	// Reset the `frames/` directory. Create it if it doesn't exist.
-	allocator: runtime.Allocator
 	animation.delete_previous_frames()
 	animation.make_frames_directory()
 
+	// Prepare for frame data.
 	pixels_pbos: [2]u32
 	gl.GenBuffers(1, &pixels_pbos[0])
 	gl.GenBuffers(1, &pixels_pbos[1])
 	defer gl.DeleteBuffers(1, &pixels_pbos[0])
 	defer gl.DeleteBuffers(1, &pixels_pbos[1])
 	current_pbo_idx := 0
-	stored_frames: [dynamic][]u32
+	stored_frames: [dynamic][]u32 = {}
+	frame_copy: []u32 = make([]u32, render.WINDOW_WIDTH * render.WINDOW_HEIGHT)
 
 	for (!glfw.WindowShouldClose(window) && render.running) {
 		// Performance stdout logging.
@@ -86,7 +87,7 @@ main :: proc() {
 
 		// Get data throuugh a PBO from the framebuffer and write it to an image. `frame_count` needed for file naming.
 		image_data := animation.capture_frame(pixels_pbos[current_pbo_idx])
-		defer delete(image_data)
+		copy(frame_copy, image_data)
 		append(&stored_frames, image_data)
 		current_pbo_idx = current_pbo_idx ~ 1
 
@@ -94,9 +95,9 @@ main :: proc() {
 		render.WINDOW_WIDTH, render.WINDOW_HEIGHT = glfw.GetWindowSize(window)
 
 		// NOTE(Ansh): Defaults to double buffering. 
-		// See https://en.wikipedia.org/wiki/Multiple_buffering to learn more about Multiple buffering
-		// https://www.glfw.org/docs/3.0/group__context.html#ga15a5a1ee5b3c2ca6b15ca209a12efd14
 		glfw.SwapBuffers(window)
+
+		free_all(context.temp_allocator)
 	}
 	glfw.DestroyWindow(window)
 
@@ -104,9 +105,9 @@ main :: proc() {
 	fmt.println("Average:", avg_framerate, "FPS")
 
 	// Write images.
-	// animation.write_frames(stored_frames)
+	animation.write_frames(stored_frames)
 	// Composite video using ffmpeg.
-	// animation.ffmpeg_composite_video(avg_framerate)
+	animation.ffmpeg_composite_video(avg_framerate)
 
 	render.mamino_exit()
 }
