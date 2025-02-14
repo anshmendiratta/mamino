@@ -1,7 +1,7 @@
 package render
 
 mamino_vertex_shader := `
-	#version 410
+	#version 410 
 
 	layout(location = 0) in vec3 position;
 	layout(location = 1) in vec4 color;
@@ -28,7 +28,7 @@ mamino_vertex_shader := `
 
 
 mamino_fragment_shader := `
-	#version 410
+	#version 410 
 
 	// in vec2 tex_coords;
 	in vec3 v_coord;
