@@ -14,9 +14,9 @@ import "base:runtime"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
 
-import "animation"
 import "objects"
 import "render"
+import "sequencing"
 
 main :: proc() {
 	// Setup.
@@ -51,8 +51,14 @@ main :: proc() {
 	last_frame := glfw.GetTime()
 
 	// Reset the `frames/` directory. Create it if it doesn't exist.
-	animation.delete_previous_frames()
-	animation.make_frames_directory()
+	sequencing.delete_previous_frames()
+	sequencing.make_frames_directory()
+	video_options: sequencing.VideoOptions = {
+			resolution = {1920, 1080},
+			framerate  = 60,
+			encoding   = "libx264",
+			out_name   = "vid.mp4",
+		}
 
 	// Prepare for frame data.
 	pixels_pbos: [2]u32
@@ -86,7 +92,7 @@ main :: proc() {
 		render.render_subgrid_axes()
 
 		// Get data throuugh a PBO from the framebuffer and write it to an image. `frame_count` needed for file naming.
-		image_data := animation.capture_frame(pixels_pbos[current_pbo_idx])
+		image_data := sequencing.capture_frame(pixels_pbos[current_pbo_idx])
 		copy(frame_copy, image_data)
 		append(&stored_frames, image_data)
 		current_pbo_idx = current_pbo_idx ~ 1
@@ -105,9 +111,9 @@ main :: proc() {
 	fmt.println("Average:", avg_framerate, "FPS")
 
 	// Write images.
-	animation.write_frames(stored_frames)
+	// sequencing.write_frames(stored_frames)
 	// Composite video using ffmpeg.
-	animation.ffmpeg_composite_video(avg_framerate)
+	// sequencing.ffmpeg_composite_video(video_options)
 
 	render.mamino_exit()
 }

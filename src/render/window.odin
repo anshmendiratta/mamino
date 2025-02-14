@@ -9,35 +9,18 @@ import gl "vendor:OpenGL"
 import "vendor:glfw"
 
 PROGRAM_NAME :: "mamino"
-// Default values for not-MacOS.
 GL_MAJOR_VERSION: c.int : 4
-GL_MINOR_VERSION :: 6
+GL_MINOR_VERSION :: 1
 
 WINDOW_WIDTH := i32(1024)
 WINDOW_HEIGHT := i32(1024)
 
 running: b32 = true
 
-mamino_init :: proc() {
-	mamino_gl_init()
-}
-
 @(cold)
-mamino_gl_init :: proc() {
+mamino_init :: proc() {
 	// https://www.glfw.org/docs/3.3/window_guide.html#window_hints
 	// https://www.glfw.org/docs/3.3/group__window.html#ga7d9c8c62384b1e2821c4dc48952d2033
-	glfw.WindowHint(glfw.RESIZABLE, 1)
-	glfw.WindowHint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
-
-	// MacOS.
-	when ODIN_OS == .Darwin {
-		glfw.WindowHint(glfw.OPENGL_FORWARD_COMPAT, gl.TRUE)
-		glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, 4)
-		glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, 1)
-	} else {
-		glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, GL_MAJOR_VERSION)
-		glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, GL_MINOR_VERSION)
-	}
 
 	// https://www.glfw.org/docs/latest/group__init.html#ga317aac130a235ab08c6db0834907d85e
 	if !glfw.Init() {
@@ -47,6 +30,14 @@ mamino_gl_init :: proc() {
 }
 
 mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
+	when ODIN_OS == .Darwin {
+		glfw.WindowHint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+		glfw.WindowHint(glfw.OPENGL_FORWARD_COMPAT, gl.TRUE)
+	}
+	glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, GL_MAJOR_VERSION)
+	glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, GL_MINOR_VERSION)
+	glfw.WindowHint(glfw.RESIZABLE, 1)
+
 	window = glfw.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, PROGRAM_NAME, nil, nil)
 	if window == nil {
 		fmt.println("Unable to create window")
@@ -57,8 +48,11 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 	glfw.SwapInterval(0)
 	glfw.SetKeyCallback(window, key_callback)
 	glfw.SetFramebufferSizeCallback(window, size_callback)
-	gl.load_up_to(int(GL_MAJOR_VERSION), GL_MINOR_VERSION, glfw.gl_set_proc_address)
-
+	when ODIN_OS == .Darwin {
+		gl.load_up_to(int(4), 1, glfw.gl_set_proc_address)
+	} else {
+		gl.load_up_to(int(GL_MAJOR_VERSION), GL_MINOR_VERSION, glfw.gl_set_proc_address)
+	}
 	return
 }
 

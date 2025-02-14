@@ -1,4 +1,4 @@
-package animation
+package sequencing
 
 import "core:fmt"
 import "core:mem"
@@ -127,16 +127,16 @@ make_frames_directory :: proc() {
 	}
 }
 
-ffmpeg_composite_video :: proc(framerate: f64) -> os2.Error {
-	if os.is_file_path("vid.mp4") {
-		remove_ok := os.remove("vid.mp4")
+ffmpeg_composite_video :: proc(vo: VideoOptions) -> os2.Error {
+	os2.set_working_directory("~/development/mamino/")
+	if os.is_file_path(vo.out_name) {
+		remove_ok := os.remove(vo.out_name)
 		if remove_ok != nil {
-			fmt.eprintln("Error: could not remove vid.mp4")
+			fmt.eprintln("Error: could not remove", vo.out_name)
 		}
 	}
-	os2.set_working_directory("~/development/mamino/")
 
-	ffmpeg_framerate := fmt.aprintf("%d", int(framerate))
+	framerate := fmt.aprintf("%d", vo.framerate)
 	process_description: os2.Process_Desc
 	process_description.command = {
 		"ffmpeg",
@@ -149,18 +149,18 @@ ffmpeg_composite_video :: proc(framerate: f64) -> os2.Error {
 		"vulkan=vk:0",
 		// ffmpeg settings.
 		"-framerate",
-		ffmpeg_framerate,
+		framerate,
 		"-pattern_type",
 		"glob",
 		"-i",
 		`frames/img_*.png`,
 		"-c:v",
-		// "av1",
-		"libx264",
-		"vid.mp4",
+		vo.encoding,
+		vo.out_name,
 	}
+
 	allocator: runtime.Allocator
-	process_state, stdout, stderr, ok := os2.process_exec(process_description, allocator)
+	process_state, _, stderr, ok := os2.process_exec(process_description, allocator)
 	if !process_state.success {
 		fmt.printfln("Error: could not run ffmpeg. {}", ok)
 		fmt.printfln("stderr of command: {}", string(stderr))
