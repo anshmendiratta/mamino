@@ -11,10 +11,8 @@ import "vendor:glfw"
 PROGRAM_NAME :: "mamino"
 GL_MAJOR_VERSION: c.int : 4
 GL_MINOR_VERSION :: 1
-
 WINDOW_WIDTH := i32(1024)
 WINDOW_HEIGHT := i32(1024)
-
 running: b32 = true
 
 @(cold)
@@ -48,11 +46,8 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 	glfw.SwapInterval(0)
 	glfw.SetKeyCallback(window, key_callback)
 	glfw.SetFramebufferSizeCallback(window, size_callback)
-	when ODIN_OS == .Darwin {
-		gl.load_up_to(int(4), 1, glfw.gl_set_proc_address)
-	} else {
-		gl.load_up_to(int(GL_MAJOR_VERSION), GL_MINOR_VERSION, glfw.gl_set_proc_address)
-	}
+	gl.load_up_to(int(GL_MAJOR_VERSION), GL_MINOR_VERSION, glfw.gl_set_proc_address)
+
 	return
 }
 
