@@ -9,6 +9,27 @@ import "vendor:glfw"
 
 import "../objects"
 
+@(cold)
+@(require_results)
+mamino_gl_init :: proc() -> (static_gl_data: StaticGLObjects) {
+	when ODIN_DEBUG {
+		gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
+	}
+	gl.Enable(gl.DEPTH_TEST)
+
+	program_id, ok := gl.load_shaders_source(mamino_vertex_shader, mamino_fragment_shader)
+	if !ok {
+		fmt.eprintln("Failed to load shaders.")
+		return
+	}
+	static_gl_data.program_id = program_id
+	gl.UseProgram(static_gl_data.program_id)
+
+	static_gl_data.uniforms = gl.get_uniforms_from_program(static_gl_data.program_id)
+
+	return
+}
+
 update_shader :: proc(uniforms: map[string]gl.Uniform_Info) {
 	proj := glm.mat4Perspective(glm.radians_f32(60), 1.0, 0.1, 100.0)
 	scale := f32(0.3)

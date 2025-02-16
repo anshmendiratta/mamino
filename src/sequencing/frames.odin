@@ -14,19 +14,57 @@ import stbi "vendor:stb/image"
 
 import "../render"
 
-write_frames :: proc(frames: [dynamic][]u32) {
+@(private)
+pixels_pbos: [2]u32 = {0, 0}
+@(private)
+current_pbo_idx := 0
+@(private)
+stored_frames: [dynamic][]u32 = {}
+@(private)
+frame_data: []u32 = make([]u32, render.WINDOW_WIDTH * render.WINDOW_HEIGHT)
+
+// @(init)
+mamino_frame_capture_init :: proc() {
+	gl.GenBuffers(1, &pixels_pbos[0])
+	gl.GenBuffers(1, &pixels_pbos[1])
+
+	delete_previous_frames()
+	make_directory("frames")
+}
+
+@(optimization_mode = "favor_size")
+mamino_capture_frame :: proc() {
+	frame_data = capture_frame(pixels_pbos[current_pbo_idx])
+	append(&stored_frames, slice.clone(frame_data))
+	current_pbo_idx = current_pbo_idx ~ 1
+}
+
+// TODO: Termination code here (if necessary).
+@(cold)
+mamino_exit :: proc(vo: Maybe(VideoOptions)) {
+	if vo == nil {
+		return
+	}
+	vo := vo.?
+
+	// Do video export.
+	write_frames(stored_frames, render.WINDOW_WIDTH, render.WINDOW_HEIGHT)
+	composite_video(vo)
+
+	// Cleanup.
+	gl.DeleteBuffers(1, &pixels_pbos[0])
+	gl.DeleteBuffers(1, &pixels_pbos[1])
+}
+
+@(private)
+@(cold)
+@(optimization_mode = "favor_size")
+write_frames :: proc(frames: [dynamic][]u32, window_width, window_height: i32) {
 	for frame, idx in frames {
 		// defer delete(frame)
 		padded_frame_count := fmt.aprintf("%04d", idx)
 		image_name := fmt.aprintf("frames/img_{}.png", padded_frame_count)
-		success := write_png(
-			image_name,
-			render.WINDOW_WIDTH,
-			render.WINDOW_HEIGHT,
-			4,
-			frame,
-			render.WINDOW_WIDTH * 4,
-		)
+		success := write_png(image_name, window_width, window_height, 4, frame, window_width * 4)
 		if success != 1 {
 			// Failure.
 			fmt.eprintln("Error: could not write frame.")
@@ -36,6 +74,8 @@ write_frames :: proc(frames: [dynamic][]u32) {
 	fmt.println("Wrote", len(frames), "frames.")
 }
 
+@(private)
+@(optimization_mode = "favor_size")
 write_png :: #force_inline proc(
 	filename: string,
 	window_width, window_height, comp: i32,
@@ -43,7 +83,7 @@ write_png :: #force_inline proc(
 	stride_in_bytes: i32,
 ) -> int {
 	assert(comp >= 0 && comp <= 4)
-	flipped_image: []u32 = make([]u32, len(data), context.temp_allocator)
+	flipped_image: []u32 = make([]u32, len(data))
 
 	for row in 0 ..< window_height {
 		for column in 0 ..< window_width {
@@ -64,7 +104,8 @@ write_png :: #force_inline proc(
 	)
 }
 
-// FIX: this PBO (Pixel Buffer Object) reading so the frames are not just black and white.
+@(private)
+@(optimization_mode = "favor_size")
 capture_frame :: proc(pixel_pbo: u32) -> (pixels: []u32) {
 	gl.ReadBuffer(gl.FRONT)
 	// Generate OpenGL buffers and bind them to the pack pixel buffer.
@@ -99,6 +140,7 @@ capture_frame :: proc(pixel_pbo: u32) -> (pixels: []u32) {
 	return
 }
 
+@(cold)
 delete_previous_frames :: proc() {
 	if !os2.is_directory("frames") {
 		return
@@ -115,26 +157,39 @@ delete_previous_frames :: proc() {
 	}
 }
 
-make_frames_directory :: proc() {
-	directory_name :: "frames"
-	if os2.is_directory("frames") {
+@(private)
+make_directory :: proc(dir_name: string = "frames") {
+	if os2.is_directory(dir_name) {
 		return
 	}
 
-	ok := os.make_directory(directory_name)
+	ok := os.make_directory(dir_name)
 	if ok != nil {
-		fmt.eprintfln("Error: Could not make a frames/ directory. {}", ok)
+		fmt.eprintfln("Error: Could not make a", dir_name, " directory. {}", ok)
 	}
 }
 
-ffmpeg_composite_video :: proc(vo: VideoOptions) -> os2.Error {
-	os2.set_working_directory("~/development/mamino/")
+@(private)
+@(cold)
+composite_video :: proc(vo: VideoOptions, dir_name: string = "outputs") {
+	ok: union {
+		os2.Error,
+		os.Error,
+	}
+
+	make_directory(dir_name)
+	os2.set_working_directory(fmt.aprintf("~/development/mamino/{}/", dir_name))
 	if os.is_file_path(vo.out_name) {
 		remove_ok := os.remove(vo.out_name)
 		if remove_ok != nil {
 			fmt.eprintln("Error: could not remove", vo.out_name)
+			ok = remove_ok
 		}
 	}
+	all_videos_files, _ := os2.read_all_directory_by_path(
+		"~/development/mamino",
+		context.allocator,
+	)
 
 	framerate := fmt.aprintf("%d", vo.framerate)
 	process_description: os2.Process_Desc
@@ -160,13 +215,16 @@ ffmpeg_composite_video :: proc(vo: VideoOptions) -> os2.Error {
 	}
 
 	allocator: runtime.Allocator
-	process_state, _, stderr, ok := os2.process_exec(process_description, allocator)
+	process_state, _, stderr, process_ok := os2.process_exec(process_description, allocator)
 	if !process_state.success {
-		fmt.printfln("Error: could not run ffmpeg. {}", ok)
+		fmt.printfln("Error: could not run ffmpeg. {}", process_ok)
 		fmt.printfln("stderr of command: {}", string(stderr))
+		ok = process_ok
 	}
 	fmt.println(#directory)
 
-	return ok
+	if ok != nil {
+		fmt.eprintln(ok)
+	}
 }
 

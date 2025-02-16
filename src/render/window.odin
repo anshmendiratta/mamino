@@ -3,35 +3,39 @@ package render
 import "core:c"
 import "core:fmt"
 
-// OpenGL/Math.
 import glm "core:math/linalg/glsl"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
 
+@(private)
 PROGRAM_NAME :: "mamino"
+@(private)
 GL_MAJOR_VERSION: c.int : 4
+@(private)
 GL_MINOR_VERSION :: 1
+
 WINDOW_WIDTH := i32(1024)
 WINDOW_HEIGHT := i32(1024)
 running: b32 = true
 
-@(cold)
-mamino_init :: proc() {
-	// https://www.glfw.org/docs/3.3/window_guide.html#window_hints
-	// https://www.glfw.org/docs/3.3/group__window.html#ga7d9c8c62384b1e2821c4dc48952d2033
+StaticGLObjects :: struct {
+	program_id: u32,
+	uniforms:   map[string]gl.Uniform_Info,
+}
 
-	// https://www.glfw.org/docs/latest/group__init.html#ga317aac130a235ab08c6db0834907d85e
+@(cold)
+// @(init)
+mamino_init :: proc() {
 	if !glfw.Init() {
-		fmt.println("Failed to initialize GLFW")
+		fmt.eprintln("Failed to initialize GLFW")
 		return
 	}
 }
 
+@(cold)
 mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
-	when ODIN_OS == .Darwin {
-		glfw.WindowHint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
-		glfw.WindowHint(glfw.OPENGL_FORWARD_COMPAT, gl.TRUE)
-	}
+	glfw.WindowHint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+	glfw.WindowHint(glfw.OPENGL_FORWARD_COMPAT, gl.TRUE)
 	glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, GL_MAJOR_VERSION)
 	glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, GL_MINOR_VERSION)
 	glfw.WindowHint(glfw.RESIZABLE, 1)
@@ -51,8 +55,6 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 	return
 }
 
-// TODO: Termination code here (if necessary).
-mamino_exit :: proc() {}
 
 key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
 	switch key {
