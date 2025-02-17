@@ -24,7 +24,7 @@ StaticGLObjects :: struct {
 }
 
 @(cold)
-// @(init)
+@(init)
 mamino_init :: proc() {
 	if !glfw.Init() {
 		fmt.eprintln("Failed to initialize GLFW")
