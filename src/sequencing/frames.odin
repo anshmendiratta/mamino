@@ -19,9 +19,9 @@ pixels_pbos: [2]u32 = {0, 0}
 @(private)
 current_pbo_idx := 0
 @(private)
-stored_frames: [dynamic]^[]u32 = {}
-// @(private)
-// frame_data: []u32 = make([]u32, render.WINDOW_WIDTH * render.WINDOW_HEIGHT)
+stored_frames: [dynamic][]u32 = {}
+@(private)
+frame_data: []u32 = make([]u32, render.WINDOW_WIDTH * render.WINDOW_HEIGHT)
 
 mamino_frame_capture_init :: proc() {
 	gl.GenBuffers(1, &pixels_pbos[0])
@@ -33,7 +33,7 @@ mamino_frame_capture_init :: proc() {
 
 @(optimization_mode = "favor_size")
 mamino_capture_frame :: proc() {
-	frame_data := capture_frame(pixels_pbos[current_pbo_idx])
+	frame_data = capture_frame(pixels_pbos[current_pbo_idx])
 	append(&stored_frames, frame_data)
 	current_pbo_idx = current_pbo_idx ~ 1
 }
@@ -56,11 +56,11 @@ mamino_exit :: proc(vo: Maybe(VideoOptions)) {
 @(private)
 @(cold)
 @(optimization_mode = "favor_size")
-write_frames :: proc(frames: [dynamic]^[]u32, window_width, window_height: i32) {
+write_frames :: proc(frames: [dynamic][]u32, window_width, window_height: i32) {
 	for frame, idx in frames {
 		padded_frame_count := fmt.aprintf("%04d", idx)
 		image_name := fmt.aprintf("frames/img_{}.png", padded_frame_count)
-		success := write_png(image_name, window_width, window_height, 4, frame^, window_width * 4)
+		success := write_png(image_name, window_width, window_height, 4, frame, window_width * 4)
 		if success != 1 {
 			// Failure.
 			fmt.eprintln("Error: could not write frame.")
@@ -102,7 +102,7 @@ write_png :: #force_inline proc(
 
 @(private)
 @(optimization_mode = "favor_size")
-capture_frame :: proc(pixel_pbo: u32) -> (pixels: ^[]u32) {
+capture_frame :: proc(pixel_pbo: u32) -> (pixels: []u32) {
 	gl.ReadBuffer(gl.FRONT)
 	// Generate OpenGL buffers and bind them to the pack pixel buffer.
 	gl.BindBuffer(gl.PIXEL_PACK_BUFFER, pixel_pbo)
@@ -115,14 +115,14 @@ capture_frame :: proc(pixel_pbo: u32) -> (pixels: ^[]u32) {
 	)
 
 	gl.BindBuffer(gl.PIXEL_PACK_BUFFER, pixel_pbo)
-	fmt.println("HELLO")
 	gl.ReadPixels(0, 0, render.WINDOW_WIDTH, render.WINDOW_HEIGHT, gl.RGBA, gl.UNSIGNED_BYTE, nil)
+	fmt.println("HELLO")
 	pbo_ptr := ([^]u32)(gl.MapBuffer(gl.PIXEL_PACK_BUFFER, gl.READ_ONLY))
-	// defer free(pbo_ptr)
 	if pbo_ptr != nil {
 		pbo_pixels := pbo_ptr[:render.WINDOW_WIDTH * render.WINDOW_HEIGHT]
-		pixels = new_clone(pbo_pixels)
-		// copy(pixels, pbo_pixels)
+		pixels = make([]u32, len(pbo_pixels))
+		// pixels = new_clone(pbo_pixels)
+		copy(pixels, pbo_pixels)
 	}
 	// Removes the bind from our CPU pbo.
 	unmap_success := gl.UnmapBuffer(gl.PIXEL_PACK_BUFFER)
