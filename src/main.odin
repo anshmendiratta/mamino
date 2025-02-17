@@ -28,6 +28,7 @@ main :: proc() {
 	static_gl_data := render.mamino_gl_init()
 	defer gl.DeleteProgram(static_gl_data.program_id)
 	defer delete(static_gl_data.uniforms)
+	sequencing.mamino_frame_capture_init()
 
 	// Setup scene.
 	render_objects: []union {
@@ -80,6 +81,9 @@ main :: proc() {
 		return
 	}
 
-	sequencing.mamino_exit(nil)
+	// For no compositing.
+	sequencing.mamino_exit()
+	// For compositing.
+	// sequencing.mamino_exit(vo)
 }
 

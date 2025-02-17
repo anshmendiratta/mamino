@@ -7,6 +7,8 @@ import glm "core:math/linalg/glsl"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
 
+// import "../sequencing"
+
 @(private)
 PROGRAM_NAME :: "mamino"
 @(private)
@@ -31,6 +33,7 @@ mamino_init :: proc() {
 		return
 	}
 }
+
 
 @(cold)
 mamino_create_window :: proc() -> (window: glfw.WindowHandle) {

@@ -17,12 +17,13 @@ import "../render"
 @(private)
 pixels_pbos: [2]u32 = {0, 0}
 @(private)
-current_pbo_idx := 0
+current_pbo_idx: u32 = 0
+@(private)
+frame_data := make([]u32, render.WINDOW_WIDTH * render.WINDOW_HEIGHT)
 @(private)
 stored_frames: [dynamic][]u32 = {}
-@(private)
-frame_data: []u32 = make([]u32, render.WINDOW_WIDTH * render.WINDOW_HEIGHT)
 
+@(cold)
 mamino_frame_capture_init :: proc() {
 	gl.GenBuffers(1, &pixels_pbos[0])
 	gl.GenBuffers(1, &pixels_pbos[1])
@@ -33,24 +34,24 @@ mamino_frame_capture_init :: proc() {
 
 @(optimization_mode = "favor_size")
 mamino_capture_frame :: proc() {
-	frame_data = capture_frame(pixels_pbos[current_pbo_idx])
-	append(&stored_frames, frame_data)
+	frame_data = capture_frame(current_pbo_idx)
+	frame_copy := slice.clone(frame_data)
+	append(&stored_frames, frame_copy)
 	current_pbo_idx = current_pbo_idx ~ 1
 }
 
-// TODO: Termination code here (if necessary).
 @(cold)
-mamino_exit :: proc(vo: Maybe(VideoOptions)) {
+mamino_exit :: proc(vo: Maybe(VideoOptions) = nil) {
+	// Cleanup.
+	gl.DeleteBuffers(1, &pixels_pbos[0])
+	gl.DeleteBuffers(1, &pixels_pbos[1])
+
 	if vo == nil {
 		return
 	}
 	vo := vo.?
 	write_frames(stored_frames, render.WINDOW_WIDTH, render.WINDOW_HEIGHT) // Do video export.
 	composite_video(vo)
-
-	// Cleanup.
-	gl.DeleteBuffers(1, &pixels_pbos[0])
-	gl.DeleteBuffers(1, &pixels_pbos[1])
 }
 
 @(private)
@@ -102,10 +103,15 @@ write_png :: #force_inline proc(
 
 @(private)
 @(optimization_mode = "favor_size")
-capture_frame :: proc(pixel_pbo: u32) -> (pixels: []u32) {
+capture_frame :: proc(
+	current_pbo_idx: u32,
+	allocator: runtime.Allocator = context.allocator,
+) -> (
+	pixels: []u32,
+) {
 	gl.ReadBuffer(gl.FRONT)
 	// Generate OpenGL buffers and bind them to the pack pixel buffer.
-	gl.BindBuffer(gl.PIXEL_PACK_BUFFER, pixel_pbo)
+	gl.BindBuffer(gl.PIXEL_PACK_BUFFER, pixels_pbos[current_pbo_idx])
 	// Allocating the space.
 	gl.BufferData(
 		gl.PIXEL_PACK_BUFFER,
@@ -114,13 +120,12 @@ capture_frame :: proc(pixel_pbo: u32) -> (pixels: []u32) {
 		gl.STREAM_READ,
 	)
 
-	gl.BindBuffer(gl.PIXEL_PACK_BUFFER, pixel_pbo)
+	gl.BindBuffer(gl.PIXEL_PACK_BUFFER, pixels_pbos[current_pbo_idx])
 	gl.ReadPixels(0, 0, render.WINDOW_WIDTH, render.WINDOW_HEIGHT, gl.RGBA, gl.UNSIGNED_BYTE, nil)
-	fmt.println("HELLO")
 	pbo_ptr := ([^]u32)(gl.MapBuffer(gl.PIXEL_PACK_BUFFER, gl.READ_ONLY))
 	if pbo_ptr != nil {
 		pbo_pixels := pbo_ptr[:render.WINDOW_WIDTH * render.WINDOW_HEIGHT]
-		pixels = make([]u32, len(pbo_pixels))
+		pixels = make([]u32, len(pbo_pixels), context.allocator)
 		// pixels = new_clone(pbo_pixels)
 		copy(pixels, pbo_pixels)
 	}

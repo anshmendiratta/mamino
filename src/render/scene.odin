@@ -71,9 +71,9 @@ render_coordinate_axes :: proc() {
 		objects.coordinate_axes_indices,
 	)
 	draw_axes(objects.coordinate_axes_indices)
-	gl.DeleteVertexArrays(1, &axes_vao)
-	gl.DeleteBuffers(1, &axes_vbo)
-	gl.DeleteBuffers(1, &axes_ebo)
+	// gl.DeleteVertexArrays(1, &axes_vao)
+	// gl.DeleteBuffers(1, &axes_vbo)
+	// gl.DeleteBuffers(1, &axes_ebo)
 }
 
 render_subgrid_axes :: proc() {
@@ -86,8 +86,8 @@ render_subgrid_axes :: proc() {
 		objects.subgrid_axes_indices,
 	)
 	draw_axes(objects.subgrid_axes_indices)
-	gl.DeleteVertexArrays(1, &subgrid_axes_vao)
-	gl.DeleteBuffers(1, &subgrid_axes_vbo)
-	gl.DeleteBuffers(1, &subgrid_axes_ebo)
+	// gl.DeleteVertexArrays(1, &subgrid_axes_vao)
+	// gl.DeleteBuffers(1, &subgrid_axes_vbo)
+	// gl.DeleteBuffers(1, &subgrid_axes_ebo)
 }
 
