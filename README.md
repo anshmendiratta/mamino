@@ -5,9 +5,10 @@ A [manim](https://www.manim.community/) inspired 3D renderer that supports coord
 To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and coordinate animation techniques (like those employed by [manim](https://www.manim.community/)) more deeply.
 
 ## Dependencies
-- glfw
-- OpenGL 4.1
-- freetype
+- [glfw](https://www.glfw.org/)
+- [OpenGL 4.1](https://www.opengl.org/)
+- [freetype](https://freetype.org/)
+- [ffmpeg](https://www.ffmpeg.org/)
 
 `freetype` is imported from the `shared/` directory -- this is located in `ODIN_ROOT` (to find out where this is, you can use `odin root`). Place your files inside the `freetype/` directory after creating it, and things should just work. For this project, we used [odin-freetype](https://github.com/englerj/odin-freetype).
 
