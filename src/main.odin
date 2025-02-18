@@ -76,7 +76,7 @@ main :: proc() {
 			resolution = {1920, 1080},
 			framerate  = 180,
 			encoding   = "libx264",
-			out_name   = "vid.mp4",
+			out_name   = "vid.h264",
 		}
 	if valid_vo := sequencing.validate_video_options(video_options); !valid_vo {
 		fmt.eprintln("Incorrect export video options.")

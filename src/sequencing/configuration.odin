@@ -4,7 +4,7 @@ import "core:slice"
 import "core:strings"
 
 VALID_ENCODINGS: []string : {"av1", "libx264", "libx265"}
-VALID_OUT_FORMATS: []string : {".mp4", ".mov", ".mkv"}
+VALID_OUT_FORMATS: []string : {".mp4", ".mov", ".mkv", ".h264"}
 
 VideoOptions :: struct {
 	resolution: []u32,
