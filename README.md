@@ -22,6 +22,7 @@ To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and co
 - [x] Translate meshes w.r.t the origin.
 - [x] Render face normals (respecting z-index).
 - [x] "Capture" frames from OpenGL/GLFW and composite them into a video.
+- [x] Add configuration for video export.
 - [ ] Speed up frame extraction.
 - [ ] Add tiling textures on faces.
 - [ ] Add translucency to select faces.

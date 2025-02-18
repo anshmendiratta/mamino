@@ -17,23 +17,29 @@ render_objects :: proc(render_objects: []union {
 			vertices = objects.get_vertices(object)
 			// Cube.
 			cube_vao, cube_vbo, cube_ebo := get_buffer_objects()
-			bind_data(cube_vbo, cube_ebo, vertices, objects.cube_indices)
+			bind_data(cube_vao, cube_vbo, cube_ebo, vertices, objects.cube_indices)
 			draw_cube(vertices, i32(len(objects.cube_indices)))
 			// Points.
 			point_vao, point_vbo, point_ebo := get_buffer_objects()
 			objects.color_vertices(vertices, objects.point_color)
-			bind_data(point_vbo, point_ebo, vertices, objects.point_indices)
+			bind_data(point_vao, point_vbo, point_ebo, vertices, objects.point_indices)
 			draw_points(vertices, objects.point_indices)
 			// Lines.
 			line_vao, line_vbo, line_ebo := get_buffer_objects()
 			objects.color_vertices(vertices, objects.line_color)
-			bind_data(line_vbo, line_ebo, vertices, objects.line_indices)
+			bind_data(line_vao, line_vbo, line_ebo, vertices, objects.line_indices)
 			draw_lines(vertices, objects.line_indices)
 			// Normals of faces.
 			when ODIN_DEBUG {
 				normal_vao, normal_vbo, normal_ebo := render.get_buffer_objects()
 				face_normals := objects.get_cube_normals_coordinates(object)
-				render.bind_data(normal_vbo, line_ebo, face_normals, {0, 1, 2, 3, 4, 5})
+				render.bind_data(
+					normal_vao,
+					normal_vbo,
+					line_ebo,
+					face_normals,
+					{0, 1, 2, 3, 4, 5},
+				)
 				render.draw_lines(face_normals, {0, 1, 2, 3, 4, 5})
 
 				gl.DeleteVertexArrays(1, &normal_vao)
@@ -58,28 +64,30 @@ render_objects :: proc(render_objects: []union {
 render_coordinate_axes :: proc() {
 	axes_vao, axes_vbo, axes_ebo := get_buffer_objects()
 	bind_data(
+		axes_vao,
 		axes_vbo,
 		axes_ebo,
 		objects.coordinate_axes_vertices,
 		objects.coordinate_axes_indices,
 	)
 	draw_axes(objects.coordinate_axes_indices)
-	gl.DeleteVertexArrays(1, &axes_vao)
-	gl.DeleteBuffers(1, &axes_vbo)
-	gl.DeleteBuffers(1, &axes_ebo)
+	// gl.DeleteVertexArrays(1, &axes_vao)
+	// gl.DeleteBuffers(1, &axes_vbo)
+	// gl.DeleteBuffers(1, &axes_ebo)
 }
 
 render_subgrid_axes :: proc() {
 	subgrid_axes_vao, subgrid_axes_vbo, subgrid_axes_ebo := get_buffer_objects()
 	bind_data(
+		subgrid_axes_vao,
 		subgrid_axes_vbo,
 		subgrid_axes_ebo,
 		objects.subgrid_axes_vertices,
 		objects.subgrid_axes_indices,
 	)
 	draw_axes(objects.subgrid_axes_indices)
-	gl.DeleteVertexArrays(1, &subgrid_axes_vao)
-	gl.DeleteBuffers(1, &subgrid_axes_vbo)
-	gl.DeleteBuffers(1, &subgrid_axes_ebo)
+	// gl.DeleteVertexArrays(1, &subgrid_axes_vao)
+	// gl.DeleteBuffers(1, &subgrid_axes_vbo)
+	// gl.DeleteBuffers(1, &subgrid_axes_ebo)
 }
 

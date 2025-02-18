@@ -113,7 +113,7 @@ get_subgrid_axes_vertices :: proc() -> (subgrid_axes_vertices: [dynamic]Vertex) 
 	for x_idx in 1 ..= NUM_SUBGRIDS {
 		subgrid_axis_middle_color: glm.vec4 = rgb_hex_to_color(
 			0xFF_FF_FF,
-			0.1 / glm.pow_f32(glm.exp_f32(f32(10 * x_idx / NUM_SUBGRIDS)), 0.5),
+			0.2 / glm.exp_f32(f32(2 * x_idx / NUM_SUBGRIDS)),
 		)
 		pos_x_line: [3]Vertex = {
 			{{f32(x_idx), 0., -SUBGRID_LENGTH_HALF}, transparent},
@@ -135,7 +135,7 @@ get_subgrid_axes_vertices :: proc() -> (subgrid_axes_vertices: [dynamic]Vertex) 
 	for z_idx in 1 ..= NUM_SUBGRIDS {
 		subgrid_axis_middle_color: glm.vec4 = rgb_hex_to_color(
 			0xFF_FF_FF,
-			0.1 / glm.pow_f32(glm.exp_f32(f32(10 * z_idx / NUM_SUBGRIDS)), 0.5),
+			0.2 / glm.exp_f32(f32(2 * z_idx / NUM_SUBGRIDS)),
 		)
 		pos_z_line: [3]Vertex = {
 			{{+SUBGRID_LENGTH_HALF, 0., f32(z_idx)}, transparent},

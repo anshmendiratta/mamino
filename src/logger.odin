@@ -7,13 +7,19 @@ import glm "core:math/linalg/glsl"
 import "core:time"
 
 import gl "vendor:OpenGL"
-
-// import ft "shared:freetype"
+import "vendor:glfw"
 
 import "render"
 
+last_frame: f64 = 0.
+
 Logger :: struct {
 	times_per_frame: [dynamic]f64,
+}
+
+@(cold)
+mamino_init_logger :: proc() {
+	last_frame = glfw.GetTime()
 }
 
 calculate_avg_fps :: proc(times_per_frame: [dynamic]f64) -> (avg: f64) {
@@ -23,5 +29,11 @@ calculate_avg_fps :: proc(times_per_frame: [dynamic]f64) -> (avg: f64) {
 	}
 	avg = total_fps / f64(len(times_per_frame))
 	return
+}
+
+logger_record_frametime :: proc(logger: ^Logger) {
+	time_for_frame := glfw.GetTime() - last_frame
+	last_frame = glfw.GetTime()
+	append(&logger^.times_per_frame, time_for_frame)
 }
 

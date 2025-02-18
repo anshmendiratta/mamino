@@ -9,6 +9,27 @@ import "vendor:glfw"
 
 import "../objects"
 
+@(cold)
+@(require_results)
+mamino_gl_init :: proc() -> (static_gl_data: StaticGLObjects) {
+	when ODIN_DEBUG {
+		gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
+	}
+	gl.Enable(gl.DEPTH_TEST)
+
+	program_id, ok := gl.load_shaders_source(mamino_vertex_shader, mamino_fragment_shader)
+	if !ok {
+		fmt.eprintln("Failed to load shaders.")
+		return
+	}
+	static_gl_data.program_id = program_id
+	gl.UseProgram(static_gl_data.program_id)
+
+	static_gl_data.uniforms = gl.get_uniforms_from_program(static_gl_data.program_id)
+
+	return
+}
+
 update_shader :: proc(uniforms: map[string]gl.Uniform_Info) {
 	proj := glm.mat4Perspective(glm.radians_f32(60), 1.0, 0.1, 100.0)
 	scale := f32(0.3)
@@ -33,14 +54,22 @@ draw_points :: proc(vertices: []objects.Vertex, indices: []u16) {
 draw_lines :: proc(vertices: []objects.Vertex, indices: []u16) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
-	gl.LineWidth(5.)
+	when ODIN_OS == .Darwin {
+		gl.LineWidth(1.)
+	} else {
+		gl.LineWidth(5.)
+	}
 	gl.DrawElements(gl.LINES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 
 draw_axes :: proc(indices: []u16) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
-	gl.LineWidth(2.)
+	when ODIN_OS == .Darwin {
+		gl.LineWidth(1.)
+	} else {
+		gl.LineWidth(2.)
+	}
 	gl.Enable(gl.BLEND)
 	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 	gl.DrawElements(gl.LINES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
@@ -71,7 +100,8 @@ get_texture_id :: proc(pixels: []u32) -> (texture_id: u32) {
 	return
 }
 
-bind_data :: proc(vbo: u32, ebo: u32, data: []objects.Vertex, indices: []u16) {
+bind_data :: proc(vao: u32, vbo: u32, ebo: u32, data: []objects.Vertex, indices: []u16) {
+	gl.BindVertexArray(vao)
 	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
 	gl.BufferData(
 		gl.ARRAY_BUFFER,
