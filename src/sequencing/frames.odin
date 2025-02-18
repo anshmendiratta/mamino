@@ -199,16 +199,17 @@ composite_video :: proc(vo: VideoOptions, dir_name: string = "outputs") {
 
 	framerate := fmt.aprintf("%d", vo.framerate)
 	process_description: os2.Process_Desc
-	process_description.command = {
-		"ffmpeg",
-		// Hardware acceleration if available.
+	// Hardware acceleration if available. Not on macOS.
+	ffmpeg_hw_accel: []string = {
 		"-hwaccel",
 		"vaapi",
 		"-hwaccel_output_format",
 		"vulkan",
 		"-init_hw_device",
 		"vulkan=vk:0",
-		// ffmpeg settings.
+	}
+	// Ffmpeg settings.
+	ffmpeg_video_args: []string = {
 		"-framerate",
 		framerate,
 		"-pattern_type",
@@ -219,6 +220,13 @@ composite_video :: proc(vo: VideoOptions, dir_name: string = "outputs") {
 		vo.encoding,
 		vo.out_name,
 	}
+	when ODIN_OS == .Darwin {
+		args_to_concat: [][]string = {{"ffmpeg"}, ffmpeg_video_args}
+		process_description.command = slice.concatenate(args_to_concat)
+	} else {
+		args_to_concat: [][]string = {{"ffmpeg"}, ffmpeg_hw_accel, ffmpeg_video_args}
+		process_description.command = slice.concatenate(args_to_concat)
+	}
 
 	allocator: runtime.Allocator
 	process_state, _, stderr, process_ok := os2.process_exec(process_description, allocator)
@@ -227,10 +235,12 @@ composite_video :: proc(vo: VideoOptions, dir_name: string = "outputs") {
 		fmt.printfln("stderr of command: {}", string(stderr))
 		ok = process_ok
 	}
-	fmt.println(#directory)
 
 	if ok != nil {
 		fmt.eprintln(ok)
+		return
 	}
+
+	fmt.println(fmt.aprintf("Wrote file in {}/", dir_name))
 }
 
