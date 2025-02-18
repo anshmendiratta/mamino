@@ -5,6 +5,7 @@ package main
 import "core:c"
 import "core:fmt"
 import glm "core:math/linalg/glsl"
+import "core:mem"
 import "core:os/os2"
 import "core:slice"
 import "core:strings"
@@ -24,7 +25,8 @@ main :: proc() {
 	render.mamino_init()
 	defer glfw.Terminate()
 	window := render.mamino_create_window()
-	defer free(window)
+	// TODO: Find out why this segfaults. "Bad free of pointer" with tracking allocator.
+	// defer free(window)
 	static_gl_data := render.mamino_gl_init()
 	defer gl.DeleteProgram(static_gl_data.program_id)
 	defer delete(static_gl_data.uniforms)
@@ -81,9 +83,7 @@ main :: proc() {
 		return
 	}
 
-	// For no compositing.
-	sequencing.mamino_exit()
-	// For compositing.
-	// sequencing.mamino_exit(vo)
+	// NOTE(Ansh): vo = nil does NOT composite a video.
+	sequencing.mamino_exit(nil)
 }
 
