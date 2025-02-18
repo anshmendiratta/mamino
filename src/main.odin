@@ -84,6 +84,6 @@ main :: proc() {
 	}
 
 	// NOTE(Ansh): vo = nil does NOT composite a video.
-	sequencing.mamino_exit(nil)
+	sequencing.mamino_exit(video_options)
 }
 
