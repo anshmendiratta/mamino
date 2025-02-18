@@ -12,7 +12,15 @@ To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and co
 
 `freetype` is imported from the `shared/` directory -- this is located in `ODIN_ROOT` (to find out where this is, you can use `odin root`). Place your files inside the `freetype/` directory after creating it, and things should just work. For this project, we used [odin-freetype](https://github.com/englerj/odin-freetype).
 
-## Goals
+## Usage
+Add the project files to Odin's `shared` or otherwise a place to import the library from. Next, fill in the blanks and guess a way to use this library.
+
+Finally, execute `odin run` with no additional flags.
+
+## Features
+See [goals](#goals) for a more detailed list on current features.
+
+### Goals
 - [x] Render vertices as points (respecting z-index).
 - [x] Render cubes using indexed drawing.
 - [x] Camera rotation with spherical coordinates.
