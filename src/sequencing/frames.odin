@@ -51,14 +51,18 @@ mamino_exit :: proc(vo: Maybe(VideoOptions) = nil) {
 		return
 	}
 	vo := vo.?
-	write_frames(stored_frames, render.WINDOW_WIDTH, render.WINDOW_HEIGHT) // Do video export.
+	write_frames(stored_frames) // Do video export.
 	composite_video(vo)
 }
 
 @(private)
 @(cold)
 @(optimization_mode = "favor_size")
-write_frames :: proc(frames: [dynamic][]u32, window_width, window_height: i32) {
+write_frames :: proc(
+	frames: [dynamic][]u32,
+	window_width: i32 = render.WINDOW_WIDTH,
+	window_height: i32 = render.WINDOW_HEIGHT,
+) {
 	for frame, idx in frames {
 		padded_frame_count := fmt.aprintf("%04d", idx)
 		image_name := fmt.aprintf("frames/img_{}.png", padded_frame_count)
