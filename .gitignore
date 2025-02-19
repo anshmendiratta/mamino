@@ -1,5 +1,6 @@
 .git/
 frames/
+src.bin.dSYM/
 ./src/src.bin
 ./src/src
 ./src.bin
