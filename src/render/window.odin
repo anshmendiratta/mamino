@@ -3,11 +3,13 @@ package render
 import "core:c"
 import "core:fmt"
 
+import im "shared:dear_imgui"
+import imgl "shared:dear_imgui/gl"
+import imfw "shared:dear_imgui/glfw"
+
 import glm "core:math/linalg/glsl"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
-
-// import "../sequencing"
 
 @(private)
 PROGRAM_NAME :: "mamino"
@@ -15,6 +17,10 @@ PROGRAM_NAME :: "mamino"
 GL_MAJOR_VERSION: c.int : 4
 @(private)
 GL_MINOR_VERSION :: 1
+@(private)
+show_window: bool = true
+logger_open: bool = true
+last_frame: f64 = 0.
 
 WINDOW_WIDTH := i32(1024)
 WINDOW_HEIGHT := i32(1024)
@@ -34,6 +40,33 @@ mamino_init :: proc() {
 	}
 }
 
+@(deferred_none = mamino_init)
+mamino_deinit :: proc() {
+	defer glfw.Terminate()
+}
+
+mamino_init_imgui :: proc(window: glfw.WindowHandle) {
+	// Dear ImGui
+	im_context := im.CreateContext()
+	im.SetCurrentContext(im_context)
+	im_config_flags := im.GetIO()
+	im_config_flags.ConfigFlags += {.NavEnableKeyboard}
+
+	imfw.InitForOpenGL(window, true)
+	imgl.Init("#version 150")
+
+	im.StyleColorsDark()
+	style := im.GetStyle()
+	style.WindowRounding = 0
+	style.Colors[im.Col.WindowBg].w = 1
+}
+
+@(deferred_in = mamino_init_imgui)
+mamino_deinit_imgui :: proc(_: glfw.WindowHandle) {
+	defer im.DestroyContext()
+	defer imfw.Shutdown()
+	defer imgl.Shutdown()
+}
 
 @(cold)
 mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
@@ -58,11 +91,18 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 	return
 }
 
+@(deferred_out = mamino_create_window)
+mamino_destroy_window :: proc(window: glfw.WindowHandle) {
+	// TODO: Find out why this segfaults. "Bad free of pointer" with tracking allocator.
+	free(window)
+}
 
 key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
 	switch key {
 	case glfw.KEY_ESCAPE, glfw.KEY_Q:
 		running = false
+		show_window = false
+		logger_open = false
 	case glfw.KEY_W, glfw.KEY_UP:
 		camera_position_spherical.z = glm.clamp(
 			camera_position_spherical.z + rotation_rate,

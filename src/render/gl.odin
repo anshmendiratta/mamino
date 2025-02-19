@@ -11,7 +11,7 @@ import "../objects"
 
 @(cold)
 @(require_results)
-mamino_gl_init :: proc() -> (static_gl_data: StaticGLObjects) {
+mamino_init_gl :: proc() -> (static_gl_data: StaticGLObjects) {
 	when ODIN_DEBUG {
 		gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
 	}
@@ -28,6 +28,12 @@ mamino_gl_init :: proc() -> (static_gl_data: StaticGLObjects) {
 	static_gl_data.uniforms = gl.get_uniforms_from_program(static_gl_data.program_id)
 
 	return
+}
+
+@(deferred_out = mamino_init_gl)
+mamino_deinit_gl :: proc(static_gl_data: StaticGLObjects) {
+	defer gl.DeleteProgram(static_gl_data.program_id)
+	defer delete(static_gl_data.uniforms)
 }
 
 update_shader :: proc(uniforms: map[string]gl.Uniform_Info) {
