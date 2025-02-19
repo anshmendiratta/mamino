@@ -29,7 +29,6 @@ main :: proc() {
 	render.mamino_init()
 	window := render.mamino_create_window()
 	render.mamino_init_imgui(window)
-	// TODO: Find out why this segfaults. "Bad free of pointer" with tracking allocator.
 	static_gl_data := render.mamino_init_gl()
 	sequencing.mamino_frame_capture_init()
 

@@ -59,7 +59,13 @@ render_logger :: proc(logger: ^Logger) {
 	imfw.NewFrame()
 	im.NewFrame()
 
-	im.Begin("Logger", &render.logger_open)
+	viewport_size := im.GetMainViewport().Size
+	im.SetNextWindowPos(im.GetMainViewport().Pos.x + viewport_size.x / 40)
+	im.SetNextWindowSize(im.Vec2{viewport_size.x / 2.5, viewport_size.y / 7.})
+
+	window_flags: im.WindowFlags
+	window_flags += {.NoMove, .NoResize}
+	im.Begin("Logger", &render.logger_open, window_flags)
 	im.Text(
 		strings.clone_to_cstring(
 			(fmt.aprintf(
