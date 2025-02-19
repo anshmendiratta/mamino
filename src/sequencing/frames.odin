@@ -192,10 +192,6 @@ composite_video :: proc(vo: VideoOptions, dir_name: string = "outputs") {
 			ok = remove_ok
 		}
 	}
-	all_videos_files, _ := os2.read_all_directory_by_path(
-		"~/development/mamino",
-		context.allocator,
-	)
 
 	framerate := fmt.aprintf("%d", vo.framerate)
 	process_description: os2.Process_Desc
