@@ -31,16 +31,10 @@ render_objects :: proc(render_objects: []union {
 			draw_lines(vertices, objects.line_indices)
 			// Normals of faces.
 			when ODIN_DEBUG {
-				normal_vao, normal_vbo, normal_ebo := render.get_buffer_objects()
+				normal_vao, normal_vbo, normal_ebo := get_buffer_objects()
 				face_normals := objects.get_cube_normals_coordinates(object)
-				render.bind_data(
-					normal_vao,
-					normal_vbo,
-					line_ebo,
-					face_normals,
-					{0, 1, 2, 3, 4, 5},
-				)
-				render.draw_lines(face_normals, {0, 1, 2, 3, 4, 5})
+				bind_data(normal_vao, normal_vbo, line_ebo, face_normals, {0, 1, 2, 3, 4, 5})
+				draw_lines(face_normals, {0, 1, 2, 3, 4, 5})
 
 				gl.DeleteVertexArrays(1, &normal_vao)
 				gl.DeleteBuffers(1, &normal_vbo)

@@ -24,6 +24,8 @@ import "objects"
 import "render"
 import "sequencing"
 
+MAMINO_EXPORT_VIDEO :: #config(MAMINO_EXPORT_VIDEO, false)
+
 main :: proc() {
 	// Init.
 	render.mamino_init()
@@ -46,8 +48,8 @@ main :: proc() {
 		logger_record_frametime(logger)
 
 		// Set background.
-		gl.ClearColor(0., 0., 0., 1.0)
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+		gl.ClearColor(0., 0., 0., 1.0)
 
 		// Input handling.
 		glfw.PollEvents()
@@ -59,9 +61,12 @@ main :: proc() {
 		render.render_coordinate_axes()
 		render.render_subgrid_axes()
 
-		render_logger(logger)
-
-		// sequencing.mamino_capture_frame()
+		when ODIN_DEBUG {
+			render_logger(logger)
+		}
+		when MAMINO_EXPORT_VIDEO {
+			sequencing.mamino_capture_frame()
+		}
 
 		render.WINDOW_WIDTH, render.WINDOW_HEIGHT = glfw.GetWindowSize(window)
 

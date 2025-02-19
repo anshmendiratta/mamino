@@ -21,11 +21,11 @@ Logger :: struct {
 }
 
 @(cold)
+@(deferred_in = mamino_deinit_logger)
 mamino_init_logger :: proc(logger: ^Logger) {
 	render.last_frame = glfw.GetTime()
 }
 
-@(deferred_in = mamino_init_logger)
 mamino_deinit_logger :: proc(logger: ^Logger) {
 	delete(logger.times_per_frame)
 }

@@ -19,12 +19,14 @@ GL_MAJOR_VERSION: c.int : 4
 GL_MINOR_VERSION :: 1
 @(private)
 show_window: bool = true
-logger_open: bool = true
-last_frame: f64 = 0.
 
 WINDOW_WIDTH := i32(1024)
 WINDOW_HEIGHT := i32(1024)
 running: b32 = true
+vsync: b32 = false
+logger_open: bool = true
+last_frame: f64 = 0.
+
 
 StaticGLObjects :: struct {
 	program_id: u32,
@@ -33,6 +35,7 @@ StaticGLObjects :: struct {
 
 @(cold)
 @(init)
+@(deferred_none = mamino_deinit)
 mamino_init :: proc() {
 	if !glfw.Init() {
 		fmt.eprintln("Failed to initialize GLFW")
@@ -40,35 +43,39 @@ mamino_init :: proc() {
 	}
 }
 
-@(deferred_none = mamino_init)
 mamino_deinit :: proc() {
 	defer glfw.Terminate()
 }
 
-mamino_init_imgui :: proc(window: glfw.WindowHandle) {
+@(deferred_out = mamino_deinit_imgui)
+mamino_init_imgui :: proc(window: glfw.WindowHandle) -> (im_context: ^im.Context) {
 	// Dear ImGui
-	im_context := im.CreateContext()
-	im.SetCurrentContext(im_context)
+	im_context = im.CreateContext()
+	im_context.FontSize = 20.
 	im_config_flags := im.GetIO()
 	im_config_flags.ConfigFlags += {.NavEnableKeyboard}
 
 	imfw.InitForOpenGL(window, true)
-	imgl.Init("#version 150")
+	imgl.Init("#version 410")
 
 	im.StyleColorsDark()
 	style := im.GetStyle()
 	style.WindowRounding = 0
 	style.Colors[im.Col.WindowBg].w = 1
+
+	im.SetCurrentContext(im_context)
+
+	return
 }
 
-@(deferred_in = mamino_init_imgui)
-mamino_deinit_imgui :: proc(_: glfw.WindowHandle) {
-	defer im.DestroyContext()
-	defer imfw.Shutdown()
-	defer imgl.Shutdown()
+mamino_deinit_imgui :: proc(im_context: ^im.Context) {
+	imgl.Shutdown()
+	imfw.Shutdown()
+	im.DestroyContext(im_context)
 }
 
 @(cold)
+@(deferred_out = mamino_destroy_window)
 mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 	glfw.WindowHint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 	glfw.WindowHint(glfw.OPENGL_FORWARD_COMPAT, gl.TRUE)
@@ -83,7 +90,7 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 	}
 
 	glfw.MakeContextCurrent(window)
-	glfw.SwapInterval(0)
+	glfw.SwapInterval(1)
 	glfw.SetKeyCallback(window, key_callback)
 	glfw.SetFramebufferSizeCallback(window, size_callback)
 	gl.load_up_to(int(GL_MAJOR_VERSION), GL_MINOR_VERSION, glfw.gl_set_proc_address)
@@ -91,9 +98,8 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 	return
 }
 
-@(deferred_out = mamino_create_window)
+// TODO: Find out why this segfaults. "Bad free of pointer" with tracking allocator.
 mamino_destroy_window :: proc(window: glfw.WindowHandle) {
-	// TODO: Find out why this segfaults. "Bad free of pointer" with tracking allocator.
 	free(window)
 }
 

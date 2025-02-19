@@ -11,6 +11,7 @@ import "../objects"
 
 @(cold)
 @(require_results)
+@(deferred_out = mamino_deinit_gl)
 mamino_init_gl :: proc() -> (static_gl_data: StaticGLObjects) {
 	when ODIN_DEBUG {
 		gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
@@ -30,7 +31,6 @@ mamino_init_gl :: proc() -> (static_gl_data: StaticGLObjects) {
 	return
 }
 
-@(deferred_out = mamino_init_gl)
 mamino_deinit_gl :: proc(static_gl_data: StaticGLObjects) {
 	defer gl.DeleteProgram(static_gl_data.program_id)
 	defer delete(static_gl_data.uniforms)
@@ -53,7 +53,9 @@ draw_cube :: proc(vertices: []objects.Vertex, indices_count: i32) {
 
 draw_points :: proc(vertices: []objects.Vertex, indices: []u16) {
 	gl.Enable(gl.PROGRAM_POINT_SIZE)
-	gl.Enable(gl.POINT_SMOOTH)
+	when ODIN_OS != .Darwin {
+		gl.Enable(gl.POINT_SMOOTH)
+	}
 	gl.DrawElements(gl.POINTS, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 
