@@ -34,18 +34,18 @@ main :: proc() {
 	program_id, uniforms := render.mamino_init_gl()
 	sequencing.mamino_frame_capture_init()
 
-	// Init logger.
-	logger: ^Logger = &{{}}
-	mamino_init_logger(logger)
-
 	// Setup scene objects.
 	render_objects: []union {
 		objects.Cube,
 	} =
 		{objects.Cube{center = {1., 1., 1.}, scale = {3., 1., 1.}, orientation = {glm.vec3{0., 1., 0.}, glm.radians(f32(45.))}}, objects.Cube{center = {-1., 1., -1.}, scale = {1., 2., 1.}, orientation = {glm.vec3{1., 1., 1.}, glm.radians(f32(35.))}}, objects.Cube{center = {0., 3., 2.}, scale = {0.5, 0.5, 0.5}, orientation = {glm.vec3{1., 0., 0.}, glm.radians(f32(60.))}}}
 
+	// Init logger.
+	logger: ^Logger = &{}
+	mamino_init_logger(logger, render_objects)
+
 	for (!glfw.WindowShouldClose(window) && render.running) {
-		logger_record_frametime(logger)
+		logger_update(logger)
 
 		// Set background.
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -75,7 +75,7 @@ main :: proc() {
 	}
 	glfw.DestroyWindow(window)
 
-	avg_framerate := logger_calculate_avg_fps(logger.times_per_frame)
+	avg_framerate := logger_calculate_avg_fps(logger.frametimes)
 	fmt.println("Average:", avg_framerate, "FPS")
 
 	video_options: sequencing.VideoOptions = {
