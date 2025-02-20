@@ -32,12 +32,12 @@ See [goals](#goals) for a more detailed list on current features.
 - [x] Render face normals (respecting z-index).
 - [x] "Capture" frames from OpenGL/GLFW and composite them into a video.
 - [x] Add configuration for video export.
+- [ ] Add debug panel with scene information.
 - [ ] Speed up frame extraction.
 - [ ] Add tiling textures on faces.
 - [ ] Add translucency to select faces.
 - [ ] Add "ambient occlusion" to mesh face colors to indicate orientation.
 - [ ] "Spawn meshes" (and their spawn animation).
-- [ ] Add debug panel with scene information.
 - [ ] Smooth camera movements.
 - [ ] Allow a sequence of animations/movements to be programmed and ran.
 - [ ] Add concurrency.

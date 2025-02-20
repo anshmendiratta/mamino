@@ -4,6 +4,9 @@ import gl "vendor:OpenGL"
 
 import "../objects"
 
+render_normals: bool = false
+render_faces: bool = false
+
 render_objects :: proc(render_objects: []union {
 		objects.Cube,
 	}) {
@@ -29,8 +32,9 @@ render_objects :: proc(render_objects: []union {
 			objects.color_vertices(vertices, objects.line_color)
 			bind_data(line_vao, line_vbo, line_ebo, vertices, objects.line_indices)
 			draw_lines(vertices, objects.line_indices)
+			// FIX(Ansh): Normal rendering doesn't want to happen on debug mode. Probably to do with setting the PolygonMode.
 			// Normals of faces.
-			when ODIN_DEBUG {
+			if ODIN_DEBUG && render_normals {
 				normal_vao, normal_vbo, normal_ebo := get_buffer_objects()
 				face_normals := objects.get_cube_normals_coordinates(object)
 				bind_data(normal_vao, normal_vbo, normal_ebo, face_normals, {0, 1, 2, 3, 4, 5})

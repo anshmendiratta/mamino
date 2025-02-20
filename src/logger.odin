@@ -75,7 +75,6 @@ render_logger :: proc(logger: ^Logger) {
 
 	viewport_size := im.GetMainViewport().Size
 	im.SetNextWindowPos(im.GetMainViewport().Pos.x + viewport_size.x / 40)
-	im.SetNextWindowSize(im.Vec2{viewport_size.x / 2.5, viewport_size.y / 7.})
 
 	window_flags: im.WindowFlags
 	window_flags += {.NoMove}
@@ -131,6 +130,17 @@ render_logger :: proc(logger: ^Logger) {
 		context.temp_allocator,
 	)
 	im.Separator()
+	if im.Button(strings.clone_to_cstring("Render faces")) {
+		if render.render_faces ~= true; render.render_faces {
+			gl.PolygonMode(gl.FRONT_AND_BACK, gl.FILL)
+		} else {
+			gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
+		}
+	}
+	im.SameLine()
+	if im.Button(strings.clone_to_cstring("Render normals")) {
+		render.render_normals ~= true
+	}
 	im.End()
 	im.Render()
 	imgl.RenderDrawData(im.GetDrawData())

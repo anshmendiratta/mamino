@@ -90,11 +90,9 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 	return
 }
 
-// TODO: Find out why this segfaults only on Linux. "Bad free of pointer" with tracking allocator.
+// TODO: Find out why doesn't need to free the window.
 mamino_destroy_window :: proc(window: glfw.WindowHandle) {
-	when ODIN_OS == .Darwin {
-		free(window)
-	}
+	// free(window)
 }
 
 key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
