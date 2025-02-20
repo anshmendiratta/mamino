@@ -1,0 +1,924 @@
+commit 7dd7158d5bc390928e901bd9d981511f581f1837
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Wed Feb 19 14:47:14 2025 -0500
+
+    [refactor] add random build files to gitignire
+
+commit 05eb18e7b5d18b4f85d821befcb899c8504595bc
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Wed Feb 19 14:46:40 2025 -0500
+
+    [refactor] add debug optional code for loggeR
+
+commit a729c6ab06f276aaffcd8f5cf33ffa3c2e5508c2
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Wed Feb 19 13:47:11 2025 -0500
+
+    [feat] move default logger window pos
+
+commit 2274c50d1677b5633a966562f425abcbb3cf0f33
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Wed Feb 19 11:41:48 2025 -0500
+
+    [feat] add deferred functions that run at end of init proc scope
+
+commit 1e794e8556160c87a7b6db880f411f12a9b7fd3f
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Wed Feb 19 10:35:20 2025 -0500
+
+    [fix] add imgui logger
+
+commit dac698285404d53903c8fd7bc1787e6a26fe3fcf
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Tue Feb 18 17:54:39 2025 -0500
+
+    [refactor] update readme with haeders
+
+commit 49d25b06de3d9d5c8e811fcd08c71346c7c82eb8
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Tue Feb 18 17:46:42 2025 -0500
+
+    [refactor] add links to deps
+
+commit c41e9cd1eb9506ec31adb77d167aa68a97f547f2
+Merge: 2a785eb 00a3ee1
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Tue Feb 18 17:45:07 2025 -0500
+
+    Merge branch 'dev'
+
+commit 00a3ee12cd1921de0848a13d4eaafe985bfde588
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Tue Feb 18 17:43:42 2025 -0500
+
+    [refactor] remove .h264 file
+
+commit 2d3222a68cdfbb7fd2a3294c6aa482fd4b2cb92f
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Tue Feb 18 17:43:25 2025 -0500
+
+    [refactor] udpate readme
+
+commit 9038bfc4699016e5fc08e6f960347ba09245ffd7
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Tue Feb 18 17:43:01 2025 -0500
+
+    [feat] added mov as video format
+
+commit 3ea4feefce8efa0b2ad3e4f67a6217a6fb3a76b4
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Tue Feb 18 14:02:00 2025 -0500
+
+    [refactor] update gitignore
+
+commit 5de096fcf91a6a232165e0284125d895af3094d9
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Tue Feb 18 14:01:45 2025 -0500
+
+    [feat] add conditional hw accel if not macos
+
+commit c6be2e3a387f48319ceccd34bf3af1fe5b6701e7
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Feb 17 23:12:55 2025 -0500
+
+    [refactor] add defaults
+
+commit 9571e995cc7b09af6d6a0bc1c3b4ce4333b6a222
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Feb 17 23:08:12 2025 -0500
+
+    [fix] small memory leak and segfau;t
+
+commit 6c4b676bccd63a763df4799834ca631b6a66cd23
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Feb 17 23:06:02 2025 -0500
+
+    [fix] segfaults
+
+commit 6725e0a051f98afbd1e7cca0f86b3387994423ef
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Mon Feb 17 14:18:25 2025 -0500
+
+    [refactor] fix bugs idk
+
+commit de55fbdd59cf55e14c4e73cb53f043bf21c49deb
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Feb 17 09:29:26 2025 -0500
+
+    [refactor] revert to array
+
+commit ab9573c0e1b524c2b3a3d09cde9583bd8cd7fcaa
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Feb 17 09:09:49 2025 -0500
+
+    [refactpr] debug printing
+
+commit 659e6e2e50cb5b96955b398720eefdfdb8c5f53a
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Feb 15 23:00:12 2025 -0500
+
+    [refactor] remove test.tzt
+
+commit c089088a278ec2b725e360b5eee2b07ffa39dbb9
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Feb 15 23:00:02 2025 -0500
+
+    [refactor] public api and odin features to simplify impls
+
+commit e8beca0f8fcece9540bb9923d20f57b2b4c48760
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Fri Feb 14 15:03:10 2025 -0500
+
+    [refactor] bind vao for core profiles
+
+commit a7a1dd3c2da9f02ead9efbbbc8d9c25db764b9e0
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Fri Feb 14 14:11:54 2025 -0500
+
+    [refactor] have window open
+
+commit 4db2a6d2b4248e9656f25d997fd5b885150002dd
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Fri Feb 14 13:31:54 2025 -0500
+
+    [refactor] do comp time os checking
+
+commit 21ddeddca3f8c883d22a58be963ba8b9dbf99219
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Fri Feb 14 12:18:48 2025 -0500
+
+    [refactor] remove stbi extern lib and add vendor lib
+
+commit 1d2b6bf473d07a0b9e483ab54780c9f5994b091e
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Fri Feb 14 10:20:18 2025 -0500
+
+    [feat] frame captured using pbo?
+
+commit e57b1cd8aa14992babf6491274c408c69477862f
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Thu Feb 13 11:55:18 2025 -0500
+
+    .
+
+commit b54101efcc566e22c473fa178fe7b775396344a0
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Feb 11 00:12:35 2025 -0500
+
+    [refactor] make background black
+
+commit 2a785eb7e11c827ff3ccd3e46f51c99cb182abbb
+Merge: bd4d505 95e823e
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Feb 10 09:09:32 2025 -0500
+
+    Merge branch 'main' of https://github.com/anshmendiratta/mamino
+
+commit bd4d505247683e3c643adad51f0b6d93d961a5dd
+Merge: e151056 601ecc8
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Feb 10 09:09:26 2025 -0500
+
+    Merge branch 'dev'
+
+commit 601ecc8b3763e043383048e7d8eb4e87d19c4c6e
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Feb 10 01:27:57 2025 -0500
+
+    [feat] added subgrids and alpha falloff
+
+commit daf0b799034c6dd99f300fca5843a91fd090b1b5
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Feb 10 00:06:38 2025 -0500
+
+    [refactor] remeove redundnat code
+
+commit d6742c59b4cc6360d8a2a14130a7bdcd07c19ccb
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Feb 10 00:05:55 2025 -0500
+
+    [refactor] remove mtl
+
+commit 60c33ac6fd29e682d9ca8159b086d1533062fdc9
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Sat Feb 8 19:11:44 2025 -0500
+
+    [refactor] remove src.o
+
+commit 42029351c59dddb00c7ee3b21eac2d0acab24564
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Sat Feb 8 19:11:27 2025 -0500
+
+    [refactor] refactor logger and add conditional compilation for os
+
+commit eff01d49794e586111ce53755d07241e3886e096
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Fri Feb 7 00:41:46 2025 -0500
+
+    [feat] add texture bindings
+
+commit 8f5e562e2ede6bf20dc824951ef6cd7ad2ffa90c
+Merge: b654135 5806704
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Feb 4 23:41:04 2025 -0500
+
+    [refactor] merge from dev
+
+commit 58067043d4ae40d013320a593ba4d1dab1918c06
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Feb 3 20:48:38 2025 -0500
+
+    [feat] add a concept of a new api
+
+commit 6823de4b9bb4065488ea51dda06f07103769da6e
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Feb 2 01:20:58 2025 -0500
+
+    [feat] tried to impl pbos and failed. visit later
+
+commit a8d01aa6174e3b0fa31b974f33ef5fa6789f683f
+Merge: 0e6eb48 5f3ea67
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Feb 1 17:02:55 2025 -0500
+
+    [feat] merge from extract_frames
+
+commit 5f3ea67bd6aabafed658bf00876c17c3b02687f1
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Feb 1 17:02:17 2025 -0500
+
+    [refactor] relax requirement fgor cstring in write png func:
+
+commit 557dcd955d17bf200877e9917c9a6378ef4a925e
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Fri Jan 31 23:23:37 2025 -0500
+
+    [refactor] go back to h264 from av1
+
+commit 151ea087c7377597ad90e560cceabccc16144f40
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Fri Jan 31 18:53:28 2025 -0500
+
+    [refactor] add hwaccel in ffmpeg for amd gpus
+
+commit 4de4e48162683d63a9bf996014bcfc3a709a7952
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Fri Jan 31 14:06:19 2025 -0500
+
+    [refactor] deprecate the avg fps calculation
+
+commit 08bc43efdbd42cd518a8fcd761b5ac25dacbba5a
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Fri Jan 31 13:58:21 2025 -0500
+
+    [refactor] enable vsync
+
+commit 9cfeea91be52b9b603bbc91826aff4077c8b7c42
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Fri Jan 31 13:57:41 2025 -0500
+
+    [feat] use right fps for ffmpeg
+
+commit 4537dc782dd52d88869e2fe27ec3fd8fc3fd373a
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Fri Jan 31 00:13:06 2025 -0500
+
+    [refactor] removes previous vid.mp4 and frames content if preexisting
+
+commit 0b46d42eb0b2e50fa31e54f3c7337a0c28ffcab8
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Thu Jan 30 23:32:48 2025 -0500
+
+    [refactor] update gitignore
+
+commit 803cd507be6004c9bad49ac5b7e78502ccff0ead
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Thu Jan 30 23:32:05 2025 -0500
+
+    [feat] add ffmpeg commands to composite into video. need to make video output better
+
+commit 724ba3332b8ecf5869de3ee62a53f992c667bde1
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Thu Jan 30 16:47:16 2025 -0500
+
+    [docs] update readme goals
+
+commit 05fe5fe9a22185dfd025383424d087fa4d84d66b
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Thu Jan 30 16:36:44 2025 -0500
+
+    [refactor] fix memory leaks
+
+commit 4457cde148c1d51c0a110201de33fb8f379050d7
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Thu Jan 30 16:33:46 2025 -0500
+
+    [feat] added flipping to images
+
+commit aff4af5e49f5eb57834b6f1fd918a7becd57656a
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Thu Jan 30 15:09:12 2025 -0500
+
+    [feat] fix framebuffers and add new package
+
+commit 6db9221472d5212330eeee8c7789d9e76023992d
+Author: nbybhen <henockdinberu11@gmail.com>
+Date:   Wed Jan 29 23:55:51 2025 -0500
+
+    feat: added stb_image_write import + basic image creation
+
+commit 0e6eb48b173a3ad6d25d66978722a9d5f4847d3d
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Wed Jan 29 09:44:05 2025 -0500
+
+    [refactor] add goalg
+
+commit f6d0737ad6f63e377b0bae343163a517de467927
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Wed Jan 29 09:43:11 2025 -0500
+
+    [refactor] add readpixels call
+
+commit 95e823e8b6e98bfc84abfef77e998e0dfe162e3d
+Author: am <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 28 17:03:44 2025 -0500
+
+    [refactor] readme update link for manim
+
+commit 640c2513c7b1c3c7d3da6692e4f751c3e44f5f8e
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Jan 27 23:33:59 2025 -0500
+
+    [refactor] update goals
+
+commit b6541355cf29d5876dec2156592554f6d717f61d
+Merge: cc2613c ee0bd33
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Mon Jan 27 13:54:24 2025 -0500
+
+    [refactor] merge from dev
+
+commit ee0bd33b435571f8c4f77453ffb84389155bddde
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Mon Jan 27 13:47:58 2025 -0500
+
+    [refactor] render normals in debug mode only
+
+commit 9f97a89b9fcbd518c2f471bb1abffb2d6704e5eb
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 26 22:29:41 2025 -0500
+
+    [feat] added normal vector rendering to objects
+
+commit b5188e7081bf3c59cd87a4a25933713da59bda43
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 26 22:08:17 2025 -0500
+
+    [feat] added new goals
+
+commit 0a0ec685e276585d87bb2f8b8a885632441c45fb
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 26 22:06:52 2025 -0500
+
+    [feat] added coloring to axes
+
+commit 7c19896c360df46a6a107c228a9b4d8820c89583
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 26 02:37:32 2025 -0500
+
+    [refactor] remove memory leak by freeing buffers
+
+commit 6d90eb608b61da30080e1b28e124f19147dcacd8
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 26 01:11:38 2025 -0500
+
+    [refactor] update goals
+
+commit 1c90401f0393ea53e20bb33d60c9f9cab20ad4b5
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 26 00:42:21 2025 -0500
+
+    [feat] steal switch for key_callback from feat/logger
+
+commit 6081b4f05d86b412201832fdc667588fa1816c51
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 26 00:40:53 2025 -0500
+
+    [refactor] add in a few objects and print fps each frame
+
+commit 310bed0d35a2c81cd5881e6d6afdd38c3b41f920
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 26 00:34:06 2025 -0500
+
+    [feat] move over pvm mul to shader
+
+commit b77ee38938fa54cc7c36101e0e1667ed99f305c8
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 25 23:32:47 2025 -0500
+
+    [refactor] correct comment for orientation
+
+commit e151056d3e293a030471d8dc64210f5d406af18f
+Merge: bd2dbb8 270cc6d
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 25 23:26:08 2025 -0500
+
+    Merge branch 'dev'
+
+commit 270cc6d828dcb2a6afc9327bc5fd75da2ee36723
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 25 23:20:58 2025 -0500
+
+    [feat] add translation and other properties to a single "Cube" object that can be manipulated
+
+commit cc2613c19bdf5666cad093dc27feeabf172f1c7a
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 25 00:29:28 2025 -0500
+
+    [refactor] give up
+
+commit beee57d2aacfa7c6ad6083be331c1e152a1e06d5
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Fri Jan 24 13:59:36 2025 -0500
+
+    [feat] try rendering text
+
+commit 21340c9465c5cc488b0cdb2bbde16d9f34520a0b
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Wed Jan 22 23:51:52 2025 -0500
+
+    [refactor] formatting of deps in readme
+
+commit 29b228b10356bdd4562f9f9f27ac91dcfe3d2488
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Wed Jan 22 23:50:49 2025 -0500
+
+    [refactor] update readme with shadred folder dep
+
+commit 22e9719b7816fa83129235f2eb4dfa7bbdbc18e8
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Wed Jan 22 23:39:09 2025 -0500
+
+    [refactor] move hack regular to assets
+
+commit f927b9d8b116bb1515731d805a61f3372b8c0582
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Wed Jan 22 23:38:44 2025 -0500
+
+    [feat] init freetype and store characters
+
+commit e7df804e9d0e2b3e1c6b954326a0fac65da16e81
+Merge: 2d9d5e0 e1bef77
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Wed Jan 22 22:10:46 2025 -0500
+
+    [refactor] merge from axes
+
+commit e1bef77750f974a8fc0acd282a7b7377e5121a24
+Merge: 5f3afff 555f539
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Wed Jan 22 22:09:21 2025 -0500
+
+    [feat] render axes; might improve later
+
+commit 5f3afff83df97d2073d6e2375b31e60ecc236365
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Wed Jan 22 22:08:22 2025 -0500
+
+    [feat] render axes; might improve later
+
+commit 555f53990a16f7437a86cc7256b1eb1d732b2a5f
+Author: Henock Dinberu <henockdinberu11@gmail.com>
+Date:   Wed Jan 22 18:38:53 2025 -0500
+
+    fix: commented font/freetype
+
+commit edaa2bab2206342bbf8d671b97bb99a42880e673
+Author: castroploiin <fieryfire1005@gmail.com>
+Date:   Wed Jan 22 17:33:43 2025 -0500
+
+    [refactor] idk
+
+commit 0fc3c03532e9e0e9a60be1d382f910db61d99f1e
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Wed Jan 22 08:58:10 2025 -0500
+
+    [feat] add buffer obejcvts for axes
+
+commit c10a5b496318ea0185abfd080eea6cb5f3261914
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 23:47:13 2025 -0500
+
+    [refactor] updater dependencies
+
+commit bd2dbb80c324dea4143e2cb0d06542ac4bbeb7c1
+Merge: c0b587e 9ff6b98
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 23:22:45 2025 -0500
+
+    Merge branch 'dev'
+
+commit 9ff6b98a3dd212eb79fc44e1cfa644866dc6a65a
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 23:20:52 2025 -0500
+
+    [refactor] update goals
+
+commit c0b587e4e8c5b19b5fbd66659eafab7c4307c776
+Merge: faa440e c8cfc7a
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 22:52:21 2025 -0500
+
+    Merge branch 'dev'
+
+commit c8cfc7af192e6a7e86ced9302bb2b274564da8f1
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 22:42:07 2025 -0500
+
+    [refactor] rearrange vertices
+
+commit 8a3a8443c8c6aeef78ededbddb490e2960005daa
+Merge: 7a90586 46e609c
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 22:34:51 2025 -0500
+
+    [refactor] cleanup
+
+commit 46e609c5bd93ac462c9b0f77a04f390b056561da
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 22:31:03 2025 -0500
+
+    [feat] add edge lines; used gl.DrawElements
+
+commit 2d9d5e0e3568d1667a4e49d03f29dc548ee48cf2
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 17:14:43 2025 -0500
+
+    [feat] add logger strucT
+
+commit 7a90586a44eadd1b52f35cc64b454170eabeddc9
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 15:30:17 2025 -0500
+
+    [refactor] cleanup
+
+commit be0a49115ae69196e96b9b3ce8285cb3cb7a6be4
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 15:29:20 2025 -0500
+
+    [feat] print time for frame and fps to stodut
+
+commit faa440ed6bea33a269e7eab1765e98815b741c07
+Merge: 3522138 e3c8502
+Author: am <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 10:10:37 2025 -0500
+
+    Merge pull request #6 from anshmendiratta/dev
+    
+    [refactor] merge dev into main
+
+commit e3c8502f0ab15a53c35f238cb813225c62b6682c
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 10:04:36 2025 -0500
+
+    [refactor] add naked returns
+
+commit ed14189d58b6de3da93cfd3331ece25cdd002024
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 09:46:28 2025 -0500
+
+    [refactor] update goals
+
+commit 1bd67286d9cfca42daabe0fe2e3b343f4b3cb73d
+Merge: 8d3f4c2 05c615d
+Author: am <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 09:44:50 2025 -0500
+
+    Merge pull request #5 from anshmendiratta/refactor/spherical_orbit_camera
+    
+    Refactor/spherical orbit camera
+
+commit 05c615db1d53cd4f064f0e8e71cc6e6d9500c351
+Merge: 69705e7 8d3f4c2
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 09:44:26 2025 -0500
+
+    [refactor] fix conflicts of pr #5
+
+commit 8d3f4c26254bb26b24eb0c0ea189c51c6117decc
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 09:38:47 2025 -0500
+
+    [refactor] remove redunant vars
+
+commit 69705e7152963ea3f8199bd1f6371fba495d6400
+Author: JarnaChao09 <yunyang4928@gmail.com>
+Date:   Tue Jan 21 03:34:31 2025 -0500
+
+    [refactor]: update camera logic to use spherical coordinates
+
+commit ebfc003a32c0ba1dc81f4c21ef7f1ced21573a53
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 00:36:33 2025 -0500
+
+    [refactor] add new goal
+
+commit 3522138b0ef5a8ad9a3d870550564740d21f7111
+Merge: 2144082 a129842
+Author: am <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 00:35:01 2025 -0500
+
+    Merge pull request #4 from anshmendiratta/dev
+    
+    [feat] merge dev into main
+
+commit a1298428cbd6900136d141cdae246f3d78d92c3a
+Merge: adb8810 66d5a64
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 00:33:38 2025 -0500
+
+    [feat] merge from feat/camera
+
+commit 66d5a647c7a6bace4c93bf1133503ea98bd08c1d
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 00:28:02 2025 -0500
+
+    [refactor] remove rdunant
+
+commit d93ae2bbd7111ee10fed73b1be9c07df7d8955a1
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Tue Jan 21 00:24:38 2025 -0500
+
+    [feat] fix camera distance bug by using sin/cos
+
+commit 512b9db8f63afdf668ccc29dc2a15af610fd2373
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Jan 20 18:53:43 2025 -0500
+
+    [feat] tried moving camera
+
+commit fb65367f457754d09c961906c32f7b223513f618
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Jan 20 17:02:24 2025 -0500
+
+    [feat] iniital commit
+
+commit cf2f85c29867672bfb7d3f43945ce51b0532c30a
+Merge: 618f356 2144082
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Jan 20 15:53:04 2025 -0500
+
+    [feat] merge main into feat/edge_lines
+
+commit 618f3568dc09e0bf1a25f145659bb9627458c744
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Jan 20 11:08:30 2025 -0500
+
+    [feat] fix bugs and move update code to shader
+
+commit e89129c3467d3db7c314422a3c8ee7f2ba23a949
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Jan 20 10:58:18 2025 -0500
+
+    [refactor] cleanup
+
+commit 23144404bff6a23b6232025b2e66806949eaa3d4
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Jan 20 09:14:46 2025 -0500
+
+    [refactor] identify problem
+
+commit 4f6dff9a82dda36e721b8d20388e343187b89c75
+Author: Henock Dinberu <henockdinberu11@gmail.com>
+Date:   Mon Jan 20 10:23:11 2025 -0500
+
+    scaffold
+
+commit adb8810cce2268df00961505b85e1238a7ac4a23
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Jan 20 08:53:19 2025 -0500
+
+    [refactor] cleanup
+
+commit 214408209d3ecd5d5cbc737676c849e21c7df18b
+Merge: c683d80 a6eaf4e
+Author: am <anshmendiratta2023@gmail.com>
+Date:   Mon Jan 20 08:50:38 2025 -0500
+
+    Merge pull request #3 from anshmendiratta/refactor/cube_indexed_drawing
+    
+    Refactor/cube indexed drawing
+
+commit a6eaf4e861fc21c519e3c80893c2abc6a29aec6a
+Author: JarnaChao09 <yunyang4928@gmail.com>
+Date:   Mon Jan 20 05:50:55 2025 -0500
+
+    [doc]: update readme goals
+
+commit d4a61229ce0afecb6a3e20cf88038e502d4b8945
+Author: JarnaChao09 <yunyang4928@gmail.com>
+Date:   Mon Jan 20 05:34:25 2025 -0500
+
+    [refactor]: update renderer to render cube using indexed drawing, removed dynamic-literals as memory was being leaked
+
+commit 9e19967e0b1ebf4fad427532b7e156bd26443f4a
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Mon Jan 20 00:04:39 2025 -0500
+
+    [refactor] make render package
+
+commit f02b4c213ce0c0eaec78266796d8f93de2120818
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 19 23:30:44 2025 -0500
+
+    [feat] update readme goal
+
+commit e6661eee6a12941ac91fa78e29d82040df1aebe3
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 19 23:28:39 2025 -0500
+
+    [feat] add points subpass to cube
+
+commit 922b8ea27cb65434c1f437a607d8cb9ce8dee08a
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 19 19:48:03 2025 -0500
+
+    [feat] added ols config
+
+commit c683d80c76333c677002b31172a7a63b562180e3
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 19 18:00:35 2025 -0500
+
+    [refactor] downgrade to opengl 4.1
+
+commit a7802d3731dde5528394a129d552c748f98ba117
+Merge: c80323c 2e5e3a3
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 19 17:36:03 2025 -0500
+
+    Merge branch 'dev'
+
+commit 2e5e3a3862bf25a82d82761685f29dbed5a40cd5
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 19 17:35:05 2025 -0500
+
+    [feat] add goals to README
+
+commit db304afad275a9c5fd5c8f42e1959d7d07479f2a
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 19 17:30:41 2025 -0500
+
+    [feat] fixed z-buffer
+
+commit 6d1876911473626852e4bc96e42d522efe9db695
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 19 16:07:36 2025 -0500
+
+    [feat] fix spinning
+
+commit 9c159bc98570e133d47c25835094f9bce70af9ee
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sun Jan 19 01:35:36 2025 -0500
+
+    [refactor] initia
+
+commit e68e5dd0c1ccbf52f91b0dbee4c1d30693467d25
+Merge: 775a68e 3918df6
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 23:46:01 2025 -0500
+
+    Merge branch 'dev' of https://github.com/anshmendiratta/mamino into dev
+
+commit 775a68e087a40810d9657650af26b1961f3c05e3
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 23:45:58 2025 -0500
+
+    d
+
+commit 2feae0a709b0140be5b52600166759b6c2aa4370
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 23:45:17 2025 -0500
+
+    [refactor] update gitignore
+
+commit 3918df69a73c08ee88942a7b3035c41550c59c70
+Author: am <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 23:44:57 2025 -0500
+
+    Delete src.bin
+
+commit 2e7671e93078d8cb016dbeb596f538241f7cf7e2
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 23:43:25 2025 -0500
+
+    [refactor] unignore gitignore
+
+commit 350575d1e134d87f13e5210be3d38d5787a87b7f
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 23:42:50 2025 -0500
+
+    [refactor] ignore more files
+
+commit 7b7c3a6fb92572dc38822de3da8448d8c9ad8242
+Author: am <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 23:33:45 2025 -0500
+
+    Delete src.bin
+
+commit de4c443d84ca7f09719228d74f3253018c76a6b5
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 23:26:49 2025 -0500
+
+    [feat] add polygon rendering for different n
+
+commit 3b3c919f4bab49f2b0f012746cb94c3b56f614b4
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 18:09:06 2025 -0500
+
+    [refactor] fix errors
+
+commit 921b090fbd1215f454cee339d354a6791b8e4f08
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 18:04:23 2025 -0500
+
+    [feat] add macos specific glfw hints
+
+commit 80384cddd347e79efb3654559bf4ce01beae17c5
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 17:37:23 2025 -0500
+
+    [feat] rotate square on window
+
+commit 5d883b9d88b20256463606c0511d0902a2b29e3c
+Merge: 004ea23 cf92269
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 15:00:34 2025 -0500
+
+    Merge remote-tracking branch 'origin/feature/license' into dev
+
+commit c80323c45b603c994435dff142bd7ad983522e2e
+Merge: 004ea23 cf92269
+Author: am <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 14:59:35 2025 -0500
+
+    Merge pull request #2 from anshmendiratta/feature/license
+    
+    Create LICENSE
+
+commit 004ea2334716756332f41c01b750b1e900988957
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 14:52:04 2025 -0500
+
+    [refactor] simplify some codeg
+
+commit b59d60cf13802f6243c2a5e0ce3faac5344d2c55
+Author: am <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 12:36:17 2025 -0500
+
+    Update README.md
+
+commit c2daf6286959b12a46d7f443482fdf7925f2c64a
+Author: am <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 12:35:11 2025 -0500
+
+    Delete src/src
+
+commit 7e80107fc7b116265f8a7815ee1a67e601c8bd3e
+Merge: 86c2895 1448936
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 12:33:10 2025 -0500
+
+    Merge branch 'main' of https://github.com/anshmendiratta/mamino
+
+commit 86c289549c0abccb0286df0c92e6bea00913d8a8
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Sat Jan 18 12:32:53 2025 -0500
+
+    [feat] open glfw window
+
+commit cf922699b4e61a80c011d21579e2ebdfe46211d7
+Author: Henock Dinberu <70591446+nbybhen@users.noreply.github.com>
+Date:   Fri Jan 17 20:39:15 2025 -0500
+
+    Create LICENSE
+
+commit 1448936c6ace89585948a9ac1e0c688659a8ffc0
+Merge: 4af2dc5 a39fe25
+Author: am <anshmendiratta2023@gmail.com>
+Date:   Fri Jan 17 17:49:43 2025 -0500
+
+    Merge pull request #1 from anshmendiratta/feature/project-lock-in
+    
+    [feat] locked in project
+
+commit a39fe25472ab71aa472a770dec89f41850398129
+Author: JarnaChao09 <yunyang4928@gmail.com>
+Date:   Fri Jan 17 17:44:05 2025 -0500
+
+    [feat] locked in project
+
+commit 4af2dc512f6ba1445ef011d493bdaa8ed2293879
+Author: anshmendiratta <anshmendiratta2023@gmail.com>
+Date:   Thu Jan 16 23:44:45 2025 -0500
+
+    [feat] initial commit

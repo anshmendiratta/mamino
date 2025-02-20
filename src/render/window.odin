@@ -17,24 +17,16 @@ PROGRAM_NAME :: "mamino"
 GL_MAJOR_VERSION: c.int : 4
 @(private)
 GL_MINOR_VERSION :: 1
-@(private)
-show_window: bool = true
 
-WINDOW_WIDTH := i32(1024)
-WINDOW_HEIGHT := i32(1024)
+WINDOW_WIDTH: i32 = 1024
+WINDOW_HEIGHT: i32 = 1024
+
 running: b32 = true
 vsync: b32 = false
 logger_open: bool = true
 last_frame: f64 = 0.
 
-
-StaticGLObjects :: struct {
-	program_id: u32,
-	uniforms:   map[string]gl.Uniform_Info,
-}
-
 @(cold)
-@(init)
 @(deferred_none = mamino_deinit)
 mamino_init :: proc() {
 	if !glfw.Init() {
@@ -44,7 +36,7 @@ mamino_init :: proc() {
 }
 
 mamino_deinit :: proc() {
-	defer glfw.Terminate()
+	glfw.Terminate()
 }
 
 @(deferred_out = mamino_deinit_imgui)
@@ -98,17 +90,17 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 	return
 }
 
-// TODO: Find out why this segfaults. "Bad free of pointer" with tracking allocator.
+// TODO: Find out why this segfaults only on Linux. "Bad free of pointer" with tracking allocator.
 mamino_destroy_window :: proc(window: glfw.WindowHandle) {
-	free(window)
+	when ODIN_OS == .Darwin {
+		free(window)
+	}
 }
 
 key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
 	switch key {
 	case glfw.KEY_ESCAPE, glfw.KEY_Q:
 		running = false
-		show_window = false
-		logger_open = false
 	case glfw.KEY_W, glfw.KEY_UP:
 		camera_position_spherical.z = glm.clamp(
 			camera_position_spherical.z + rotation_rate,

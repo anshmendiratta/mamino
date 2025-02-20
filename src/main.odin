@@ -31,7 +31,7 @@ main :: proc() {
 	render.mamino_init()
 	window := render.mamino_create_window()
 	render.mamino_init_imgui(window)
-	static_gl_data := render.mamino_init_gl()
+	program_id, uniforms := render.mamino_init_gl()
 	sequencing.mamino_frame_capture_init()
 
 	// Init logger.
@@ -55,13 +55,13 @@ main :: proc() {
 		glfw.PollEvents()
 		render.update_camera()
 		// Update (rotate) the vertices every frame.
-		render.update_shader(static_gl_data.uniforms)
+		render.update_shader(uniforms)
 
 		render.render_objects(render_objects)
 		render.render_coordinate_axes()
 		render.render_subgrid_axes()
 
-		when ODIN_DEBUG {
+		if ODIN_DEBUG && render.logger_open {
 			render_logger(logger)
 		}
 		when MAMINO_EXPORT_VIDEO {

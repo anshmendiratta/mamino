@@ -12,28 +12,28 @@ import "../objects"
 @(cold)
 @(require_results)
 @(deferred_out = mamino_deinit_gl)
-mamino_init_gl :: proc() -> (static_gl_data: StaticGLObjects) {
+mamino_init_gl :: proc() -> (program_id: u32, uniforms: map[string]gl.Uniform_Info) {
 	when ODIN_DEBUG {
 		gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
 	}
 	gl.Enable(gl.DEPTH_TEST)
 
-	program_id, ok := gl.load_shaders_source(mamino_vertex_shader, mamino_fragment_shader)
+	ok: bool
+	program_id, ok = gl.load_shaders_source(mamino_vertex_shader, mamino_fragment_shader)
 	if !ok {
 		fmt.eprintln("Failed to load shaders.")
 		return
 	}
-	static_gl_data.program_id = program_id
-	gl.UseProgram(static_gl_data.program_id)
+	gl.UseProgram(program_id)
 
-	static_gl_data.uniforms = gl.get_uniforms_from_program(static_gl_data.program_id)
+	uniforms = gl.get_uniforms_from_program(program_id)
 
 	return
 }
 
-mamino_deinit_gl :: proc(static_gl_data: StaticGLObjects) {
-	defer gl.DeleteProgram(static_gl_data.program_id)
-	defer delete(static_gl_data.uniforms)
+mamino_deinit_gl :: proc(program_id: u32, uniforms: map[string]gl.Uniform_Info) {
+	gl.DeleteProgram(program_id)
+	delete(uniforms)
 }
 
 update_shader :: proc(uniforms: map[string]gl.Uniform_Info) {
@@ -54,7 +54,7 @@ draw_cube :: proc(vertices: []objects.Vertex, indices_count: i32) {
 draw_points :: proc(vertices: []objects.Vertex, indices: []u16) {
 	gl.Enable(gl.PROGRAM_POINT_SIZE)
 	when ODIN_OS != .Darwin {
-		gl.Enable(gl.POINT_SMOOTH)
+		// gl.Enable(gl.POINT_SMOOTH)
 	}
 	gl.DrawElements(gl.POINTS, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
@@ -62,22 +62,14 @@ draw_points :: proc(vertices: []objects.Vertex, indices: []u16) {
 draw_lines :: proc(vertices: []objects.Vertex, indices: []u16) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
-	when ODIN_OS == .Darwin {
-		gl.LineWidth(1.)
-	} else {
-		gl.LineWidth(5.)
-	}
+	gl.LineWidth(1.)
 	gl.DrawElements(gl.LINES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 
 draw_axes :: proc(indices: []u16) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
-	when ODIN_OS == .Darwin {
-		gl.LineWidth(1.)
-	} else {
-		gl.LineWidth(2.)
-	}
+	gl.LineWidth(1.)
 	gl.Enable(gl.BLEND)
 	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 	gl.DrawElements(gl.LINES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
