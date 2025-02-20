@@ -82,7 +82,7 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 	}
 
 	glfw.MakeContextCurrent(window)
-	glfw.SwapInterval(1)
+	glfw.SwapInterval(0)
 	glfw.SetKeyCallback(window, key_callback)
 	glfw.SetFramebufferSizeCallback(window, size_callback)
 	gl.load_up_to(int(GL_MAJOR_VERSION), GL_MINOR_VERSION, glfw.gl_set_proc_address)

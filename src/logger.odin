@@ -41,10 +41,11 @@ mamino_deinit_logger :: proc(logger: ^Logger, _: []union {
 
 logger_calculate_avg_fps :: proc(times_per_frame: [dynamic]f64) -> (avg: f64) {
 	total_fps: f64 = 0
-	for time_per_frame in times_per_frame {
+	cutoff := len(times_per_frame) / 5
+	for time_per_frame in times_per_frame[cutoff:] {
 		total_fps += 1 / time_per_frame
 	}
-	avg = total_fps / f64(len(times_per_frame))
+	avg = total_fps / f64(len(times_per_frame) * 4 / 5)
 	return
 }
 
