@@ -22,6 +22,11 @@ Orientation :: struct {
 	angle: f32,
 }
 
+ObjectInfo :: struct {
+	type: string,
+	id:   uint,
+}
+
 get_vertices :: proc {
 	get_cube_vertices,
 }
@@ -30,5 +35,37 @@ color_vertices :: proc(vertices: []Vertex, color: glm.vec4 = {1., 1., 1., 1.}) {
 	for &vertex in vertices {
 		vertex.color = color
 	}
+}
+
+get_object_id :: proc(object: union {
+		Cube,
+	}) -> uint {
+	#partial switch generic_object in object {
+	case Cube:
+		return generic_object.id
+	case:
+		return 0
+	}
+}
+
+get_object_type_string :: proc(object: union {
+		Cube,
+	}) -> (object_type: string) {
+	#partial switch generic_object in object {
+	case Cube:
+		object_type = "Cube"
+	case:
+	}
+
+	return
+}
+
+get_object_info :: proc(object: union {
+		Cube,
+	}) -> (object_info: ObjectInfo) {
+	object_info.type = get_object_type_string(object)
+	object_info.id = get_object_id(object)
+
+	return
 }
 

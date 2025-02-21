@@ -5,6 +5,7 @@ import "core:mem"
 
 Cube :: struct {
 	// Geometric center.
+	id:          uint,
 	center:      glm.vec3,
 	scale:       Scale,
 	orientation: Orientation,

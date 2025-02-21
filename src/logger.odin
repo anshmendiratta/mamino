@@ -68,7 +68,9 @@ logger_get_most_recent_framerate :: proc(logger: ^Logger) -> f64 {
 	return 1. / logger.frametimes[len(logger.frametimes) - 1]
 }
 
-render_logger :: proc(logger: ^Logger) {
+render_logger :: proc(logger: ^Logger, render_objects: ^[]union {
+		objects.Cube,
+	}, render_objects_info: ^[dynamic]objects.ObjectInfo) {
 	imgl.NewFrame()
 	imfw.NewFrame()
 	im.NewFrame()
@@ -79,6 +81,7 @@ render_logger :: proc(logger: ^Logger) {
 	window_flags: im.WindowFlags
 	window_flags += {.NoMove}
 	im.Begin("Logger", &render.logger_open, window_flags)
+
 	im.TextWrapped(
 		strings.clone_to_cstring(
 			(fmt.aprintf(
@@ -110,6 +113,7 @@ render_logger :: proc(logger: ^Logger) {
 		context.temp_allocator,
 	)
 	im.Separator()
+
 	im.TextWrapped(
 		strings.clone_to_cstring(
 			fmt.aprintf("Object count: {}", logger.object_count),
@@ -130,6 +134,7 @@ render_logger :: proc(logger: ^Logger) {
 		context.temp_allocator,
 	)
 	im.Separator()
+
 	if im.Button(strings.clone_to_cstring("Render faces")) {
 		if render.render_faces ~= true; render.render_faces {
 			gl.PolygonMode(gl.FRONT_AND_BACK, gl.FILL)
@@ -141,6 +146,36 @@ render_logger :: proc(logger: ^Logger) {
 	if im.Button(strings.clone_to_cstring("Render normals")) {
 		render.render_normals ~= true
 	}
+	im.Separator()
+
+	debug_object_info: [dynamic]cstring
+	for object_info in render_objects_info {
+		debug_list_item, _ := strings.clone_to_cstring(
+			fmt.aprintf(
+				"{} {}",
+				object_info.type,
+				object_info.id,
+				allocator = context.temp_allocator,
+			),
+			allocator = context.temp_allocator,
+		)
+		append(&debug_object_info, debug_list_item)
+	}
+
+	s, _ := strings.clone_to_cstring("A")
+	t: []cstring = {s}
+	if im.ListBox(
+		label = strings.clone_to_cstring("Select object"),
+		current_item = nil,
+		items = raw_data(t),
+		items_count = i32(len(t)),
+		height_in_items = 4,
+	) {
+		// selectable_flags: im.SelectableFlags
+		// selectable_flags += {.Highlight}
+	}
+	// im.EndListBox()
+
 	im.End()
 	im.Render()
 	imgl.RenderDrawData(im.GetDrawData())

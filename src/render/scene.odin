@@ -7,7 +7,7 @@ import "../objects"
 render_normals: bool = false
 render_faces: bool = false
 
-render_objects :: proc(render_objects: []union {
+render_objects :: proc(render_objects: ^[]union {
 		objects.Cube,
 	}) {
 	vertices: []objects.Vertex

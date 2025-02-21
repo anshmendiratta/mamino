@@ -38,7 +38,11 @@ main :: proc() {
 	render_objects: []union {
 		objects.Cube,
 	} =
-		{objects.Cube{center = {1., 1., 1.}, scale = {3., 1., 1.}, orientation = {glm.vec3{0., 1., 0.}, glm.radians(f32(45.))}}, objects.Cube{center = {-1., 1., -1.}, scale = {1., 2., 1.}, orientation = {glm.vec3{1., 1., 1.}, glm.radians(f32(35.))}}, objects.Cube{center = {0., 3., 2.}, scale = {0.5, 0.5, 0.5}, orientation = {glm.vec3{1., 0., 0.}, glm.radians(f32(60.))}}}
+		{objects.Cube{id = 0, center = {1., 1., 1.}, scale = {3., 1., 1.}, orientation = {glm.vec3{0., 1., 0.}, glm.radians(f32(45.))}}, objects.Cube{id = 1, center = {-1., 1., -1.}, scale = {1., 2., 1.}, orientation = {glm.vec3{1., 1., 1.}, glm.radians(f32(35.))}}, objects.Cube{id = 2, center = {0., 3., 2.}, scale = {0.5, 0.5, 0.5}, orientation = {glm.vec3{1., 0., 0.}, glm.radians(f32(60.))}}}
+	render_objects_info: [dynamic]objects.ObjectInfo
+	for object in render_objects {
+		append(&render_objects_info, objects.get_object_info(object))
+	}
 
 	// Init logger.
 	logger: ^Logger = &{}
@@ -57,12 +61,12 @@ main :: proc() {
 		// Update (rotate) the vertices every frame.
 		render.update_shader(uniforms)
 
-		render.render_objects(render_objects)
+		render.render_objects(&render_objects)
 		render.render_coordinate_axes()
 		render.render_subgrid_axes()
 
 		if ODIN_DEBUG && render.logger_open {
-			render_logger(logger)
+			render_logger(logger, &render_objects, &render_objects_info)
 		}
 		when MAMINO_EXPORT_VIDEO {
 			sequencing.mamino_capture_frame()
