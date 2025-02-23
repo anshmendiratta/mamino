@@ -27,22 +27,43 @@ import "sequencing"
 MAMINO_EXPORT_VIDEO :: #config(MAMINO_EXPORT_VIDEO, false)
 
 main :: proc() {
+	when ODIN_DEBUG {
+		track: mem.Tracking_Allocator
+		mem.tracking_allocator_init(&track, context.allocator)
+		context.allocator = mem.tracking_allocator(&track)
+
+		defer {
+			if len(track.allocation_map) > 0 {
+				fmt.eprintf("=== %v allocations not freed: ===\n", len(track.allocation_map))
+				for _, entry in track.allocation_map {
+					fmt.eprintf("- %v bytes @ %v\n", entry.size, entry.location)
+				}
+			}
+			if len(track.bad_free_array) > 0 {
+				fmt.eprintf("=== %v incorrect frees: ===\n", len(track.bad_free_array))
+				for entry in track.bad_free_array {
+					fmt.eprintf("- %p @ %v\n", entry.memory, entry.location)
+				}
+			}
+			mem.tracking_allocator_destroy(&track)
+		}
+	}
 	// Init.
+	// 
 	render.mamino_init()
 	window := render.mamino_create_window()
 	render.mamino_init_imgui(window)
 	program_id, uniforms := render.mamino_init_gl()
-	sequencing.mamino_frame_capture_init()
+	when MAMINO_EXPORT_VIDEO {
+		sequencing.mamino_frame_capture_init()
+	}
 
 	// Setup scene objects.
 	render_objects: []union {
 		objects.Cube,
 	} =
 		{objects.Cube{id = 0, center = {1., 1., 1.}, scale = {3., 1., 1.}, orientation = {glm.vec3{0., 1., 0.}, glm.radians(f32(45.))}}, objects.Cube{id = 1, center = {-1., 1., -1.}, scale = {1., 2., 1.}, orientation = {glm.vec3{1., 1., 1.}, glm.radians(f32(35.))}}, objects.Cube{id = 2, center = {0., 3., 2.}, scale = {0.5, 0.5, 0.5}, orientation = {glm.vec3{1., 0., 0.}, glm.radians(f32(60.))}}}
-	render_objects_info: [dynamic]objects.ObjectInfo
-	for object in render_objects {
-		append(&render_objects_info, objects.get_object_info(object))
-	}
+	render_objects_info: []objects.ObjectInfo = objects.get_objects_info(render_objects)
 
 	// Init logger.
 	logger: ^Logger = &{}

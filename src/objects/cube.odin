@@ -12,7 +12,7 @@ Cube :: struct {
 }
 
 get_cube_vertices :: proc(cube: Cube) -> (vertices: []Vertex) {
-	vertices = make([]Vertex, len(cube_vertices))
+	vertices = make([]Vertex, len(cube_vertices), context.temp_allocator)
 	copy(vertices, cube_vertices)
 	for &vertex in vertices {
 		vertex.position.x *= cube.scale.x

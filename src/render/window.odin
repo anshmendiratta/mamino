@@ -45,7 +45,7 @@ mamino_init_imgui :: proc(window: glfw.WindowHandle) -> (im_context: ^im.Context
 	im_context = im.CreateContext()
 	im_context.FontSize = 20.
 	im_config_flags := im.GetIO()
-	im_config_flags.ConfigFlags += {.NavEnableKeyboard}
+	im_config_flags.ConfigFlags += {.NavEnableKeyboard, .DockingEnable}
 
 	imfw.InitForOpenGL(window, true)
 	imgl.Init("#version 410")

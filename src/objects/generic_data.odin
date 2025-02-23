@@ -1,6 +1,7 @@
 package objects
 
 import glm "core:math/linalg/glsl"
+import "core:slice"
 
 // Vertex used for drawing. Mapped directly from vertices of objects.
 Vertex :: struct {
@@ -37,6 +38,7 @@ color_vertices :: proc(vertices: []Vertex, color: glm.vec4 = {1., 1., 1., 1.}) {
 	}
 }
 
+@(private)
 get_object_id :: proc(object: union {
 		Cube,
 	}) -> uint {
@@ -48,6 +50,7 @@ get_object_id :: proc(object: union {
 	}
 }
 
+@(private)
 get_object_type_string :: proc(object: union {
 		Cube,
 	}) -> (object_type: string) {
@@ -65,6 +68,14 @@ get_object_info :: proc(object: union {
 	}) -> (object_info: ObjectInfo) {
 	object_info.type = get_object_type_string(object)
 	object_info.id = get_object_id(object)
+
+	return
+}
+
+get_objects_info :: proc(objects: []union {
+		Cube,
+	}) -> (objects_info: []ObjectInfo) {
+	objects_info = slice.mapper(objects, get_object_info)
 
 	return
 }

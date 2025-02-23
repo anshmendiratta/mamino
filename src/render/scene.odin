@@ -10,14 +10,11 @@ render_faces: bool = false
 render_objects :: proc(render_objects: ^[]union {
 		objects.Cube,
 	}) {
-	vertices: []objects.Vertex
-	defer delete(vertices)
-
 	for generic_object in render_objects {
 		#partial switch object in generic_object {
 		case objects.Cube:
 			// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
-			vertices = objects.get_vertices(object)
+			vertices := objects.get_vertices(object)
 			// Cube.
 			cube_vao, cube_vbo, cube_ebo := get_buffer_objects()
 			bind_data(cube_vao, cube_vbo, cube_ebo, vertices, objects.cube_indices)
