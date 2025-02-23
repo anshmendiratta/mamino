@@ -58,20 +58,17 @@ logger_calculate_percent_low_fps :: proc(
 	percent_low_fps: uint,
 ) {
 	slice.reverse_sort(times_per_frame[:])
-	reciprocal :: #force_inline proc(x: f64) -> f64 {
-		return 1 / x
-	}
 	percent_low_frametimes := times_per_frame[0:max(len(times_per_frame) / 100, 1)]
-	percent_low_fps_frames, _ := slice.mapper(
-		percent_low_frametimes[:],
-		reciprocal,
-		context.temp_allocator,
-	)
-	sum_reduction :: #force_inline proc(accumulator: f64, next: f64) -> f64 {return(
-			accumulator +
-			next \
-		)}
-	percent_low_fps = uint(slice.reduce(percent_low_fps_frames, 0., sum_reduction))
+	useful_frame_fps: [dynamic]f64
+	defer delete(useful_frame_fps)
+	for frametime in percent_low_frametimes {
+		append(&useful_frame_fps, 1 / frametime)
+	}
+	total_low_fps: f64 = 0
+	for percent_low_fps in useful_frame_fps {
+		total_low_fps += percent_low_fps
+	}
+	percent_low_fps = uint(total_low_fps / f64(len(useful_frame_fps)))
 
 	return
 }
@@ -87,11 +84,11 @@ logger_update :: proc(logger: ^Logger) {
 }
 
 logger_get_most_recent_frametime :: proc(logger: ^Logger) -> f64 {
-	return slice.last(logger.frametimes[:])
+	return logger.frametimes[len(logger.frametimes) - 1]
 }
 
 logger_get_most_recent_framerate :: proc(logger: ^Logger) -> f64 {
-	return 1. / slice.last(logger.frametimes[:])
+	return 1. / logger.frametimes[len(logger.frametimes) - 1]
 }
 
 render_logger :: proc(logger: ^Logger, render_objects: ^[]union {
@@ -116,22 +113,15 @@ render_logger :: proc(logger: ^Logger, render_objects: ^[]union {
 	logger_render_toggle_render_buttons(logger)
 	im.Separator()
 	// List debug objects and their properties.
-	object_info_formatter :: #force_inline proc(
-		object_info: objects.ObjectInfo,
-	) -> (
-		debug_list_item: cstring,
-	) {
-		debug_list_item = strings.clone_to_cstring(
+	debug_objects_display: [dynamic]cstring
+	defer delete(debug_objects_display)
+	for object_info in render_objects_info {
+		debug_list_item := strings.clone_to_cstring(
 			fmt.tprintf("{} {}", object_info.type, object_info.id),
 			allocator = context.temp_allocator,
 		)
-		return
+		append(&debug_objects_display, debug_list_item)
 	}
-	debug_objects_display, _ := slice.mapper(
-		render_objects_info^,
-		object_info_formatter,
-		context.temp_allocator,
-	)
 	logger_render_debug_objects_list(logger, &debug_objects_display)
 
 	im.End()
@@ -154,6 +144,16 @@ logger_render_frame_info :: proc(logger: ^Logger) {
 	im.TextWrapped(
 		strings.clone_to_cstring(
 			(fmt.tprintf(
+					"Average framerate: {} FPS",
+					uint(logger_calculate_avg_fps(logger.frametimes)),
+				)),
+			context.temp_allocator,
+		),
+		context.temp_allocator,
+	)
+	im.TextWrapped(
+		strings.clone_to_cstring(
+			(fmt.tprintf(
 					`Percent low framerate: {} FPS`,
 					uint(logger_calculate_percent_low_fps(logger.frametimes)),
 				)),
@@ -166,6 +166,7 @@ logger_render_frame_info :: proc(logger: ^Logger) {
 		strings.clone_to_cstring(
 			(fmt.tprintf(
 					"Most recent frametime: {:.9f} ms",
+					// "Most recent frametime: {:.9f} ms",
 					logger_get_most_recent_frametime(logger) * SECOND_TO_MILLISECOND,
 				)),
 			context.temp_allocator,
@@ -213,7 +214,10 @@ logger_render_toggle_render_buttons :: proc(logger: ^Logger) {
 }
 
 @(private = "file")
-logger_render_debug_objects_list :: proc(logger: ^Logger, debug_objects_display: ^[]cstring) {
+logger_render_debug_objects_list :: proc(
+	logger: ^Logger,
+	debug_objects_display: ^[dynamic]cstring,
+) {
 	highlight_item := true
 	item_selected := false
 	highlighted_item_idx := -1
