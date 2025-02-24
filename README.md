@@ -15,13 +15,14 @@ To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and co
 
 `imgui` is imported from the `shared/` directory. Odin has imgui binds in progress, but for the time being, we've used the ones generated using https://gitlab.com/L-4/odin-imgui. Place the base imgui files in `dear_imgui` inside `shared/` and create subfolders `gl/` and `glfw/` for the library specific imgui files. Don't forget to move your OS's static libraries too (such as `imgui_linux_x64.a`).
 
-Required structure:
+Example structure:
 ```
 shared/
   imgui.odin
   imconfig.odin
   imgui_internal.odin
   impl_enabled.odin
+  imgui_linux_x64.a
 
   gl/
     imgui_impl_opengl3.odin    
