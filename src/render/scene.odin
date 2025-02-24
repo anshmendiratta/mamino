@@ -12,7 +12,7 @@ render_faces: bool = false
 render_axes: bool = true
 render_grid: bool = true
 
-HIGHLIGHTED_OBJECT_COLOR :: glm.vec4{0.15, 0.83, 1.0, 0.25}
+HIGHLIGHTED_OBJECT_COLOR :: glm.vec4{0.15, 0.83, 1.0, 0.5}
 
 render_objects :: proc(render_objects: ^[]union {
 		objects.Cube,

@@ -65,12 +65,12 @@ main :: proc() {
 		{objects.Cube{id = 0, center = {1., 1., 1.}, scale = {3., 1., 1.}, orientation = {glm.vec3{0., 1., 0.}, glm.radians(f32(45.))}}, objects.Cube{id = 1, center = {-1., 1., -1.}, scale = {1., 2., 1.}, orientation = {glm.vec3{1., 1., 1.}, glm.radians(f32(35.))}}, objects.Cube{id = 2, center = {0., 3., 2.}, scale = {0.5, 0.5, 0.5}, orientation = {glm.vec3{1., 0., 0.}, glm.radians(f32(60.))}}}
 	render_objects_info: []objects.ObjectInfo = objects.get_objects_info(render_objects)
 
-	// Init logger.
-	logger: ^Logger = &{}
-	mamino_init_logger(logger, render_objects)
+	// Init Debugger.
+	debugger: ^Debugger = &{}
+	mamino_init_debugger(debugger, render_objects)
 
 	for (!glfw.WindowShouldClose(window) && render.running) {
-		logger_update(logger)
+		debugger_update(debugger)
 
 		// Set background.
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -90,8 +90,8 @@ main :: proc() {
 			render.render_subgrid_axes()
 		}
 
-		if ODIN_DEBUG && render.logger_open {
-			render_logger(logger, &render_objects, &render_objects_info)
+		if ODIN_DEBUG && render.debugger_open {
+			render_debugger(debugger, &render_objects, &render_objects_info)
 		}
 		when MAMINO_EXPORT_VIDEO {
 			sequencing.mamino_capture_frame()
@@ -104,9 +104,9 @@ main :: proc() {
 	}
 	glfw.DestroyWindow(window)
 
-	avg_framerate := logger_calculate_avg_fps(logger.frametimes)
+	avg_framerate := debugger_calculate_avg_fps(debugger.frametimes)
 	fmt.println("Average:", avg_framerate, "FPS")
-	low_framerate := logger_calculate_percent_low_fps(logger.frametimes)
+	low_framerate := debugger_calculate_percent_low_fps(debugger.frametimes)
 	fmt.println("Percent low:", low_framerate, "FPS")
 
 	video_options: sequencing.VideoOptions = {

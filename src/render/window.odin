@@ -23,7 +23,7 @@ WINDOW_HEIGHT: i32 = 1024
 
 running: b32 = true
 vsync: b32 = false
-logger_open: bool = true
+debugger_open: bool = true
 last_frame: f64 = 0.
 
 @(cold)
