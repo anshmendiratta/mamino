@@ -44,3 +44,4 @@ See [goals](#goals) for a more detailed list on current features.
 - [ ] Increase render and video resolution.
 - [ ] Think about and clean-up public API.
 - [ ] Add example mains.
+- [ ] Reduce draw calls.

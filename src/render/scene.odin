@@ -1,11 +1,18 @@
 package render
 
+import glm "core:math/linalg/glsl"
+
 import gl "vendor:OpenGL"
 
 import "../objects"
 
+highlighted_debug_object_id: objects.ObjectID
 render_normals: bool = false
 render_faces: bool = false
+render_axes: bool = true
+render_grid: bool = true
+
+HIGHLIGHTED_OBJECT_COLOR :: glm.vec4{0.15, 0.83, 1.0, 0.25}
 
 render_objects :: proc(render_objects: ^[]union {
 		objects.Cube,
@@ -16,17 +23,20 @@ render_objects :: proc(render_objects: ^[]union {
 			// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
 			vertices := objects.get_vertices(object)
 			// Cube.
+			if object.id == highlighted_debug_object_id {
+				objects.color_vertices(&vertices, HIGHLIGHTED_OBJECT_COLOR)
+			}
 			cube_vao, cube_vbo, cube_ebo := get_buffer_objects()
 			bind_data(cube_vao, cube_vbo, cube_ebo, vertices, objects.cube_indices)
 			draw_cube(vertices, i32(len(objects.cube_indices)))
 			// Points.
 			point_vao, point_vbo, point_ebo := get_buffer_objects()
-			objects.color_vertices(vertices, objects.point_color)
+			objects.color_vertices(&vertices, objects.point_color)
 			bind_data(point_vao, point_vbo, point_ebo, vertices, objects.point_indices)
 			draw_points(vertices, objects.point_indices)
 			// Lines.
 			line_vao, line_vbo, line_ebo := get_buffer_objects()
-			objects.color_vertices(vertices, objects.line_color)
+			objects.color_vertices(&vertices, objects.line_color)
 			bind_data(line_vao, line_vbo, line_ebo, vertices, objects.line_indices)
 			draw_lines(vertices, objects.line_indices)
 			// FIX(Ansh): Normal rendering doesn't want to happen on debug mode. Probably to do with setting the PolygonMode.
@@ -66,9 +76,6 @@ render_coordinate_axes :: proc() {
 		objects.coordinate_axes_indices,
 	)
 	draw_axes(objects.coordinate_axes_indices)
-	// gl.DeleteVertexArrays(1, &axes_vao)
-	// gl.DeleteBuffers(1, &axes_vbo)
-	// gl.DeleteBuffers(1, &axes_ebo)
 }
 
 render_subgrid_axes :: proc() {

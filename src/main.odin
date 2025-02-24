@@ -83,8 +83,12 @@ main :: proc() {
 		render.update_shader(uniforms)
 
 		render.render_objects(&render_objects)
-		render.render_coordinate_axes()
-		render.render_subgrid_axes()
+		if render.render_axes {
+			render.render_coordinate_axes()
+		}
+		if render.render_grid {
+			render.render_subgrid_axes()
+		}
 
 		if ODIN_DEBUG && render.logger_open {
 			render_logger(logger, &render_objects, &render_objects_info)
@@ -102,6 +106,8 @@ main :: proc() {
 
 	avg_framerate := logger_calculate_avg_fps(logger.frametimes)
 	fmt.println("Average:", avg_framerate, "FPS")
+	low_framerate := logger_calculate_percent_low_fps(logger.frametimes)
+	fmt.println("Percent low:", low_framerate, "FPS")
 
 	video_options: sequencing.VideoOptions = {
 			resolution = {1920, 1080},

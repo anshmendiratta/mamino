@@ -53,9 +53,6 @@ draw_cube :: proc(vertices: []objects.Vertex, indices_count: i32) {
 
 draw_points :: proc(vertices: []objects.Vertex, indices: []u16) {
 	gl.Enable(gl.PROGRAM_POINT_SIZE)
-	when ODIN_OS != .Darwin {
-		// gl.Enable(gl.POINT_SMOOTH)
-	}
 	gl.DrawElements(gl.POINTS, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 

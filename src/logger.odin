@@ -18,6 +18,7 @@ import "vendor:glfw"
 import "objects"
 import "render"
 
+
 Logger :: struct {
 	frametimes:      [dynamic]f64,
 	object_count:    uint,
@@ -113,14 +114,22 @@ render_logger :: proc(logger: ^Logger, render_objects: ^[]union {
 	logger_render_toggle_render_buttons(logger)
 	im.Separator()
 	// List debug objects and their properties.
-	debug_objects_display: [dynamic]cstring
+	debug_objects_display: [dynamic][2]union {
+		cstring,
+		objects.ObjectID,
+	}
 	defer delete(debug_objects_display)
 	for object_info in render_objects_info {
 		debug_list_item := strings.clone_to_cstring(
 			fmt.tprintf("{} {}", object_info.type, object_info.id),
 			allocator = context.temp_allocator,
 		)
-		append(&debug_objects_display, debug_list_item)
+		debug_object_display_with_id: [2]union {
+			cstring,
+			objects.ObjectID,
+		}
+		debug_object_display_with_id = {debug_list_item, object_info.id}
+		append(&debug_objects_display, debug_object_display_with_id)
 	}
 	logger_render_debug_objects_list(logger, &debug_objects_display)
 
@@ -211,26 +220,38 @@ logger_render_toggle_render_buttons :: proc(logger: ^Logger) {
 	if im.Button(strings.clone_to_cstring("Render normals", context.temp_allocator)) {
 		render.render_normals ~= true
 	}
+	im.SameLine()
+	if im.Button(strings.clone_to_cstring("Render axes", context.temp_allocator)) {
+		render.render_axes ~= true
+	}
+	im.SameLine()
+	if im.Button(strings.clone_to_cstring("Render grid", context.temp_allocator)) {
+		render.render_grid ~= true
+	}
 }
 
 @(private = "file")
 logger_render_debug_objects_list :: proc(
 	logger: ^Logger,
-	debug_objects_display: ^[dynamic]cstring,
+	debug_objects_display: ^[dynamic][2]union {
+		cstring,
+		objects.ObjectID,
+	},
 ) {
-	highlight_item := true
 	item_selected := false
 	highlighted_item_idx := -1
+	selected_item_idx := -1
 
 	if im.BeginListBox("Debug object") {
 		for debug_object, item_idx in debug_objects_display {
 			is_selected := highlighted_item_idx == item_idx
 
-			if im.Selectable(debug_object, is_selected) {
-				highlighted_item_idx = item_idx
+			if im.Selectable(debug_object.x.(cstring), is_selected) {
+				selected_item_idx = item_idx
 			}
-			if highlight_item && im.IsItemHovered() {
+			if im.IsItemHovered() {
 				highlighted_item_idx = item_idx
+				render.highlighted_debug_object_id = debug_object.y.(objects.ObjectID)
 			}
 			if is_selected {
 				im.SetItemDefaultFocus()
