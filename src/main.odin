@@ -48,8 +48,8 @@ main :: proc() {
 			mem.tracking_allocator_destroy(&track)
 		}
 	}
+
 	// Init.
-	// 
 	render.mamino_init()
 	window := render.mamino_create_window()
 	render.mamino_init_imgui(window)
@@ -65,7 +65,7 @@ main :: proc() {
 		{objects.Cube{id = 0, center = {1., 1., 1.}, scale = {3., 1., 1.}, orientation = {glm.vec3{0., 1., 0.}, glm.radians(f32(45.))}}, objects.Cube{id = 1, center = {-1., 1., -1.}, scale = {1., 2., 1.}, orientation = {glm.vec3{1., 1., 1.}, glm.radians(f32(35.))}}, objects.Cube{id = 2, center = {0., 3., 2.}, scale = {0.5, 0.5, 0.5}, orientation = {glm.vec3{1., 0., 0.}, glm.radians(f32(60.))}}}
 	render_objects_info: []objects.ObjectInfo = objects.get_objects_info(render_objects)
 
-	// Init Debugger.
+	// Init debugger.
 	debugger: ^Debugger = &{}
 	mamino_init_debugger(debugger, render_objects)
 

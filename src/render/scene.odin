@@ -40,7 +40,6 @@ render_objects :: proc(render_objects: ^[]union {
 			bind_data(line_vao, line_vbo, line_ebo, vertices, objects.line_indices)
 			draw_lines(vertices, objects.line_indices)
 			// FIX(Ansh): Normal rendering doesn't want to happen on debug mode. Probably to do with setting the PolygonMode.
-			// Normals of faces.
 			if ODIN_DEBUG && render_normals {
 				normal_vao, normal_vbo, normal_ebo := get_buffer_objects()
 				face_normals := objects.get_cube_normals_coordinates(object)
@@ -61,7 +60,6 @@ render_objects :: proc(render_objects: ^[]union {
 			gl.DeleteVertexArrays(1, &line_vao)
 			gl.DeleteBuffers(1, &line_vbo)
 			gl.DeleteBuffers(1, &line_ebo)
-		case:
 		}
 	}
 }
@@ -76,6 +74,9 @@ render_coordinate_axes :: proc() {
 		objects.coordinate_axes_indices,
 	)
 	draw_axes(objects.coordinate_axes_indices)
+	gl.DeleteVertexArrays(1, &axes_vao)
+	gl.DeleteBuffers(1, &axes_vbo)
+	gl.DeleteBuffers(1, &axes_ebo)
 }
 
 render_subgrid_axes :: proc() {
@@ -88,8 +89,8 @@ render_subgrid_axes :: proc() {
 		objects.subgrid_axes_indices,
 	)
 	draw_axes(objects.subgrid_axes_indices)
-	// gl.DeleteVertexArrays(1, &subgrid_axes_vao)
-	// gl.DeleteBuffers(1, &subgrid_axes_vbo)
-	// gl.DeleteBuffers(1, &subgrid_axes_ebo)
+	gl.DeleteVertexArrays(1, &subgrid_axes_vao)
+	gl.DeleteBuffers(1, &subgrid_axes_vbo)
+	gl.DeleteBuffers(1, &subgrid_axes_ebo)
 }
 

@@ -39,7 +39,6 @@ color_vertices :: proc(vertices: ^[]Vertex, color: glm.vec4 = {1., 1., 1., 1.}) 
 	}
 }
 
-@(private)
 get_object_id :: proc(object: union {
 		Cube,
 	}) -> ObjectID {
@@ -51,13 +50,47 @@ get_object_id :: proc(object: union {
 	}
 }
 
-@(private)
 get_object_type_string :: proc(object: union {
 		Cube,
 	}) -> (object_type: string) {
 	#partial switch generic_object in object {
 	case Cube:
 		object_type = "Cube"
+	case:
+	}
+
+	return
+}
+
+get_object_center :: proc(object: union {
+		Cube,
+	}) -> (center: glm.vec3) {
+	#partial switch generic_object in object {
+	case Cube:
+		center = generic_object.center
+	}
+
+	return
+}
+
+get_object_scale :: proc(object: union {
+		Cube,
+	}) -> (scale: Scale) {
+	#partial switch generic_object in object {
+	case Cube:
+		scale = generic_object.scale
+	case:
+	}
+
+	return
+}
+
+get_object_orientation :: proc(object: union {
+		Cube,
+	}) -> (orientation: Orientation) {
+	#partial switch generic_object in object {
+	case Cube:
+		orientation = generic_object.orientation
 	case:
 	}
 

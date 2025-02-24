@@ -95,6 +95,8 @@ debugger_get_most_recent_framerate :: proc(debugger: ^Debugger) -> f64 {
 render_debugger :: proc(debugger: ^Debugger, render_objects: ^[]union {
 		objects.Cube,
 	}, render_objects_info: ^[]objects.ObjectInfo) {
+	context.allocator = context.temp_allocator
+
 	imgl.NewFrame()
 	imfw.NewFrame()
 	im.NewFrame()
@@ -106,14 +108,15 @@ render_debugger :: proc(debugger: ^Debugger, render_objects: ^[]union {
 	im.Begin("Debugger", &render.debugger_open, window_flags)
 
 	// Display basic debug info.
+	im.SeparatorText(strings.clone_to_cstring("FRAME INFO"))
 	debugger_render_frame_info(debugger)
-	im.Separator()
+	im.SeparatorText(strings.clone_to_cstring("SCENE INFO"))
 	debugger_render_scene_info(debugger)
-	im.Separator()
+	im.SeparatorText(strings.clone_to_cstring("TOGGLE RENDERING"))
 	// Toggle rendering of faces/normals.
 	debugger_render_toggle_render_buttons(debugger)
-	im.Separator()
-	// List debug objects and their properties.
+	im.SeparatorText(strings.clone_to_cstring("DEBUG OBJECT INFO"))
+	// List debug objects and their properties. Selected debug object info.
 	debug_objects_display: [dynamic][2]union {
 		cstring,
 		objects.ObjectID,
@@ -122,7 +125,6 @@ render_debugger :: proc(debugger: ^Debugger, render_objects: ^[]union {
 	for object_info in render_objects_info {
 		debug_list_item := strings.clone_to_cstring(
 			fmt.tprintf("{} {}", object_info.type, object_info.id),
-			allocator = context.temp_allocator,
 		)
 		debug_object_display_with_id: [2]union {
 			cstring,
@@ -131,7 +133,16 @@ render_debugger :: proc(debugger: ^Debugger, render_objects: ^[]union {
 		debug_object_display_with_id = {debug_list_item, object_info.id}
 		append(&debug_objects_display, debug_object_display_with_id)
 	}
-	debugger_render_debug_objects_list(debugger, &debug_objects_display)
+	highlighted_debug_object: union {
+		objects.Cube,
+	}
+	for obj in render_objects {
+		if objects.get_object_info(obj).id == render.highlighted_debug_object_id {
+			highlighted_debug_object = obj
+			break
+		}
+	}
+	debugger_render_debug_objects_list(debugger, &debug_objects_display, highlighted_debug_object)
 
 	im.End()
 	im.Render()
@@ -186,25 +197,14 @@ debugger_render_frame_info :: proc(debugger: ^Debugger) {
 
 @(private = "file")
 debugger_render_scene_info :: proc(debugger: ^Debugger) {
+	context.allocator = context.temp_allocator
 	im.TextWrapped(
-		strings.clone_to_cstring(
-			fmt.tprintf("Object count: {}", debugger.object_count),
-			context.temp_allocator,
-		),
-		context.temp_allocator,
+		strings.clone_to_cstring(fmt.tprintf("Object count: {}", debugger.object_count)),
 	)
-	im.TextWrapped(
-		strings.clone_to_cstring(
-			fmt.tprintf(
-				"Camera position (x, y, z): ({}, {}, {})",
-				debugger.camera_position.x,
-				debugger.camera_position.y,
-				debugger.camera_position.z,
-			),
-			context.temp_allocator,
-		),
-		context.temp_allocator,
-	)
+	im.TextWrapped(strings.clone_to_cstring("Camera position (x, y, z):"))
+	im.BulletText(strings.clone_to_cstring(fmt.tprintf("x: {}", debugger.camera_position.x)))
+	im.BulletText(strings.clone_to_cstring(fmt.tprintf("y: {}", debugger.camera_position.y)))
+	im.BulletText(strings.clone_to_cstring(fmt.tprintf("z: {}", debugger.camera_position.z)))
 }
 
 @(private = "file")
@@ -237,12 +237,18 @@ debugger_render_debug_objects_list :: proc(
 		cstring,
 		objects.ObjectID,
 	},
+	highlighted_debug_object: union {
+		objects.Cube,
+	},
 ) {
+	context.allocator = context.temp_allocator
+
 	item_selected := false
 	highlighted_item_idx := -1
 	selected_item_idx := -1
-
-	if im.BeginListBox("Debug object") {
+	// Full width.
+	listbox_size := im.Vec2{im.GetWindowSize().x, 5 * im.GetTextLineHeightWithSpacing()}
+	if im.BeginListBox(strings.clone_to_cstring("Debug Text"), listbox_size) {
 		for debug_object, item_idx in debug_objects_display {
 			is_selected := highlighted_item_idx == item_idx
 
@@ -260,5 +266,29 @@ debugger_render_debug_objects_list :: proc(
 
 		im.EndListBox()
 	}
+	im.TextWrapped(strings.clone_to_cstring("Object: "))
+	im.BulletText(
+		strings.clone_to_cstring(
+			fmt.tprintf("ID: {}", objects.get_object_id(highlighted_debug_object)),
+		),
+	)
+	im.BulletText(
+		strings.clone_to_cstring(
+			fmt.tprintf("Center: {}", objects.get_object_scale(highlighted_debug_object)),
+		),
+	)
+	im.BulletText(
+		strings.clone_to_cstring(
+			fmt.tprintf("Scale: {}", objects.get_object_scale(highlighted_debug_object)),
+		),
+	)
+	im.BulletText(
+		strings.clone_to_cstring(
+			fmt.tprintf(
+				"Orientation: {}",
+				objects.get_object_orientation(highlighted_debug_object),
+			),
+		),
+	)
 }
 
