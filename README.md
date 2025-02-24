@@ -4,6 +4,8 @@ A [manim](https://www.manim.community/) inspired 3D renderer that supports coord
 ## Why?
 To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and coordinate animation techniques (like those employed by [manim](https://www.manim.community/)) more deeply.
 
+This project may be rewritten in Vulkan in the future if deemed necesssary.
+
 ## Dependencies
 - [glfw](https://www.glfw.org/)
 - [OpenGL 4.1](https://www.opengl.org/)
