@@ -35,6 +35,7 @@ mamino_init_debugger :: proc(debugger: ^Debugger, objects: []union {
 	debugger.camera_position = render.camera_position_cartesian
 }
 
+@(private = "file")
 mamino_deinit_debugger :: proc(debugger: ^Debugger, _: []union {
 		objects.Cube,
 	}) {

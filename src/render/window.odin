@@ -35,6 +35,7 @@ mamino_init :: proc() {
 	}
 }
 
+@(private = "file")
 mamino_deinit :: proc() {
 	glfw.Terminate()
 }
@@ -60,6 +61,7 @@ mamino_init_imgui :: proc(window: glfw.WindowHandle) -> (im_context: ^im.Context
 	return
 }
 
+@(private = "file")
 mamino_deinit_imgui :: proc(im_context: ^im.Context) {
 	imgl.Shutdown()
 	imfw.Shutdown()
@@ -91,6 +93,7 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 }
 
 // TODO: Find out why doesn't need to free the window.
+@(private = "file")
 mamino_destroy_window :: proc(window: glfw.WindowHandle) {
 	// free(window)
 }
