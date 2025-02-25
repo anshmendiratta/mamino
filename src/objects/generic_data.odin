@@ -23,7 +23,7 @@ Orientation :: struct {
 	angle: f32,
 }
 
-ObjectID :: distinct uint
+ObjectID :: distinct int
 ObjectInfo :: struct {
 	type: string,
 	id:   ObjectID,
