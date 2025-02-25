@@ -9,12 +9,14 @@ Cube :: struct {
 	center:      glm.vec3,
 	scale:       Scale,
 	orientation: Orientation,
+	texture_id:  u32,
 }
 
 get_cube_vertices :: proc(cube: Cube) -> (vertices: []Vertex) {
 	vertices = make([]Vertex, len(cube_vertices), context.temp_allocator)
 	copy(vertices, cube_vertices)
 	for &vertex in vertices {
+		// Positions.
 		vertex.position.x *= cube.scale.x
 		vertex.position.y *= cube.scale.y
 		vertex.position.z *= cube.scale.z
@@ -59,12 +61,12 @@ get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []Vertex) {
 	z_normal_color.a = 0.6
 
 	normals = {
-		{cube.center, x_normal_color},
-		{rotated_x_normal + cube.center, x_normal_color},
-		{cube.center, y_normal_color},
-		{rotated_y_normal + cube.center, y_normal_color},
-		{cube.center, z_normal_color},
-		{rotated_z_normal + cube.center, z_normal_color},
+		{cube.center, x_normal_color, {0., 0.}},
+		{rotated_x_normal + cube.center, x_normal_color, {0., 0.}},
+		{cube.center, y_normal_color, {0., 0.}},
+		{rotated_y_normal + cube.center, y_normal_color, {0., 0.}},
+		{cube.center, z_normal_color, {0., 0.}},
+		{rotated_z_normal + cube.center, z_normal_color, {0., 0.}},
 	}
 
 	return

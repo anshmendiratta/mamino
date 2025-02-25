@@ -3,10 +3,16 @@ package objects
 import glm "core:math/linalg/glsl"
 import "core:slice"
 
+import gl "vendor:opengl"
+
+textures: [dynamic]Texture = {}
+texture_ids: [dynamic]u32 = {}
+
 // Vertex used for drawing. Mapped directly from vertices of objects.
 Vertex :: struct {
-	position: glm.vec3,
-	color:    glm.vec4,
+	position:      glm.vec3,
+	color:         glm.vec4,
+	texture_coord: glm.vec2,
 }
 
 // `x`, `y`, `z` are scalars (1.0 = "standard" size).
@@ -23,6 +29,12 @@ Orientation :: struct {
 	angle: f32,
 }
 
+Texture :: struct {
+	texture:       rawptr,
+	// i32 instead of u32 for compat with OpenGL requirements.
+	width, height: i32,
+}
+
 ObjectID :: distinct uint
 ObjectInfo :: struct {
 	type: string,
@@ -37,6 +49,12 @@ color_vertices :: proc(vertices: ^[]Vertex, color: glm.vec4 = {1., 1., 1., 1.}) 
 	for &vertex in vertices {
 		vertex.color = color
 	}
+}
+
+assign_texture_coords :: proc(vertices: ^[]Vertex, texture_id: u32) {
+	// for &vertex, idx in vertices {
+	// 	vertex.texture_coord = textures[texture_id].
+	// }
 }
 
 get_object_id :: proc(object: union {

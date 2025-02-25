@@ -108,6 +108,7 @@ bind_data :: proc(vao: u32, vbo: u32, ebo: u32, data: []objects.Vertex, indices:
 	)
 	gl.EnableVertexAttribArray(0)
 	gl.EnableVertexAttribArray(1)
+	gl.EnableVertexAttribArray(2)
 	gl.VertexAttribPointer(
 		0,
 		3,
@@ -123,6 +124,14 @@ bind_data :: proc(vao: u32, vbo: u32, ebo: u32, data: []objects.Vertex, indices:
 		false,
 		size_of(objects.Vertex),
 		offset_of(objects.Vertex, color),
+	)
+	gl.VertexAttribPointer(
+		1,
+		2,
+		gl.FLOAT,
+		false,
+		size_of(objects.Vertex),
+		offset_of(objects.Vertex, texture_coord),
 	)
 	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
 	gl.BufferData(
