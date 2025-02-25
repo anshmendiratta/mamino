@@ -35,7 +35,7 @@ Texture :: struct {
 	width, height: i32,
 }
 
-ObjectID :: distinct uint
+ObjectID :: distinct int
 ObjectInfo :: struct {
 	type: string,
 	id:   ObjectID,

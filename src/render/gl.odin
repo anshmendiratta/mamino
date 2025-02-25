@@ -31,6 +31,7 @@ mamino_init_gl :: proc() -> (program_id: u32, uniforms: map[string]gl.Uniform_In
 	return
 }
 
+@(private = "file")
 mamino_deinit_gl :: proc(program_id: u32, uniforms: map[string]gl.Uniform_Info) {
 	gl.DeleteProgram(program_id)
 	delete(uniforms)

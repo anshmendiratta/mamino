@@ -6,7 +6,7 @@ import gl "vendor:OpenGL"
 
 import "../objects"
 
-highlighted_debug_object_id: objects.ObjectID
+highlighted_debug_object_id: objects.ObjectID = -1
 render_normals: bool = false
 render_faces: bool = false
 render_axes: bool = true
