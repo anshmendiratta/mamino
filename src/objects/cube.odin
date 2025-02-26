@@ -3,6 +3,8 @@ package objects
 import glm "core:math/linalg/glsl"
 import "core:mem"
 
+import "../objects"
+
 Cube :: struct {
 	// Geometric center.
 	id:          ObjectID,
@@ -65,12 +67,12 @@ get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []Vertex) {
 	z_normal_color.a = 0.6
 
 	normals = {
-		{cube.center, x_normal_color, nil},
-		{rotated_x_normal + cube.center, x_normal_color, nil},
-		{cube.center, y_normal_color, nil},
-		{rotated_y_normal + cube.center, y_normal_color, nil},
-		{cube.center, z_normal_color, nil},
-		{rotated_z_normal + cube.center, z_normal_color, nil},
+		{cube.center, x_normal_color, objects.NULL_TEX_COORD},
+		{rotated_x_normal + cube.center, x_normal_color, objects.NULL_TEX_COORD},
+		{cube.center, y_normal_color, objects.NULL_TEX_COORD},
+		{rotated_y_normal + cube.center, y_normal_color, objects.NULL_TEX_COORD},
+		{cube.center, z_normal_color, objects.NULL_TEX_COORD},
+		{rotated_z_normal + cube.center, z_normal_color, objects.NULL_TEX_COORD},
 	}
 
 	return

@@ -130,7 +130,7 @@ bind_data :: proc(vao: u32, vbo: u32, ebo: u32, data: []objects.Vertex, indices:
 		2,
 		2,
 		gl.FLOAT,
-		false,
+		true,
 		size_of(objects.Vertex),
 		offset_of(objects.Vertex, texture_coord),
 	)
@@ -141,22 +141,12 @@ bind_data :: proc(vao: u32, vbo: u32, ebo: u32, data: []objects.Vertex, indices:
 		raw_data(indices),
 		gl.STATIC_DRAW,
 	)
-	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
-	gl.BufferData(
-		gl.ELEMENT_ARRAY_BUFFER,
-		len(indices) * size_of(u16),
-		raw_data(indices),
-		gl.STATIC_DRAW,
-	)
-}
-
-bind_text_data :: proc(vao: u32, vbo: u32, data: any) {
-	gl.BindVertexArray(vao)
-	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
-	gl.BufferData(gl.ARRAY_BUFFER, 6 * 4 * size_of(f32), nil, gl.DYNAMIC_DRAW)
-	gl.EnableVertexAttribArray(0)
-	gl.VertexAttribPointer(0, 4, gl.FLOAT, gl.FALSE, 4 * size_of(f32), 0)
-	gl.BindBuffer(gl.ARRAY_BUFFER, 0)
-	gl.BindVertexArray(0)
+	// gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
+	// gl.BufferData(
+	// 	gl.ELEMENT_ARRAY_BUFFER,
+	// 	len(indices) * size_of(u16),
+	// 	raw_data(indices),
+	// 	gl.STATIC_DRAW,
+	// )
 }
 

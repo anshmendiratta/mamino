@@ -3,7 +3,7 @@ package objects
 import glm "core:math/linalg/glsl"
 import "core:slice"
 
-import gl "vendor:opengl"
+import gl "vendor:OpenGL"
 
 TextureID :: distinct u32
 textures: map[TextureID]Texture
@@ -12,7 +12,7 @@ textures: map[TextureID]Texture
 Vertex :: struct {
 	position:      glm.vec3,
 	color:         glm.vec4,
-	texture_coord: Maybe(glm.vec2),
+	texture_coord: glm.vec2,
 }
 
 // `x`, `y`, `z` are scalars (1.0 = "standard" size).

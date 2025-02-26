@@ -4,8 +4,12 @@ import glm "core:math/linalg/glsl"
 
 @(private)
 GRID_EXTENT_HALF :: 20.
+@(private)
 NUM_SUBGRIDS :: GRID_EXTENT_HALF
+@(private)
 SUBGRID_LENGTH_HALF :: NUM_SUBGRIDS
+
+NULL_TEX_COORD :: glm.vec2{-1., -1.}
 
 // Colors.
 x_axis_color: glm.vec4 = rgb_hex_to_color(0xeb_3a_34, 0.7)
@@ -18,25 +22,25 @@ cube_color: glm.vec4 = rgb_hex_to_color(0xD3_47_3D)
 
 // Uses indexed drawing.
 cube_vertices: []Vertex = {
-	{{1.0, 1.0, 1.0}, cube_color, nil}, // right    top  back
-	{{-1.0, 1.0, 1.0}, cube_color, nil}, //  left    top  back
-	{{1.0, -1.0, 1.0}, cube_color, nil}, // right bottom  back
-	{{1.0, 1.0, -1.0}, cube_color, nil}, // right    top front
-	{{-1.0, -1.0, 1.0}, cube_color, nil}, //  left bottom  back
-	{{1.0, -1.0, -1.0}, cube_color, nil}, // right bottom front
-	{{-1.0, 1.0, -1.0}, cube_color, nil}, //  left    top front
-	{{-1.0, -1.0, -1.0}, cube_color, nil}, //  left bottom front
+	{{1.0, 1.0, 1.0}, cube_color, NULL_TEX_COORD}, // right    top  back
+	{{-1.0, 1.0, 1.0}, cube_color, NULL_TEX_COORD}, //  left    top  back
+	{{1.0, -1.0, 1.0}, cube_color, NULL_TEX_COORD}, // right bottom  back
+	{{1.0, 1.0, -1.0}, cube_color, NULL_TEX_COORD}, // right    top front
+	{{-1.0, -1.0, 1.0}, cube_color, NULL_TEX_COORD}, //  left bottom  back
+	{{1.0, -1.0, -1.0}, cube_color, NULL_TEX_COORD}, // right bottom front
+	{{-1.0, 1.0, -1.0}, cube_color, NULL_TEX_COORD}, //  left    top front
+	{{-1.0, -1.0, -1.0}, cube_color, NULL_TEX_COORD}, //  left bottom front
 }
 coordinate_axes_vertices: []Vertex = {
-	{{-GRID_EXTENT_HALF, 0., 0.}, transparent, nil},
-	{{0., 0., 0.}, x_axis_color, nil},
-	{{GRID_EXTENT_HALF, 0., 0.}, transparent, nil}, // x-axis
-	{{0., -GRID_EXTENT_HALF, 0.}, transparent, nil},
-	{{0., 0., 0.}, y_axis_color, nil},
-	{{0., GRID_EXTENT_HALF, 0.}, transparent, nil}, // y-axis
-	{{0., 0., -GRID_EXTENT_HALF}, transparent, nil},
-	{{0., 0., 0.}, z_axis_color, nil},
-	{{0., 0., GRID_EXTENT_HALF}, transparent, nil}, // z-axis
+	{{-GRID_EXTENT_HALF, 0., 0.}, transparent, NULL_TEX_COORD},
+	{{0., 0., 0.}, x_axis_color, NULL_TEX_COORD},
+	{{GRID_EXTENT_HALF, 0., 0.}, transparent, NULL_TEX_COORD}, // x-axis
+	{{0., -GRID_EXTENT_HALF, 0.}, transparent, NULL_TEX_COORD},
+	{{0., 0., 0.}, y_axis_color, NULL_TEX_COORD},
+	{{0., GRID_EXTENT_HALF, 0.}, transparent, NULL_TEX_COORD}, // y-axis
+	{{0., 0., -GRID_EXTENT_HALF}, transparent, NULL_TEX_COORD},
+	{{0., 0., 0.}, z_axis_color, NULL_TEX_COORD},
+	{{0., 0., GRID_EXTENT_HALF}, transparent, NULL_TEX_COORD}, // z-axis
 }
 subgrid_axes_vertices: []Vertex = get_subgrid_axes_vertices()[:]
 
@@ -116,14 +120,14 @@ get_subgrid_axes_vertices :: proc() -> (subgrid_axes_vertices: [dynamic]Vertex) 
 			0.2 / glm.exp_f32(f32(2 * x_idx / NUM_SUBGRIDS)),
 		)
 		pos_x_line: [3]Vertex = {
-			{{f32(x_idx), 0., -SUBGRID_LENGTH_HALF}, transparent, nil},
-			{{f32(x_idx), 0., 0.}, subgrid_axis_middle_color, nil},
-			{{f32(x_idx), 0., +SUBGRID_LENGTH_HALF}, transparent, nil},
+			{{f32(x_idx), 0., -SUBGRID_LENGTH_HALF}, transparent, NULL_TEX_COORD},
+			{{f32(x_idx), 0., 0.}, subgrid_axis_middle_color, NULL_TEX_COORD},
+			{{f32(x_idx), 0., +SUBGRID_LENGTH_HALF}, transparent, NULL_TEX_COORD},
 		}
 		neg_x_line: [3]Vertex = {
-			{{-f32(x_idx), 0., -SUBGRID_LENGTH_HALF}, transparent, nil},
-			{{-f32(x_idx), 0., 0.}, subgrid_axis_middle_color, nil},
-			{{-f32(x_idx), 0., +SUBGRID_LENGTH_HALF}, transparent, nil},
+			{{-f32(x_idx), 0., -SUBGRID_LENGTH_HALF}, transparent, NULL_TEX_COORD},
+			{{-f32(x_idx), 0., 0.}, subgrid_axis_middle_color, NULL_TEX_COORD},
+			{{-f32(x_idx), 0., +SUBGRID_LENGTH_HALF}, transparent, NULL_TEX_COORD},
 		}
 		append(&subgrid_axes_vertices, pos_x_line[0])
 		append(&subgrid_axes_vertices, pos_x_line[1])
@@ -138,14 +142,14 @@ get_subgrid_axes_vertices :: proc() -> (subgrid_axes_vertices: [dynamic]Vertex) 
 			0.2 / glm.exp_f32(f32(2 * z_idx / NUM_SUBGRIDS)),
 		)
 		pos_z_line: [3]Vertex = {
-			{{+SUBGRID_LENGTH_HALF, 0., f32(z_idx)}, transparent, nil},
-			{{0., 0., f32(z_idx)}, subgrid_axis_middle_color, nil},
-			{{-SUBGRID_LENGTH_HALF, 0., f32(z_idx)}, transparent, nil},
+			{{+SUBGRID_LENGTH_HALF, 0., f32(z_idx)}, transparent, NULL_TEX_COORD},
+			{{0., 0., f32(z_idx)}, subgrid_axis_middle_color, NULL_TEX_COORD},
+			{{-SUBGRID_LENGTH_HALF, 0., f32(z_idx)}, transparent, NULL_TEX_COORD},
 		}
 		neg_z_line: [3]Vertex = {
-			{{+SUBGRID_LENGTH_HALF, 0., -f32(z_idx)}, transparent, nil},
-			{{0., 0., -f32(z_idx)}, subgrid_axis_middle_color, nil},
-			{{-SUBGRID_LENGTH_HALF, 0., -f32(z_idx)}, transparent, nil},
+			{{+SUBGRID_LENGTH_HALF, 0., -f32(z_idx)}, transparent, NULL_TEX_COORD},
+			{{0., 0., -f32(z_idx)}, subgrid_axis_middle_color, NULL_TEX_COORD},
+			{{-SUBGRID_LENGTH_HALF, 0., -f32(z_idx)}, transparent, NULL_TEX_COORD},
 		}
 		append(&subgrid_axes_vertices, pos_z_line[0])
 		append(&subgrid_axes_vertices, pos_z_line[1])
