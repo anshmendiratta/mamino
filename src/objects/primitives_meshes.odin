@@ -18,25 +18,25 @@ cube_color: glm.vec4 = rgb_hex_to_color(0xD3_47_3D)
 
 // Uses indexed drawing.
 cube_vertices: []Vertex = {
-	{{1.0, 1.0, 1.0}, cube_color, {0., 0.}}, // right    top  back
-	{{-1.0, 1.0, 1.0}, cube_color, {0., 0.}}, //  left    top  back
-	{{1.0, -1.0, 1.0}, cube_color, {0., 0.}}, // right bottom  back
-	{{1.0, 1.0, -1.0}, cube_color, {0., 0.}}, // right    top front
-	{{-1.0, -1.0, 1.0}, cube_color, {0., 0.}}, //  left bottom  back
-	{{1.0, -1.0, -1.0}, cube_color, {0., 0.}}, // right bottom front
-	{{-1.0, 1.0, -1.0}, cube_color, {0., 0.}}, //  left    top front
-	{{-1.0, -1.0, -1.0}, cube_color, {0., 0.}}, //  left bottom front
+	{{1.0, 1.0, 1.0}, cube_color, nil}, // right    top  back
+	{{-1.0, 1.0, 1.0}, cube_color, nil}, //  left    top  back
+	{{1.0, -1.0, 1.0}, cube_color, nil}, // right bottom  back
+	{{1.0, 1.0, -1.0}, cube_color, nil}, // right    top front
+	{{-1.0, -1.0, 1.0}, cube_color, nil}, //  left bottom  back
+	{{1.0, -1.0, -1.0}, cube_color, nil}, // right bottom front
+	{{-1.0, 1.0, -1.0}, cube_color, nil}, //  left    top front
+	{{-1.0, -1.0, -1.0}, cube_color, nil}, //  left bottom front
 }
 coordinate_axes_vertices: []Vertex = {
-	{{-GRID_EXTENT_HALF, 0., 0.}, transparent, {0., 0.}},
-	{{0., 0., 0.}, x_axis_color, {0., 0.}},
-	{{GRID_EXTENT_HALF, 0., 0.}, transparent, {0., 0.}}, // x-axis
-	{{0., -GRID_EXTENT_HALF, 0.}, transparent, {0., 0.}},
-	{{0., 0., 0.}, y_axis_color, {0., 0.}},
-	{{0., GRID_EXTENT_HALF, 0.}, transparent, {0., 0.}}, // y-axis
-	{{0., 0., -GRID_EXTENT_HALF}, transparent, {0., 0.}},
-	{{0., 0., 0.}, z_axis_color, {0., 0.}},
-	{{0., 0., GRID_EXTENT_HALF}, transparent, {0., 0.}}, // z-axis
+	{{-GRID_EXTENT_HALF, 0., 0.}, transparent, nil},
+	{{0., 0., 0.}, x_axis_color, nil},
+	{{GRID_EXTENT_HALF, 0., 0.}, transparent, nil}, // x-axis
+	{{0., -GRID_EXTENT_HALF, 0.}, transparent, nil},
+	{{0., 0., 0.}, y_axis_color, nil},
+	{{0., GRID_EXTENT_HALF, 0.}, transparent, nil}, // y-axis
+	{{0., 0., -GRID_EXTENT_HALF}, transparent, nil},
+	{{0., 0., 0.}, z_axis_color, nil},
+	{{0., 0., GRID_EXTENT_HALF}, transparent, nil}, // z-axis
 }
 subgrid_axes_vertices: []Vertex = get_subgrid_axes_vertices()[:]
 
@@ -116,14 +116,14 @@ get_subgrid_axes_vertices :: proc() -> (subgrid_axes_vertices: [dynamic]Vertex) 
 			0.2 / glm.exp_f32(f32(2 * x_idx / NUM_SUBGRIDS)),
 		)
 		pos_x_line: [3]Vertex = {
-			{{f32(x_idx), 0., -SUBGRID_LENGTH_HALF}, transparent, {0., 0.}},
-			{{f32(x_idx), 0., 0.}, subgrid_axis_middle_color, {0., 0.}},
-			{{f32(x_idx), 0., +SUBGRID_LENGTH_HALF}, transparent, {0., 0.}},
+			{{f32(x_idx), 0., -SUBGRID_LENGTH_HALF}, transparent, nil},
+			{{f32(x_idx), 0., 0.}, subgrid_axis_middle_color, nil},
+			{{f32(x_idx), 0., +SUBGRID_LENGTH_HALF}, transparent, nil},
 		}
 		neg_x_line: [3]Vertex = {
-			{{-f32(x_idx), 0., -SUBGRID_LENGTH_HALF}, transparent, {0., 0.}},
-			{{-f32(x_idx), 0., 0.}, subgrid_axis_middle_color, {0., 0.}},
-			{{-f32(x_idx), 0., +SUBGRID_LENGTH_HALF}, transparent, {0., 0.}},
+			{{-f32(x_idx), 0., -SUBGRID_LENGTH_HALF}, transparent, nil},
+			{{-f32(x_idx), 0., 0.}, subgrid_axis_middle_color, nil},
+			{{-f32(x_idx), 0., +SUBGRID_LENGTH_HALF}, transparent, nil},
 		}
 		append(&subgrid_axes_vertices, pos_x_line[0])
 		append(&subgrid_axes_vertices, pos_x_line[1])
@@ -138,14 +138,14 @@ get_subgrid_axes_vertices :: proc() -> (subgrid_axes_vertices: [dynamic]Vertex) 
 			0.2 / glm.exp_f32(f32(2 * z_idx / NUM_SUBGRIDS)),
 		)
 		pos_z_line: [3]Vertex = {
-			{{+SUBGRID_LENGTH_HALF, 0., f32(z_idx)}, transparent, {0., 0.}},
-			{{0., 0., f32(z_idx)}, subgrid_axis_middle_color, {0., 0.}},
-			{{-SUBGRID_LENGTH_HALF, 0., f32(z_idx)}, transparent, {0., 0.}},
+			{{+SUBGRID_LENGTH_HALF, 0., f32(z_idx)}, transparent, nil},
+			{{0., 0., f32(z_idx)}, subgrid_axis_middle_color, nil},
+			{{-SUBGRID_LENGTH_HALF, 0., f32(z_idx)}, transparent, nil},
 		}
 		neg_z_line: [3]Vertex = {
-			{{+SUBGRID_LENGTH_HALF, 0., -f32(z_idx)}, transparent, {0., 0.}},
-			{{0., 0., -f32(z_idx)}, subgrid_axis_middle_color, {0., 0.}},
-			{{-SUBGRID_LENGTH_HALF, 0., -f32(z_idx)}, transparent, {0., 0.}},
+			{{+SUBGRID_LENGTH_HALF, 0., -f32(z_idx)}, transparent, nil},
+			{{0., 0., -f32(z_idx)}, subgrid_axis_middle_color, nil},
+			{{-SUBGRID_LENGTH_HALF, 0., -f32(z_idx)}, transparent, nil},
 		}
 		append(&subgrid_axes_vertices, pos_z_line[0])
 		append(&subgrid_axes_vertices, pos_z_line[1])

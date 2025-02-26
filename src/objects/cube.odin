@@ -9,10 +9,10 @@ Cube :: struct {
 	center:      glm.vec3,
 	scale:       Scale,
 	orientation: Orientation,
-	texture_id:  u32,
+	texture_id:  Maybe(TextureID),
 }
 
-get_cube_vertices :: proc(cube: Cube) -> (vertices: []Vertex) {
+get_cube_vertices :: proc(cube: Cube, texture_id: Maybe(TextureID)) -> (vertices: []Vertex) {
 	vertices = make([]Vertex, len(cube_vertices), context.temp_allocator)
 	copy(vertices, cube_vertices)
 	for &vertex in vertices {
@@ -31,6 +31,10 @@ get_cube_vertices :: proc(cube: Cube) -> (vertices: []Vertex) {
 		vertex.position = (rotation_matrix * vertex_pos_as_vec4).xyz
 		vertex.position += cube.center
 	}
+	if texture_id != nil {
+		assign_texture_coords(&vertices, texture_id.?)
+	}
+
 	return
 }
 
@@ -61,12 +65,12 @@ get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []Vertex) {
 	z_normal_color.a = 0.6
 
 	normals = {
-		{cube.center, x_normal_color, {0., 0.}},
-		{rotated_x_normal + cube.center, x_normal_color, {0., 0.}},
-		{cube.center, y_normal_color, {0., 0.}},
-		{rotated_y_normal + cube.center, y_normal_color, {0., 0.}},
-		{cube.center, z_normal_color, {0., 0.}},
-		{rotated_z_normal + cube.center, z_normal_color, {0., 0.}},
+		{cube.center, x_normal_color, nil},
+		{rotated_x_normal + cube.center, x_normal_color, nil},
+		{cube.center, y_normal_color, nil},
+		{rotated_y_normal + cube.center, y_normal_color, nil},
+		{cube.center, z_normal_color, nil},
+		{rotated_z_normal + cube.center, z_normal_color, nil},
 	}
 
 	return

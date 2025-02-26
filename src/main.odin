@@ -87,16 +87,16 @@ main :: proc() {
 		texture_data,
 	)
 	gl.GenerateMipmap(gl.TEXTURE_2D)
+	objects.textures[objects.TextureID(texture_id)] = objects.Texture {
+		texture = texture_data,
+		width   = width,
+		height  = height,
+	}
 
-	append(
-		&objects.textures,
-		objects.Texture{texture = texture_data, width = width, height = height},
-	)
-	append(&objects.texture_ids, texture_id)
 	render_objects: []union {
 		objects.Cube,
 	} =
-		{objects.Cube{id = 0, center = {1., 1., 1.}, scale = {3., 1., 1.}, orientation = {glm.vec3{0., 1., 0.}, glm.radians(f32(45.))}, texture_id = objects.texture_ids[0]}, objects.Cube{id = 1, center = {-1., 1., -1.}, scale = {1., 2., 1.}, orientation = {glm.vec3{1., 1., 1.}, glm.radians(f32(35.))}, texture_id = objects.texture_ids[0]}, objects.Cube{id = 2, center = {0., 3., 2.}, scale = {0.5, 0.5, 0.5}, orientation = {glm.vec3{1., 0., 0.}, glm.radians(f32(60.))}, texture_id = objects.texture_ids[0]}}
+		{objects.Cube{id = 0, center = {1., 1., 1.}, scale = {3., 1., 1.}, orientation = {glm.vec3{0., 1., 0.}, glm.radians(f32(45.))}, texture_id = objects.TextureID(texture_id)}, objects.Cube{id = 1, center = {-1., 1., -1.}, scale = {1., 2., 1.}, orientation = {glm.vec3{1., 1., 1.}, glm.radians(f32(35.))}, texture_id = nil}, objects.Cube{id = 2, center = {0., 3., 2.}, scale = {0.5, 0.5, 0.5}, orientation = {glm.vec3{1., 0., 0.}, glm.radians(f32(60.))}, texture_id = nil}}
 	render_objects_info: []objects.ObjectInfo = objects.get_objects_info(render_objects)
 
 	// Init debugger.

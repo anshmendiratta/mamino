@@ -64,7 +64,7 @@ See [goals](#goals) for a more detailed list on current features.
 - [ ] Smooth camera movements.
 - [ ] Allow a sequence of animations/movements to be programmed and ran.
 - [ ] Add concurrency.
-- [ ] Increase render and video resolution.
 - [ ] Think about and clean-up public API.
 - [ ] Add example mains.
 - [ ] Reduce draw calls.
+- [ ] Have aspect ratio of drawing stay constant across window resizes.

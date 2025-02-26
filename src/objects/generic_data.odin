@@ -5,14 +5,14 @@ import "core:slice"
 
 import gl "vendor:opengl"
 
-textures: [dynamic]Texture = {}
-texture_ids: [dynamic]u32 = {}
+TextureID :: distinct u32
+textures: map[TextureID]Texture
 
 // Vertex used for drawing. Mapped directly from vertices of objects.
 Vertex :: struct {
 	position:      glm.vec3,
 	color:         glm.vec4,
-	texture_coord: glm.vec2,
+	texture_coord: Maybe(glm.vec2),
 }
 
 // `x`, `y`, `z` are scalars (1.0 = "standard" size).
@@ -51,10 +51,23 @@ color_vertices :: proc(vertices: ^[]Vertex, color: glm.vec4 = {1., 1., 1., 1.}) 
 	}
 }
 
-assign_texture_coords :: proc(vertices: ^[]Vertex, texture_id: u32) {
-	// for &vertex, idx in vertices {
-	// 	vertex.texture_coord = textures[texture_id].
-	// }
+assign_texture_coords :: proc(vertices: ^[]Vertex, texture_id: TextureID) {
+	for &vertex, idx in vertices {
+		width := textures[texture_id].width
+		height := textures[texture_id].height
+		switch (idx % 3) {
+		case 0:
+			// Bottom left.
+			vertex.texture_coord = glm.vec2{0, 0}
+		case 1:
+			// Top Left.
+			vertex.texture_coord = glm.vec2{1, 1}
+		case 2:
+			// Top Right.
+			vertex.texture_coord = glm.vec2{0.5, 0.5}
+		}
+	}
+	gl.BindTexture(gl.TEXTURE_2D, u32(texture_id))
 }
 
 get_object_id :: proc(object: union {

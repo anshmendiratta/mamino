@@ -127,7 +127,7 @@ bind_data :: proc(vao: u32, vbo: u32, ebo: u32, data: []objects.Vertex, indices:
 		offset_of(objects.Vertex, color),
 	)
 	gl.VertexAttribPointer(
-		1,
+		2,
 		2,
 		gl.FLOAT,
 		false,

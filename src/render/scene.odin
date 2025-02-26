@@ -8,7 +8,7 @@ import "../objects"
 
 highlighted_debug_object_id: objects.ObjectID = -1
 render_normals: bool = false
-render_faces: bool = false
+render_faces: bool = true
 render_axes: bool = true
 render_grid: bool = true
 
@@ -20,15 +20,23 @@ render_objects :: proc(render_objects: ^[]union {
 	for generic_object in render_objects {
 		#partial switch object in generic_object {
 		case objects.Cube:
-			// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
-			vertices := objects.get_vertices(object)
-			// Cube.
+			vertices: []objects.Vertex
+			if object.texture_id != nil {
+				vertices = objects.get_vertices(object, object.texture_id.?)
+			}
+			vertices = objects.get_vertices(object, nil)
+
+
 			if object.id == highlighted_debug_object_id {
+				// Highlighted Cube.
 				objects.color_vertices(&vertices, HIGHLIGHTED_OBJECT_COLOR)
 			}
+			// Cube.
 			cube_vao, cube_vbo, cube_ebo := get_buffer_objects()
 			bind_data(cube_vao, cube_vbo, cube_ebo, vertices, objects.cube_indices)
 			draw_cube(vertices, i32(len(objects.cube_indices)))
+			// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
+
 			// Points.
 			point_vao, point_vbo, point_ebo := get_buffer_objects()
 			objects.color_vertices(&vertices, objects.point_color)
