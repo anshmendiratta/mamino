@@ -59,49 +59,55 @@ main :: proc() {
 		sequencing.mamino_frame_capture_init()
 	}
 
-	// Setup scene objects and textures.
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT)
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT)
-	tex_border_color: []f32 = {1., 1., 0., 1.}
-	gl.TexParameterfv(gl.TEXTURE_2D, gl.TEXTURE_BORDER_COLOR, raw_data(tex_border_color))
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
-
-	texture_id: u32
-	gl.GenTextures(1, &texture_id)
-	gl.BindTexture(gl.TEXTURE_2D, texture_id)
-
+	// Load image to use as texture.
 	width, height, channel_num: i32
 	texture_data := stbi.load("assets/wall.jpg", &width, &height, &channel_num, 0)
 	defer stbi.image_free(texture_data)
-	gl.TexImage2D(
-		gl.TEXTURE_2D,
-		0,
-		gl.RGB,
-		width,
-		height,
-		0,
-		gl.RGB,
-		gl.UNSIGNED_BYTE,
-		texture_data,
-	)
-	gl.GenerateMipmap(gl.TEXTURE_2D)
+	// Init texture.
+	texture_id: u32 = render.get_texture_id(texture_data, width, height)
+	// Add image as a OpenGL texture.
 	objects.textures[objects.TextureID(texture_id)] = objects.Texture {
-		texture = texture_data,
-		width   = width,
-		height  = height,
+		data   = texture_data,
+		width  = width,
+		height = height,
 	}
+	defer delete(objects.textures)
+	defer gl.DeleteTextures(1, &texture_id)
 
 	render_objects: []union {
 		objects.Cube,
-	} =
-		{objects.Cube{id = 0, center = {1., 1., 1.}, scale = {3., 1., 1.}, orientation = {glm.vec3{0., 1., 0.}, glm.radians(f32(45.))}, texture_id = objects.TextureID(texture_id)}, objects.Cube{id = 1, center = {-1., 1., -1.}, scale = {1., 2., 1.}, orientation = {glm.vec3{1., 1., 1.}, glm.radians(f32(35.))}, texture_id = nil}, objects.Cube{id = 2, center = {0., 3., 2.}, scale = {0.5, 0.5, 0.5}, orientation = {glm.vec3{1., 0., 0.}, glm.radians(f32(60.))}, texture_id = nil}}
-	render_objects_info: []objects.ObjectInfo = objects.get_objects_info(render_objects)
+	} = {
+		objects.Cube {
+			id = 0,
+			center = {1., 1., 1.},
+			scale = {3., 1., 1.},
+			orientation = {glm.vec3{0., 1., 0.}, glm.radians(f32(45.))},
+			texture_id = objects.TextureID(texture_id),
+		},
+		// 
+		objects.Cube {
+			id = 1,
+			center = {-1., 1., -1.},
+			scale = {1., 2., 1.},
+			orientation = {glm.vec3{1., 1., 1.}, glm.radians(f32(35.))},
+			texture_id = nil,
+		},
+		// 
+		objects.Cube {
+			id = 2,
+			center = {0., 3., 2.},
+			scale = {0.5, 0.5, 0.5},
+			orientation = {glm.vec3{1., 0., 0.}, glm.radians(f32(60.))},
+			texture_id = nil,
+		},
+	}
+	render_objects_info: []objects.DebugObjectInfo = objects.get_objects_info(render_objects)
 
 	// Init debugger.
 	debugger: ^Debugger = &{}
-	mamino_init_debugger(debugger, render_objects)
+	when ODIN_DEBUG {
+		mamino_init_debugger(debugger, render_objects)
+	}
 
 	for (!glfw.WindowShouldClose(window) && render.running) {
 		debugger_update(debugger)
@@ -136,6 +142,7 @@ main :: proc() {
 		glfw.SwapBuffers(window)
 		free_all(context.temp_allocator) // Frees most of the frames initializations.
 	}
+
 	glfw.DestroyWindow(window)
 
 	avg_framerate := debugger_calculate_avg_fps(debugger.frametimes)
@@ -144,11 +151,11 @@ main :: proc() {
 	fmt.println("Percent low:", low_framerate, "FPS")
 
 	video_options: sequencing.VideoOptions = {
-			resolution = {1920, 1080},
-			framerate  = 180,
-			encoding   = "libx264",
-			out_name   = "vid.h264",
-		}
+		resolution = {1920, 1080},
+		framerate  = 180,
+		encoding   = "libx264",
+		out_name   = "vid.h264",
+	}
 	if valid_vo := sequencing.validate_video_options(video_options); !valid_vo {
 		fmt.eprintln("Incorrect export video options.")
 		return

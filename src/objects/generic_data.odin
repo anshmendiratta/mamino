@@ -1,6 +1,7 @@
 package objects
 
 import glm "core:math/linalg/glsl"
+import "core:math/rand"
 import "core:slice"
 
 import gl "vendor:OpenGL"
@@ -30,13 +31,13 @@ Orientation :: struct {
 }
 
 Texture :: struct {
-	texture:       rawptr,
+	data:          rawptr,
 	// i32 instead of u32 for compat with OpenGL requirements.
 	width, height: i32,
 }
 
 ObjectID :: distinct int
-ObjectInfo :: struct {
+DebugObjectInfo :: struct {
 	type: string,
 	id:   ObjectID,
 }
@@ -53,21 +54,15 @@ color_vertices :: proc(vertices: ^[]Vertex, color: glm.vec4 = {1., 1., 1., 1.}) 
 
 assign_texture_coords :: proc(vertices: ^[]Vertex, texture_id: TextureID) {
 	for &vertex, idx in vertices {
-		width := textures[texture_id].width
-		height := textures[texture_id].height
 		switch (idx % 3) {
 		case 0:
-			// Bottom left.
-			vertex.texture_coord = glm.vec2{0, 0}
+			vertex.texture_coord = glm.vec2{0., 0.}
 		case 1:
-			// Top Left.
-			vertex.texture_coord = glm.vec2{1, 1}
+			vertex.texture_coord = glm.vec2{0., 1.}
 		case 2:
-			// Top Right.
-			vertex.texture_coord = glm.vec2{0.5, 0.5}
+			vertex.texture_coord = glm.vec2{1., 1.}
 		}
 	}
-	gl.BindTexture(gl.TEXTURE_2D, u32(texture_id))
 }
 
 get_object_id :: proc(object: union {
@@ -130,7 +125,7 @@ get_object_orientation :: proc(object: union {
 
 get_object_info :: proc(object: union {
 		Cube,
-	}) -> (object_info: ObjectInfo) {
+	}) -> (object_info: DebugObjectInfo) {
 	object_info.type = get_object_type_string(object)
 	object_info.id = ObjectID(get_object_id(object))
 
@@ -139,7 +134,7 @@ get_object_info :: proc(object: union {
 
 get_objects_info :: proc(objects: []union {
 		Cube,
-	}) -> (objects_info: []ObjectInfo) {
+	}) -> (objects_info: []DebugObjectInfo) {
 	objects_info = slice.mapper(objects, get_object_info)
 
 	return

@@ -185,7 +185,7 @@ composite_video :: proc(vo: VideoOptions, dir_name: string = "outputs") {
 
 	make_directory(dir_name)
 	os2.set_working_directory(fmt.aprintf("~/development/mamino/{}/", dir_name))
-	if os.is_file_path(vo.out_name) {
+	if os.is_file(vo.out_name) {
 		remove_ok := os.remove(vo.out_name)
 		if remove_ok != nil {
 			fmt.eprintln("Error: could not remove", vo.out_name)

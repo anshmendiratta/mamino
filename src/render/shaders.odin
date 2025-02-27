@@ -37,10 +37,11 @@ mamino_fragment_shader := `
 	uniform sampler2D tex_sampler;
 	
 	void main() {
-		if (t_coord == vec2(-1., -1.)) {
+		if (t_coord == vec2(-1, -1)) {
+			// Don't use texture data.
 			out_color = f_color;
 		} else {
-			out_color = texture(tex_sampler, t_coord);
+			out_color = texture(tex_sampler, t_coord.xy);
 		}
 	}
 `

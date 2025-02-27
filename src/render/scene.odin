@@ -1,5 +1,6 @@
 package render
 
+import "core:fmt"
 import glm "core:math/linalg/glsl"
 
 import gl "vendor:OpenGL"
@@ -17,36 +18,42 @@ HIGHLIGHTED_OBJECT_COLOR :: glm.vec4{0.15, 0.83, 1.0, 0.5}
 render_objects :: proc(render_objects: ^[]union {
 		objects.Cube,
 	}) {
+	context.allocator = context.temp_allocator
+
 	for generic_object in render_objects {
+		// vertices: []objects.Vertex
 		#partial switch object in generic_object {
 		case objects.Cube:
-			vertices: []objects.Vertex
+			vertices := objects.get_vertices(object)
+			defer delete(vertices)
+
+			// Assigns texture if needed.
 			if object.texture_id != nil {
-				vertices = objects.get_vertices(object, object.texture_id.?)
+				objects.assign_texture_coords(&vertices, object.texture_id.?)
 			}
-			vertices = objects.get_vertices(object, nil)
 
-
+			// Cube.
+			cube_vao, cube_vbo, cube_ebo := get_buffer_objects()
 			if object.id == highlighted_debug_object_id {
 				// Highlighted Cube.
 				objects.color_vertices(&vertices, HIGHLIGHTED_OBJECT_COLOR)
 			}
-			// Cube.
-			cube_vao, cube_vbo, cube_ebo := get_buffer_objects()
 			bind_data(cube_vao, cube_vbo, cube_ebo, vertices, objects.cube_indices)
 			draw_cube(vertices, i32(len(objects.cube_indices)))
-			// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
 
+			// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
 			// Points.
 			point_vao, point_vbo, point_ebo := get_buffer_objects()
 			objects.color_vertices(&vertices, objects.point_color)
 			bind_data(point_vao, point_vbo, point_ebo, vertices, objects.point_indices)
 			draw_points(vertices, objects.point_indices)
+
 			// Lines.
 			line_vao, line_vbo, line_ebo := get_buffer_objects()
 			objects.color_vertices(&vertices, objects.line_color)
 			bind_data(line_vao, line_vbo, line_ebo, vertices, objects.line_indices)
 			draw_lines(vertices, objects.line_indices)
+
 			// FIX(Ansh): Normal rendering doesn't want to happen on debug mode. Probably to do with setting the PolygonMode.
 			if ODIN_DEBUG && render_normals {
 				normal_vao, normal_vbo, normal_ebo := get_buffer_objects()

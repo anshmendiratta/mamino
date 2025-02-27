@@ -14,8 +14,8 @@ Cube :: struct {
 	texture_id:  Maybe(TextureID),
 }
 
-get_cube_vertices :: proc(cube: Cube, texture_id: Maybe(TextureID)) -> (vertices: []Vertex) {
-	vertices = make([]Vertex, len(cube_vertices), context.temp_allocator)
+get_cube_vertices :: proc(cube: Cube) -> (vertices: []Vertex) {
+	vertices = make([]Vertex, len(cube_vertices))
 	copy(vertices, cube_vertices)
 	for &vertex in vertices {
 		// Positions.
@@ -32,9 +32,6 @@ get_cube_vertices :: proc(cube: Cube, texture_id: Maybe(TextureID)) -> (vertices
 		}
 		vertex.position = (rotation_matrix * vertex_pos_as_vec4).xyz
 		vertex.position += cube.center
-	}
-	if texture_id != nil {
-		assign_texture_coords(&vertices, texture_id.?)
 	}
 
 	return
