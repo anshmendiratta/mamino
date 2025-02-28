@@ -12,10 +12,11 @@ SUBGRID_LENGTH_HALF :: NUM_SUBGRIDS
 NULL_TEX_COORD :: glm.vec2{-1., -1.}
 
 // Colors.
+transparent: glm.vec4 = glm.vec4{0., 0., 0., 0.}
+
 x_axis_color: glm.vec4 = rgb_hex_to_color(0xeb_3a_34, 0.7)
 y_axis_color: glm.vec4 = rgb_hex_to_color(0x46_eb_34, 0.7)
 z_axis_color: glm.vec4 = rgb_hex_to_color(0x34_65_eb, 0.7)
-transparent: glm.vec4 = glm.vec4{0., 0., 0., 0.}
 point_color: glm.vec4 = rgb_hex_to_color(0xFF_FF_FF)
 line_color: glm.vec4 = rgb_hex_to_color(0xFF_FF_FF)
 cube_color: glm.vec4 = rgb_hex_to_color(0xD3_47_3D)

@@ -61,7 +61,7 @@ main :: proc() {
 
 	// Load image to use as texture.
 	width, height, channel_num: i32
-	texture_data := stbi.load("assets/wall.jpg", &width, &height, &channel_num, 0)
+	texture_data := stbi.load("assets/abstract.jpg", &width, &height, &channel_num, 0)
 	defer stbi.image_free(texture_data)
 	// Init texture.
 	texture_id: u32 = render.get_texture_id(texture_data, width, height)

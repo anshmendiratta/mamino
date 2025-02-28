@@ -58,9 +58,9 @@ assign_texture_coords :: proc(vertices: ^[]Vertex, texture_id: TextureID) {
 		case 0:
 			vertex.texture_coord = glm.vec2{0., 0.}
 		case 1:
-			vertex.texture_coord = glm.vec2{0., 1.}
+			vertex.texture_coord = glm.vec2{auto_cast (idx % 2), auto_cast ((idx % 2) ~ 1)}
 		case 2:
-			vertex.texture_coord = glm.vec2{1., 1.}
+			vertex.texture_coord = glm.vec2{0., 1.}
 		}
 	}
 }
