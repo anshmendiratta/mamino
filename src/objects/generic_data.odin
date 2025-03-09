@@ -41,19 +41,23 @@ ObjectInfo :: struct {
 @(private)
 current_object_id: ObjectID = 0
 
-create_cube :: proc(center: glm.vec3 = {0., 0., 0.}, starting_scale: Scale = {1., 1., 1.}, starting_orientation: Orientation = {norm = {1., 0., 0.,}, angle = 0.}) -> Object {
-	key_frames := make([dynamic]Frame)
-	append(&key_frames, Frame { scale = starting_scale, orientation = starting_orientation })
-	cube := Cube {
-		id = current_object_id,
-		center = center,
-		key_frames = key_frames,
-		current_key_frame = 0,
+set_current_key_frame :: proc(object: ^Object, frame_index: uint) {
+	#partial switch &generic_object in object {
+		case Cube:
+			generic_object.current_key_frame = frame_index % len(generic_object.key_frames)
+		case:
+			return
 	}
+}
 
-	current_object_id += 1
-
-	return cube
+add_key_frame :: proc(object: ^Object, scale: Maybe(Scale) = nil, orientation: Maybe(Orientation) = nil) {
+	#partial switch &generic_object in object {
+		case Cube:
+			last_index := len(generic_object.key_frames) - 1
+			append(&generic_object.key_frames, Frame { scale = scale.? or_else generic_object.key_frames[last_index].scale, orientation = orientation.? or_else generic_object.key_frames[last_index].orientation })
+		case:
+			return
+	}
 }
 
 get_vertices :: proc {

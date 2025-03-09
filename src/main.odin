@@ -52,8 +52,12 @@ main :: proc() {
 	render.mamino_init()
 	window := render.mamino_create_window()
 
-	// render.mamino_init_imgui(window)
 	render.highlighted_debug_object_id = ~objects.ObjectID(0)
+
+	when MAMINO_DEBUGGER {
+		render.mamino_init_imgui(window)
+		render.highlighted_debug_object_id = 0
+	}
 	
 	program_id, uniforms := render.mamino_init_gl()
 	when MAMINO_EXPORT_VIDEO {
@@ -62,35 +66,49 @@ main :: proc() {
 
 	scene := render.create_scene()
 
-	cube1 := objects.create_cube(
-		center = {1., 1., 1.},
-		starting_scale = {3., 1., 1.},
-		starting_orientation = {
-			{0., 1., 0.},
-			glm.radians(f32(35.)),
+	cube := objects.create_cube()
+	render.add_object(&scene, &cube)
+	objects.add_key_frame(&cube, 
+		scale = objects.Scale {
+			1., 2., 1.,
 		},
 	)
-	render.add_object(&scene, &cube1)
-
-	cube2 := objects.create_cube(
-		center = {-1., 1., -1.}, 
-		starting_scale = {1., 2., 1.}, 
-		starting_orientation = {
-			{1., 1., 1.}, 
-			glm.radians(f32(35.)),
-		}
+	objects.add_key_frame(&cube, 
+		orientation = objects.Orientation {
+			norm = {1., 0., 0.,}, 
+			angle = glm.radians(f32(45.))
+		},
 	)
-	render.add_object(&scene, &cube2)
 
-	cube3 := objects.create_cube(
-		center = {0., 3., 2.}, 
-		starting_scale = {0.5, 0.5, 0.5}, 
-		starting_orientation = {
-			{1., 0., 0.}, 
-			glm.radians(f32(60.)),
-		}
-	)
-	render.add_object(&scene, &cube3)
+	// cube1 := objects.create_cube(
+	// 	center = {1., 1., 1.},
+	// 	starting_scale = {3., 1., 1.},
+	// 	starting_orientation = {
+	// 		{0., 1., 0.},
+	// 		glm.radians(f32(35.)),
+	// 	},
+	// )
+	// render.add_object(&scene, &cube1)
+
+	// cube2 := objects.create_cube(
+	// 	center = {-1., 1., -1.}, 
+	// 	starting_scale = {1., 2., 1.}, 
+	// 	starting_orientation = {
+	// 		{1., 1., 1.}, 
+	// 		glm.radians(f32(35.)),
+	// 	}
+	// )
+	// render.add_object(&scene, &cube2)
+
+	// cube3 := objects.create_cube(
+	// 	center = {0., 3., 2.}, 
+	// 	starting_scale = {0.5, 0.5, 0.5}, 
+	// 	starting_orientation = {
+	// 		{1., 0., 0.}, 
+	// 		glm.radians(f32(60.)),
+	// 	}
+	// )
+	// render.add_object(&scene, &cube3)
 
 	// Setup scene objects.
 	// render_objects :=
@@ -132,6 +150,9 @@ main :: proc() {
 	}
 
 	for (!glfw.WindowShouldClose(window) && render.running) {
+
+		// NOTE(Jaran): temporary "public" API to modify keyframes
+		objects.set_current_key_frame(&cube, render.current_key_frame)
 
 		when MAMINO_DEBUGGER {
 			debugger_update(debugger)

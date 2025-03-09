@@ -11,6 +11,21 @@ Cube :: struct {
 	current_key_frame: uint,
 }
 
+create_cube :: proc(center: glm.vec3 = {0., 0., 0.}, starting_scale: Scale = {1., 1., 1.}, starting_orientation: Orientation = {norm = {1., 0., 0.,}, angle = 0.}) -> Object {
+	key_frames := make([dynamic]Frame)
+	append(&key_frames, Frame { scale = starting_scale, orientation = starting_orientation })
+	cube := Cube {
+		id = current_object_id,
+		center = center,
+		key_frames = key_frames,
+		current_key_frame = 0,
+	}
+
+	current_object_id += 1
+
+	return cube
+}
+
 get_cube_vertices :: proc(cube: Cube) -> (vertices: []Vertex) {
 	vertices = make([]Vertex, len(cube_vertices), context.temp_allocator)
 	copy(vertices, cube_vertices)

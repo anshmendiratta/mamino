@@ -95,10 +95,16 @@ mamino_destroy_window :: proc(window: glfw.WindowHandle) {
 	// free(window)
 }
 
+current_key_frame: uint = 0
+
 key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
 	switch key {
 	case glfw.KEY_ESCAPE, glfw.KEY_Q:
 		running = false
+	case glfw.KEY_E:
+		if action == glfw.PRESS {
+			current_key_frame += 1
+		}
 	case glfw.KEY_W, glfw.KEY_UP:
 		camera_position_spherical.z = glm.clamp(
 			camera_position_spherical.z + rotation_rate,
