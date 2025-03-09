@@ -62,13 +62,67 @@ main :: proc() {
 
 	scene := render.create_scene()
 
-	cube1 := objects.create_cube()
-
+	cube1 := objects.create_cube(
+		center = {1., 1., 1.},
+		starting_scale = {3., 1., 1.},
+		starting_orientation = {
+			{0., 1., 0.},
+			glm.radians(f32(35.)),
+		},
+	)
 	render.add_object(&scene, &cube1)
 
+	cube2 := objects.create_cube(
+		center = {-1., 1., -1.}, 
+		starting_scale = {1., 2., 1.}, 
+		starting_orientation = {
+			{1., 1., 1.}, 
+			glm.radians(f32(35.)),
+		}
+	)
+	render.add_object(&scene, &cube2)
+
+	cube3 := objects.create_cube(
+		center = {0., 3., 2.}, 
+		starting_scale = {0.5, 0.5, 0.5}, 
+		starting_orientation = {
+			{1., 0., 0.}, 
+			glm.radians(f32(60.)),
+		}
+	)
+	render.add_object(&scene, &cube3)
+
 	// Setup scene objects.
-	// render_objects := scene.objects
-		// {objects.Cube{id = 0, center = {1., 1., 1.}, scale = {3., 1., 1.}, orientation = {glm.vec3{0., 1., 0.}, glm.radians(f32(45.))}}, objects.Cube{id = 1, center = {-1., 1., -1.}, scale = {1., 2., 1.}, orientation = {glm.vec3{1., 1., 1.}, glm.radians(f32(35.))}}, objects.Cube{id = 2, center = {0., 3., 2.}, scale = {0.5, 0.5, 0.5}, orientation = {glm.vec3{1., 0., 0.}, glm.radians(f32(60.))}}}
+	// render_objects :=
+	// {
+	// 	objects.Cube{
+	// 		id = 0, 
+	// 		center = {1., 1., 1.}, 
+	// 		scale = {3., 1., 1.}, 
+	// 		orientation = {
+	// 			glm.vec3{0., 1., 0.}, 
+	// 			glm.radians(f32(45.))
+	// 		}
+	// 	}, 
+	// 	objects.Cube{
+	// 		id = 1, 
+	// 		center = {-1., 1., -1.}, 
+	// 		scale = {1., 2., 1.}, 
+	// 		orientation = {
+	// 			glm.vec3{1., 1., 1.}, 
+	// 			glm.radians(f32(35.))
+	// 		}
+	// 	}, 
+	// 	objects.Cube{
+	// 		id = 2, 
+	// 		center = {0., 3., 2.}, 
+	// 		scale = {0.5, 0.5, 0.5}, 
+	// 		orientation = {
+	// 			glm.vec3{1., 0., 0.}, 
+	// 			glm.radians(f32(60.))
+	// 		}
+	// 	}
+	// }
 	render_objects_info: []objects.ObjectInfo = objects.get_objects_info(scene.objects)
 
 	// Init debugger.
