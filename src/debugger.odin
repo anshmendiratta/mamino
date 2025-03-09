@@ -92,9 +92,7 @@ debugger_get_most_recent_framerate :: proc(debugger: ^Debugger) -> f64 {
 	return 1. / debugger.frametimes[len(debugger.frametimes) - 1]
 }
 
-render_debugger :: proc(debugger: ^Debugger, render_objects: ^[]union {
-		objects.Cube,
-	}, render_objects_info: ^[]objects.ObjectInfo) {
+render_debugger :: proc(debugger: ^Debugger, render_objects: ^[]objects.Object, render_objects_info: ^[]objects.ObjectInfo) {
 	context.allocator = context.temp_allocator
 
 	imgl.NewFrame()
@@ -133,11 +131,9 @@ render_debugger :: proc(debugger: ^Debugger, render_objects: ^[]union {
 		debug_object_display_with_id = {debug_list_item, object_info.id}
 		append(&debug_objects_display, debug_object_display_with_id)
 	}
-	highlighted_debug_object: union {
-		objects.Cube,
-	}
-	for obj in render_objects {
-		if objects.get_object_info(obj).id == render.highlighted_debug_object_id {
+	highlighted_debug_object: objects.Object
+	for &obj in render_objects {
+		if objects.get_object_info(&obj).id == render.highlighted_debug_object_id {
 			highlighted_debug_object = obj
 			break
 		}
@@ -237,9 +233,7 @@ debugger_render_debug_objects_list :: proc(
 		cstring,
 		objects.ObjectID,
 	},
-	highlighted_debug_object: union {
-		objects.Cube,
-	},
+	highlighted_debug_object: objects.Object,
 ) {
 	context.allocator = context.temp_allocator
 
