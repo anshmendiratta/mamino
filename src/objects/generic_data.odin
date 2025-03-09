@@ -23,7 +23,7 @@ Orientation :: struct {
 	angle: f32,
 }
 
-Frame :: struct {
+KeyFrame :: struct {
 	scale: Scale,
 	orientation: Orientation,
 }
@@ -54,7 +54,7 @@ add_key_frame :: proc(object: ^Object, scale: Maybe(Scale) = nil, orientation: M
 	#partial switch &generic_object in object {
 		case Cube:
 			last_index := len(generic_object.key_frames) - 1
-			append(&generic_object.key_frames, Frame { scale = scale.? or_else generic_object.key_frames[last_index].scale, orientation = orientation.? or_else generic_object.key_frames[last_index].orientation })
+			append(&generic_object.key_frames, KeyFrame { scale = scale.? or_else generic_object.key_frames[last_index].scale, orientation = orientation.? or_else generic_object.key_frames[last_index].orientation })
 		case:
 			return
 	}
