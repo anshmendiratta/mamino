@@ -23,10 +23,37 @@ Orientation :: struct {
 	angle: f32,
 }
 
+Frame :: struct {
+	scale: Scale,
+	orientation: Orientation,
+}
+
+Object :: union {
+	Cube,
+}
+
 ObjectID :: distinct uint
 ObjectInfo :: struct {
 	type: string,
 	id:   ObjectID,
+}
+
+@(private)
+current_object_id: ObjectID = 0
+
+create_cube :: proc(center: glm.vec3 = {0., 0., 0.}, starting_scale: Scale = {1., 1., 1.}, starting_orientation: Orientation = {norm = {1., 0., 0.,}, angle = 0.}) -> Object {
+	key_frames := make([dynamic]Frame)
+	append(&key_frames, Frame { scale = starting_scale, orientation = starting_orientation })
+	cube := Cube {
+		id = current_object_id,
+		center = center,
+		key_frames = key_frames,
+		current_key_frame = 0,
+	}
+
+	current_object_id += 1
+
+	return cube
 }
 
 get_vertices :: proc {
@@ -39,9 +66,7 @@ color_vertices :: proc(vertices: ^[]Vertex, color: glm.vec4 = {1., 1., 1., 1.}) 
 	}
 }
 
-get_object_id :: proc(object: union {
-		Cube,
-	}) -> ObjectID {
+get_object_id :: proc(object: Object) -> ObjectID {
 	#partial switch generic_object in object {
 	case Cube:
 		return generic_object.id
@@ -50,9 +75,7 @@ get_object_id :: proc(object: union {
 	}
 }
 
-get_object_type_string :: proc(object: union {
-		Cube,
-	}) -> (object_type: string) {
+get_object_type_string :: proc(object: Object) -> (object_type: string) {
 	#partial switch generic_object in object {
 	case Cube:
 		object_type = "Cube"
@@ -62,9 +85,7 @@ get_object_type_string :: proc(object: union {
 	return
 }
 
-get_object_center :: proc(object: union {
-		Cube,
-	}) -> (center: glm.vec3) {
+get_object_center :: proc(object: Object) -> (center: glm.vec3) {
 	#partial switch generic_object in object {
 	case Cube:
 		center = generic_object.center
@@ -73,43 +94,35 @@ get_object_center :: proc(object: union {
 	return
 }
 
-get_object_scale :: proc(object: union {
-		Cube,
-	}) -> (scale: Scale) {
+get_object_scale :: proc(object: Object) -> (scale: Scale) {
 	#partial switch generic_object in object {
 	case Cube:
-		scale = generic_object.scale
+		scale = generic_object.key_frames[generic_object.current_key_frame].scale
 	case:
 	}
 
 	return
 }
 
-get_object_orientation :: proc(object: union {
-		Cube,
-	}) -> (orientation: Orientation) {
+get_object_orientation :: proc(object: Object) -> (orientation: Orientation) {
 	#partial switch generic_object in object {
 	case Cube:
-		orientation = generic_object.orientation
+		orientation = generic_object.key_frames[generic_object.current_key_frame].orientation
 	case:
 	}
 
 	return
 }
 
-get_object_info :: proc(object: union {
-		Cube,
-	}) -> (object_info: ObjectInfo) {
-	object_info.type = get_object_type_string(object)
-	object_info.id = ObjectID(get_object_id(object))
+get_object_info :: proc(object: ^Object) -> (object_info: ObjectInfo) {
+	object_info.type = get_object_type_string(object^)
+	object_info.id = ObjectID(get_object_id(object^))
 
 	return
 }
 
-get_objects_info :: proc(objects: []union {
-		Cube,
-	}) -> (objects_info: []ObjectInfo) {
-	objects_info = slice.mapper(objects, get_object_info)
+get_objects_info :: proc(objects: [dynamic]^Object) -> (objects_info: []ObjectInfo) {
+	objects_info = slice.mapper(objects[:], get_object_info)
 
 	return
 }

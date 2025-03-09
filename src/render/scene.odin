@@ -14,9 +14,20 @@ render_grid: bool = true
 
 HIGHLIGHTED_OBJECT_COLOR :: glm.vec4{0.15, 0.83, 1.0, 0.5}
 
-render_objects :: proc(render_objects: ^[]union {
-		objects.Cube,
-	}) {
+Scene :: struct {
+	objects: [dynamic]^objects.Object
+}
+
+create_scene :: proc() -> Scene {
+	return Scene {}
+}
+
+add_object :: proc(scene: ^Scene, object: ^objects.Object) {
+	append(&scene.objects, object)
+}
+
+render_scene :: proc(scene: ^Scene) {
+	render_objects := scene.objects
 	for generic_object in render_objects {
 		#partial switch object in generic_object {
 		case objects.Cube:
