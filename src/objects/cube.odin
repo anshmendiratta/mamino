@@ -7,13 +7,13 @@ Cube :: struct {
 	// Geometric center.
 	id:          ObjectID,
 	center:      glm.vec3,
-	key_frames: [dynamic]Frame,
+	key_frames: [dynamic]KeyFrame,
 	current_key_frame: uint,
 }
 
 create_cube :: proc(center: glm.vec3 = {0., 0., 0.}, starting_scale: Scale = {1., 1., 1.}, starting_orientation: Orientation = {norm = {1., 0., 0.,}, angle = 0.}) -> Object {
-	key_frames := make([dynamic]Frame)
-	append(&key_frames, Frame { scale = starting_scale, orientation = starting_orientation })
+	key_frames := make([dynamic]KeyFrame)
+	append(&key_frames, KeyFrame { scale = starting_scale, orientation = starting_orientation })
 	cube := Cube {
 		id = current_object_id,
 		center = center,
