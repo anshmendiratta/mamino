@@ -20,17 +20,18 @@ This project may be rewritten in Vulkan in the future if deemed necesssary.
 Example structure:
 ```
 shared/
-  imgui.odin
-  imconfig.odin
-  imgui_internal.odin
-  impl_enabled.odin
-  imgui_linux_x64.a
+ dear_imgui/
+    imgui.odin
+    imconfig.odin
+    imgui_internal.odin
+    impl_enabled.odin
+    imgui_linux_x64.a
 
-  gl/
-    imgui_impl_opengl3.odin    
+    gl/
+      imgui_impl_opengl3.odin    
 
-  glfw/
-    imgui_impl_glfw.odin
+    glfw/
+      imgui_impl_glfw.odin
 ```
 Of course, you may choose to edit the source of this library to match the structure of your `shared/`.
 
