@@ -45,3 +45,4 @@ See [goals](#goals) for a more detailed list on current features.
 - [ ] Think about and clean-up public API.
 - [ ] Add example mains.
 - [ ] Reduce draw calls.
+- [ ] Add keyframe interpolation.
