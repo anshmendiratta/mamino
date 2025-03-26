@@ -68,17 +68,17 @@ main :: proc() {
 	render.add_object(&scene, &cube)
 	objects.rotate(
 		&cube,
-		objects.create_orientation(axis = {0., 1., 1.}, angle = 45),
+		objects.create_orientation(axis = {0., 1., 0.}, angle = 10),
 		time.duration_seconds(2),
 	)
 	objects.rotate(
 		&cube,
-		objects.create_orientation(axis = {0., 1., 1.}, angle = 60),
+		objects.create_orientation(axis = {0., 1., 0.}, angle = 10),
 		time.duration_seconds(2),
 	)
 	objects.rotate(
 		&cube,
-		objects.create_orientation(axis = {0., 1., 1.}, angle = 30),
+		objects.create_orientation(axis = {0., 1., 0.}, angle = 10),
 		time.duration_seconds(2),
 	)
 	fmt.println(cube.(objects.Cube).key_frames)

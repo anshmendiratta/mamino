@@ -17,7 +17,7 @@ Cube :: struct {
 create_cube :: proc(
 	center: glm.vec3 = {0., 0., 0.},
 	starting_scale: Scale = {1., 1., 1.},
-	starting_orientation: Orientation = Orientation(glm.quat(0)),
+	starting_orientation: Orientation = Orientation(glm.quat(1)),
 ) -> Object {
 	key_frames: [dynamic]KeyFrame
 	append(&key_frames, KeyFrame{scale = starting_scale, orientation = starting_orientation})
