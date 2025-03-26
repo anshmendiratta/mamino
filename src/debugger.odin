@@ -92,7 +92,11 @@ debugger_get_most_recent_framerate :: proc(debugger: ^Debugger) -> f64 {
 	return 1. / debugger.frametimes[len(debugger.frametimes) - 1]
 }
 
-render_debugger :: proc(debugger: ^Debugger, render_objects: ^[]objects.Object, render_objects_info: ^[]objects.ObjectInfo) {
+render_debugger :: proc(
+	debugger: ^Debugger,
+	render_objects: ^[]objects.Object,
+	render_objects_info: ^[]objects.ObjectInfo,
+) {
 	context.allocator = context.temp_allocator
 
 	imgl.NewFrame()

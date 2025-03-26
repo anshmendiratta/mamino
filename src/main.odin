@@ -58,7 +58,7 @@ main :: proc() {
 		render.mamino_init_imgui(window)
 		render.highlighted_debug_object_id = 0
 	}
-	
+
 	program_id, uniforms := render.mamino_init_gl()
 	when MAMINO_EXPORT_VIDEO {
 		sequencing.mamino_frame_capture_init()
@@ -68,16 +68,10 @@ main :: proc() {
 
 	cube := objects.create_cube()
 	render.add_object(&scene, &cube)
-	objects.add_key_frame(&cube, 
-		scale = objects.Scale {
-			1., 2., 1.,
-		},
-	)
-	objects.add_key_frame(&cube, 
-		orientation = objects.Orientation {
-			norm = {1., 0., 0.,}, 
-			angle = glm.radians(f32(45.))
-		},
+	objects.rotate(
+		&cube,
+		objects.create_orientation(axis = {0., 0., 1.}, angle = 45),
+		time.duration_seconds(2),
 	)
 
 	// cube1 := objects.create_cube(
@@ -201,11 +195,11 @@ main :: proc() {
 	}
 
 	video_options: sequencing.VideoOptions = {
-			resolution = {1920, 1080},
-			framerate  = 180,
-			encoding   = "libx264",
-			out_name   = "vid.h264",
-		}
+		resolution = {1920, 1080},
+		framerate  = 180,
+		encoding   = "libx264",
+		out_name   = "vid.h264",
+	}
 	if valid_vo := sequencing.validate_video_options(video_options); !valid_vo {
 		fmt.eprintln("Incorrect export video options.")
 		return

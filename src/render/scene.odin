@@ -15,11 +15,12 @@ render_grid: bool = true
 HIGHLIGHTED_OBJECT_COLOR :: glm.vec4{0.15, 0.83, 1.0, 0.5}
 
 Scene :: struct {
-	objects: [dynamic]^objects.Object
+	objects:     [dynamic]^objects.Object,
+	global_time: f32,
 }
 
 create_scene :: proc() -> Scene {
-	return Scene {}
+	return Scene{}
 }
 
 add_object :: proc(scene: ^Scene, object: ^objects.Object) {

@@ -1,5 +1,6 @@
 package objects
 
+import "core:math"
 import glm "core:math/linalg/glsl"
 import "core:slice"
 
@@ -18,13 +19,11 @@ Scale :: struct {
 
 // See: https://en.wikipedia.org/wiki/Euler%27s_rotation_theorem
 // Stores the orientation of an object as some rotation around the `norm`(al vector) by some `angle` radians.
-Orientation :: struct {
-	norm:  glm.vec3,
-	angle: f32,
-}
+@(private)
+Orientation :: distinct glm.quat
 
 KeyFrame :: struct {
-	scale: Scale,
+	scale:       Scale,
 	orientation: Orientation,
 }
 
@@ -39,25 +38,41 @@ ObjectInfo :: struct {
 }
 
 @(private)
-current_object_id: ObjectID = 0
+next_object_creation_id: ObjectID = 0
 
 set_current_key_frame :: proc(object: ^Object, frame_index: uint) {
 	#partial switch &generic_object in object {
-		case Cube:
-			generic_object.current_key_frame = frame_index % len(generic_object.key_frames)
-		case:
-			return
+	case Cube:
+		generic_object.current_key_frame = frame_index % len(generic_object.key_frames)
+	case:
+		return
 	}
 }
 
-add_key_frame :: proc(object: ^Object, scale: Maybe(Scale) = nil, orientation: Maybe(Orientation) = nil) {
+@(private)
+add_key_frame :: proc(
+	object: ^Object,
+	scale: Maybe(Scale) = nil,
+	orientation: Maybe(Orientation) = nil,
+) {
 	#partial switch &generic_object in object {
-		case Cube:
-			last_index := len(generic_object.key_frames) - 1
-			append(&generic_object.key_frames, KeyFrame { scale = scale.? or_else generic_object.key_frames[last_index].scale, orientation = orientation.? or_else generic_object.key_frames[last_index].orientation })
-		case:
-			return
+	case Cube:
+		last_index := len(generic_object.key_frames) - 1
+		append(
+			&generic_object.key_frames,
+			KeyFrame {
+				scale = scale.? or_else generic_object.key_frames[last_index].scale,
+				orientation = orientation.? or_else generic_object.key_frames[last_index].orientation,
+			},
+		)
+	case:
+		return
 	}
+}
+
+create_orientation :: proc(axis: glm.vec3, angle: f32) -> (o: Orientation) {
+	o = Orientation(glm.quatAxisAngle(axis, angle))
+	return
 }
 
 get_vertices :: proc {
