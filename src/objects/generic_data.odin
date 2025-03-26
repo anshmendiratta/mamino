@@ -71,7 +71,7 @@ add_key_frame :: proc(
 }
 
 create_orientation :: proc(axis: glm.vec3, angle: f32) -> (o: Orientation) {
-	o = Orientation(glm.quatAxisAngle(axis, angle))
+	o = Orientation(glm.quatAxisAngle(axis, glm.radians(angle)))
 	return
 }
 

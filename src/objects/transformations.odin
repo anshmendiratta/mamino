@@ -14,7 +14,7 @@ rotate :: proc(object: ^Object, rotation: Orientation, duration: f64) {
 		last_keyframe: KeyFrame = generic_object.key_frames[last_idx]
 		last_orientation: glm.quat = glm.quat(last_keyframe.orientation)
 		rotation: glm.quat = glm.quat(rotation)
-		final_rotation: glm.quat = rotation * last_orientation
+		final_rotation: glm.quat = last_orientation * rotation
 
 		add_key_frame(
 			object,
