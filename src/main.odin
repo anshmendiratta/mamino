@@ -66,6 +66,7 @@ main :: proc() {
 
 	cube := objects.create_cube()
 	render.add_object(&scene, &cube)
+
 	objects.rotate(
 		&cube,
 		objects.create_orientation(axis = {0., 1., 0.}, angle = 45),
