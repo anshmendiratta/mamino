@@ -27,6 +27,10 @@ add_object :: proc(scene: ^Scene, object: ^objects.Object) {
 	append(&scene.objects, object)
 }
 
+scene_get_num_objects :: proc(scene: ^Scene) -> uint {
+	return len(scene.objects)
+}
+
 render_scene :: proc(scene: ^Scene) {
 	render_objects := scene.objects
 	for generic_object in render_objects {

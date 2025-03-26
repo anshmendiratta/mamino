@@ -1,28 +1,27 @@
 package objects
 
-import glm "core:math/linalg/glsl"
+import "core:fmt"
 import "core:time"
 
-// Transformation :: enum {
-// 	Rotate    = rotate(),
-// 	Translate = translate(),
-// }
+import glm "core:math/linalg/glsl"
+
 
 // NOTE(Ansh): Duration implicitly uses seconds.
 rotate :: proc(object: ^Object, rotation: Orientation, duration: f64) {
 	#partial switch &generic_object in object {
 	case Cube:
 		last_keyframe: KeyFrame = generic_object.key_frames[generic_object.current_key_frame]
-		last_orientation_mat4: glm.quat = quaternion128(last_keyframe.orientation)
-		rotation: glm.quat = quaternion128(rotation)
-		final_rotation: glm.quat = last_orientation_mat4 * rotation
+		last_orientation: glm.quat = glm.quat(last_keyframe.orientation)
+		rotation: glm.quat = glm.quat(rotation)
+		// TODO(Ansh): Figure out why this is addition and not multiplication.
+		final_rotation: glm.quat = rotation + last_orientation
+
 		add_key_frame(
 			object,
 			scale = last_keyframe.scale,
 			orientation = Orientation(final_rotation),
 		)
 	}
-
 }
 
 translate :: proc(object: ^Object, translation: glm.vec3) {

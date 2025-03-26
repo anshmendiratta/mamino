@@ -27,17 +27,13 @@ Debugger :: struct {
 
 @(cold)
 @(deferred_in = mamino_deinit_debugger)
-mamino_init_debugger :: proc(debugger: ^Debugger, objects: []union {
-		objects.Cube,
-	}) {
+mamino_init_debugger :: proc(debugger: ^Debugger, num_objects: uint) {
 	render.last_frame = glfw.GetTime()
-	debugger.object_count = len(objects)
+	debugger.object_count = num_objects
 	debugger.camera_position = render.camera_position_cartesian
 }
 
-mamino_deinit_debugger :: proc(debugger: ^Debugger, _: []union {
-		objects.Cube,
-	}) {
+mamino_deinit_debugger :: proc(debugger: ^Debugger, _: uint) {
 	delete(debugger.frametimes)
 }
 
@@ -94,7 +90,7 @@ debugger_get_most_recent_framerate :: proc(debugger: ^Debugger) -> f64 {
 
 render_debugger :: proc(
 	debugger: ^Debugger,
-	render_objects: ^[]objects.Object,
+	scene: ^render.Scene,
 	render_objects_info: ^[]objects.ObjectInfo,
 ) {
 	context.allocator = context.temp_allocator
@@ -136,9 +132,9 @@ render_debugger :: proc(
 		append(&debug_objects_display, debug_object_display_with_id)
 	}
 	highlighted_debug_object: objects.Object
-	for &obj in render_objects {
-		if objects.get_object_info(&obj).id == render.highlighted_debug_object_id {
-			highlighted_debug_object = obj
+	for &obj in scene.objects {
+		if objects.get_object_info(obj).id == render.highlighted_debug_object_id {
+			highlighted_debug_object = obj^
 			break
 		}
 	}

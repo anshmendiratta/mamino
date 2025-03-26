@@ -1,3 +1,5 @@
+#+feature dynamic-literals
+
 package objects
 
 import glm "core:math/linalg/glsl"
@@ -11,12 +13,13 @@ Cube :: struct {
 	current_key_frame: uint,
 }
 
+
 create_cube :: proc(
 	center: glm.vec3 = {0., 0., 0.},
 	starting_scale: Scale = {1., 1., 1.},
 	starting_orientation: Orientation = Orientation(glm.quat(0)),
 ) -> Object {
-	key_frames := make([dynamic]KeyFrame)
+	key_frames: [dynamic]KeyFrame
 	append(&key_frames, KeyFrame{scale = starting_scale, orientation = starting_orientation})
 	cube := Cube {
 		id                = next_object_creation_id,
