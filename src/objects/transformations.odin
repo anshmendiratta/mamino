@@ -10,7 +10,8 @@ import glm "core:math/linalg/glsl"
 rotate :: proc(object: ^Object, rotation: Orientation, duration: f64) {
 	#partial switch &generic_object in object {
 	case Cube:
-		last_keyframe: KeyFrame = generic_object.key_frames[generic_object.current_key_frame]
+		last_idx := len(generic_object.key_frames) - 1
+		last_keyframe: KeyFrame = generic_object.key_frames[last_idx]
 		last_orientation: glm.quat = glm.quat(last_keyframe.orientation)
 		rotation: glm.quat = glm.quat(rotation)
 		final_rotation: glm.quat = rotation * last_orientation

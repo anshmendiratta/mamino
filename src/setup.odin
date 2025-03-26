@@ -9,6 +9,7 @@ import imfw "shared:dear_imgui/glfw"
 import "vendor:glfw"
 
 debugger: ^Debugger = &{}
+mamino_configuration: ^MaminoConfiguration = &{}
 
 @(cold)
 @(deferred_none = mamino_deinit)
