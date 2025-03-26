@@ -71,11 +71,14 @@ main :: proc() {
 		objects.create_orientation(axis = {0., 1., 0.}, angle = 45),
 		time.duration_seconds(2),
 	)
+	objects.translate(&cube, glm.vec3{1., 0., 0.}, time.duration_seconds(2))
+	objects.scale(&cube, objects.Scale{2., 1., 1.}, time.duration_seconds(2))
 	objects.rotate(
 		&cube,
 		objects.create_orientation(axis = {0., 1., 0.}, angle = 45),
 		time.duration_seconds(2),
 	)
+	objects.translate(&cube, glm.vec3{0., 1., 0.}, time.duration_seconds(2))
 	objects.rotate(
 		&cube,
 		objects.create_orientation(axis = {0., 1., 0.}, angle = 45),

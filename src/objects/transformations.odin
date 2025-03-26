@@ -20,22 +20,47 @@ rotate :: proc(object: ^Object, rotation: Orientation, duration: f64) {
 			object,
 			scale = last_keyframe.scale,
 			orientation = Orientation(final_rotation),
+			translation = last_keyframe.center,
 		)
 	}
 }
 
-translate :: proc(object: ^Object, translation: glm.vec3) {
+translate :: proc(object: ^Object, translation: glm.vec3, duration: f64) {
 	#partial switch &generic_object in object {
 	case Cube:
-	// generic_object.k
+		last_idx := len(generic_object.key_frames) - 1
+		last_keyframe: KeyFrame = generic_object.key_frames[last_idx]
+		last_center: glm.vec3 = last_keyframe.center
+		final_center: glm.vec3 = last_center + translation
+
+		add_key_frame(
+			object,
+			scale = last_keyframe.scale,
+			orientation = last_keyframe.orientation,
+			translation = final_center,
+		)
 	}
 
 }
 
-scale :: proc(object: ^Object, scale: Scale) {
+scale :: proc(object: ^Object, scale: Scale, duration: f64) {
 	#partial switch &generic_object in object {
 	case Cube:
-	// generic_object.keyframe = 
+		last_idx := len(generic_object.key_frames) - 1
+		last_keyframe: KeyFrame = generic_object.key_frames[last_idx]
+		last_scale: Scale = last_keyframe.scale
+		final_scale: Scale = {
+			x = last_scale.x * scale.x,
+			y = last_scale.y * scale.y,
+			z = last_scale.z * scale.z,
+		}
+
+		add_key_frame(
+			object,
+			scale = final_scale,
+			orientation = last_keyframe.orientation,
+			translation = last_keyframe.center,
+		)
 	}
 }
 

@@ -25,6 +25,7 @@ Orientation :: distinct glm.quat
 KeyFrame :: struct {
 	scale:       Scale,
 	orientation: Orientation,
+	center:      glm.vec3,
 }
 
 Object :: union {
@@ -54,6 +55,7 @@ add_key_frame :: proc(
 	object: ^Object,
 	scale: Maybe(Scale) = nil,
 	orientation: Maybe(Orientation) = nil,
+	translation: Maybe(glm.vec3) = glm.vec3{0., 0., 0.},
 ) {
 	#partial switch &generic_object in object {
 	case Cube:
@@ -63,6 +65,7 @@ add_key_frame :: proc(
 			KeyFrame {
 				scale = scale.? or_else generic_object.key_frames[last_index].scale,
 				orientation = orientation.? or_else generic_object.key_frames[last_index].orientation,
+				center = translation.? or_else generic_object.key_frames[last_index].center,
 			},
 		)
 	case:
@@ -107,7 +110,9 @@ get_object_type_string :: proc(object: Object) -> (object_type: string) {
 get_object_center :: proc(object: Object) -> (center: glm.vec3) {
 	#partial switch generic_object in object {
 	case Cube:
-		center = generic_object.center
+		last_idx := len(generic_object.key_frames) - 1
+		last_keyframe: KeyFrame = generic_object.key_frames[last_idx]
+		center = last_keyframe.center
 	}
 
 	return

@@ -8,7 +8,6 @@ import "core:mem"
 Cube :: struct {
 	// Geometric center.
 	id:                ObjectID,
-	center:            glm.vec3,
 	key_frames:        [dynamic]KeyFrame,
 	current_key_frame: uint,
 }
@@ -23,7 +22,6 @@ create_cube :: proc(
 	append(&key_frames, KeyFrame{scale = starting_scale, orientation = starting_orientation})
 	cube := Cube {
 		id                = next_object_creation_id,
-		center            = center,
 		key_frames        = key_frames,
 		current_key_frame = 0,
 	}
@@ -38,6 +36,7 @@ get_cube_vertices :: proc(cube: Cube) -> (vertices: []Vertex) {
 
 	scale := cube.key_frames[cube.current_key_frame].scale
 	orientation := cube.key_frames[cube.current_key_frame].orientation
+	center := cube.key_frames[cube.current_key_frame].center
 
 	for &vertex in vertices {
 		vertex.position.x *= scale.x
@@ -52,7 +51,7 @@ get_cube_vertices :: proc(cube: Cube) -> (vertices: []Vertex) {
 			1.0,
 		}
 		vertex.position = (rotation_matrix * vertex_pos_as_vec4).xyz
-		vertex.position += cube.center
+		vertex.position += center
 	}
 	return
 }
@@ -65,6 +64,7 @@ get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []Vertex) {
 
 	scale := cube.key_frames[cube.current_key_frame].scale
 	orientation := cube.key_frames[cube.current_key_frame].orientation
+	translation := cube.key_frames[cube.current_key_frame].center
 
 	rotation_matrix := glm.mat4FromQuat(quaternion128(orientation))
 	rotated_x_axis: glm.vec3 = (rotation_matrix * standard_x_axis).xyz
@@ -84,12 +84,12 @@ get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []Vertex) {
 	z_normal_color.a = 0.6
 
 	normals = {
-		{cube.center, x_normal_color},
-		{rotated_x_normal + cube.center, x_normal_color},
-		{cube.center, y_normal_color},
-		{rotated_y_normal + cube.center, y_normal_color},
-		{cube.center, z_normal_color},
-		{rotated_z_normal + cube.center, z_normal_color},
+		{translation, x_normal_color},
+		{rotated_x_normal + translation, x_normal_color},
+		{translation, y_normal_color},
+		{rotated_y_normal + translation, y_normal_color},
+		{translation, z_normal_color},
+		{rotated_z_normal + translation, z_normal_color},
 	}
 
 	return
