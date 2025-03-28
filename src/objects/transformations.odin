@@ -5,14 +5,14 @@ import "core:time"
 
 import glm "core:math/linalg/glsl"
 
-
 // NOTE(Ansh): Duration implicitly uses seconds.
-rotate :: proc(object: ^Object, rotation: Orientation, duration: f64) {
+rotate :: proc(object: ^Object, rotation: Orientation, duration: time.Duration) {
 	#partial switch &generic_object in object {
 	case Cube:
 		last_idx := len(generic_object.key_frames) - 1
 		last_keyframe: KeyFrame = generic_object.key_frames[last_idx]
 		last_orientation: glm.quat = glm.quat(last_keyframe.orientation)
+		last_from_time: time.Time = last_keyframe.from_time
 		rotation: glm.quat = glm.quat(rotation)
 		// NOTE(Jaran): testing leads to equivalent quaternions being calculated
 		// unsure if this will cause problems in the future, leaving as a left multiplication for now
@@ -23,11 +23,14 @@ rotate :: proc(object: ^Object, rotation: Orientation, duration: f64) {
 			scale = last_keyframe.scale,
 			orientation = Orientation(final_rotation),
 			translation = last_keyframe.center,
+			from_time = last_from_time + time.Time(time.duration_nanoseconds(duration)),
+			duration = duration,
 		)
 	}
 }
 
-translate :: proc(object: ^Object, translation: glm.vec3, duration: f64) {
+// NOTE(Ansh): Duration implicitly uses seconds.
+translate :: proc(object: ^Object, translation: glm.vec3, duration: time.Duration) {
 	#partial switch &generic_object in object {
 	case Cube:
 		last_idx := len(generic_object.key_frames) - 1
@@ -45,7 +48,8 @@ translate :: proc(object: ^Object, translation: glm.vec3, duration: f64) {
 
 }
 
-scale :: proc(object: ^Object, scale: Scale, duration: f64) {
+// NOTE(Ansh): Duration implicitly uses seconds.
+scale :: proc(object: ^Object, scale: Scale, duration: time.Duration) {
 	#partial switch &generic_object in object {
 	case Cube:
 		last_idx := len(generic_object.key_frames) - 1
@@ -66,7 +70,19 @@ scale :: proc(object: ^Object, scale: Scale, duration: f64) {
 	}
 }
 
-wait_for :: proc() {
+// NOTE(Ansh): Duration implicitly uses seconds.
+wait_for :: proc(object: ^Object, duration: time.Duration) {
+	#partial switch &generic_object in object {
+	case Cube:
+		last_idx := len(generic_object.key_frames) - 1
+		last_keyframe: KeyFrame = generic_object.key_frames[last_idx]
 
+		add_key_frame(
+			object,
+			scale = last_keyframe.scale,
+			orientation = last_keyframe.orientation,
+			translation = last_keyframe.center,
+		)
+	}
 }
 

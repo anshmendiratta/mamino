@@ -68,22 +68,22 @@ main :: proc() {
 	render.add_object(&scene, &cube)
 
 	objects.rotate(
-		&cube,
-		objects.create_orientation(axis = {0., 1., 0.}, angle = 45),
-		time.duration_seconds(2),
+		object = &cube,
+		rotation = objects.create_orientation(axis = {0., 1., 0.}, angle = 45),
+		duration = 2 * time.Second,
 	)
-	objects.translate(&cube, glm.vec3{1., 0., 0.}, time.duration_seconds(2))
-	objects.scale(&cube, objects.Scale{2., 1., 1.}, time.duration_seconds(2))
+	objects.translate(&cube, glm.vec3{1., 0., 0.}, time.duration_seconds(2 * time.Second))
+	objects.scale(&cube, objects.Scale{2., 1., 1.}, time.duration_seconds(2 * time.Second))
 	objects.rotate(
 		&cube,
 		objects.create_orientation(axis = {0., 1., 0.}, angle = 45),
-		time.duration_seconds(2),
+		time.duration_seconds(2 * time.Second),
 	)
-	objects.translate(&cube, glm.vec3{0., 1., 0.}, time.duration_seconds(2))
+	objects.translate(&cube, glm.vec3{0., 1., 0.}, time.duration_seconds(2 * time.Second))
 	objects.rotate(
 		&cube,
 		objects.create_orientation(axis = {0., 1., 0.}, angle = 45),
-		time.duration_seconds(2),
+		time.duration_seconds(2 * time.Second),
 	)
 	fmt.println(cube.(objects.Cube).key_frames)
 

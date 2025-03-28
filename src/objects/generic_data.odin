@@ -3,6 +3,7 @@ package objects
 import "core:math"
 import glm "core:math/linalg/glsl"
 import "core:slice"
+import "core:time"
 
 // Vertex used for drawing. Mapped directly from vertices of objects.
 Vertex :: struct {
@@ -26,6 +27,8 @@ KeyFrame :: struct {
 	scale:       Scale,
 	orientation: Orientation,
 	center:      glm.vec3,
+	from_time:   time.Time,
+	duration:    time.Duration,
 }
 
 Object :: union {
@@ -56,6 +59,8 @@ add_key_frame :: proc(
 	scale: Maybe(Scale) = nil,
 	orientation: Maybe(Orientation) = nil,
 	translation: Maybe(glm.vec3) = glm.vec3{0., 0., 0.},
+	from_time: time.Time,
+	duration: time.Duration,
 ) {
 	#partial switch &generic_object in object {
 	case Cube:
