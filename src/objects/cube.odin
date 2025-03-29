@@ -2,41 +2,50 @@
 
 package objects
 
+import "core:fmt"
 import glm "core:math/linalg/glsl"
-import "core:mem"
+import "core:time"
+
 
 Cube :: struct {
 	// Geometric center.
-	id:                ObjectID,
-	key_frames:        [dynamic]KeyFrame,
-	current_key_frame: uint,
+	id:               ObjectID,
+	keyframes:        [dynamic]KeyFrame,
+	current_keyframe: uint,
 }
-
 
 create_cube :: proc(
 	center: glm.vec3 = {0., 0., 0.},
 	starting_scale: Scale = {1., 1., 1.},
 	starting_orientation: Orientation = Orientation(glm.quat(1)),
 ) -> Object {
-	key_frames: [dynamic]KeyFrame
-	append(&key_frames, KeyFrame{scale = starting_scale, orientation = starting_orientation})
+	keyframes: [dynamic]KeyFrame
+	append(
+		&keyframes,
+		KeyFrame {
+			scale = starting_scale,
+			orientation = starting_orientation,
+			center = glm.vec3{0., 0., 0.},
+			from_time = time.now(),
+		},
+	)
 	cube := Cube {
-		id                = next_object_creation_id,
-		key_frames        = key_frames,
-		current_key_frame = 0,
+		id               = next_object_creation_id,
+		keyframes        = keyframes,
+		current_keyframe = 0,
 	}
 	next_object_creation_id += 1
 
 	return cube
 }
 
-get_cube_vertices :: proc(cube: Cube) -> (vertices: []Vertex) {
+get_cube_vertices :: proc(cube: Cube, keyframe: KeyFrame) -> (vertices: []Vertex) {
 	vertices = make([]Vertex, len(cube_vertices), context.temp_allocator)
 	copy(vertices, cube_vertices)
 
-	scale := cube.key_frames[cube.current_key_frame].scale
-	orientation := cube.key_frames[cube.current_key_frame].orientation
-	center := cube.key_frames[cube.current_key_frame].center
+	scale := keyframe.scale
+	orientation := keyframe.orientation
+	center := keyframe.center
 
 	for &vertex in vertices {
 		vertex.position.x *= scale.x
@@ -62,9 +71,9 @@ get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []Vertex) {
 	standard_y_axis: glm.vec4 = {0., 1., 0., 0.}
 	standard_z_axis: glm.vec4 = {0., 0., 1., 0.}
 
-	scale := cube.key_frames[cube.current_key_frame].scale
-	orientation := cube.key_frames[cube.current_key_frame].orientation
-	translation := cube.key_frames[cube.current_key_frame].center
+	scale := cube.keyframes[cube.current_keyframe].scale
+	orientation := cube.keyframes[cube.current_keyframe].orientation
+	translation := cube.keyframes[cube.current_keyframe].center
 
 	rotation_matrix := glm.mat4FromQuat(quaternion128(orientation))
 	rotated_x_axis: glm.vec3 = (rotation_matrix * standard_x_axis).xyz

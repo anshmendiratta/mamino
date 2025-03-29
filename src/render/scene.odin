@@ -1,6 +1,8 @@
 package render
 
+import "core:fmt"
 import glm "core:math/linalg/glsl"
+import "core:time"
 
 import gl "vendor:OpenGL"
 
@@ -15,15 +17,15 @@ render_grid: bool = true
 HIGHLIGHTED_OBJECT_COLOR :: glm.vec4{0.15, 0.83, 1.0, 0.5}
 
 Scene :: struct {
-	objects:     [dynamic]^objects.Object,
-	global_time: f32,
+	objects:      [dynamic]^objects.Object,
+	_global_time: time.Time,
 }
 
 create_scene :: proc() -> Scene {
 	return Scene{}
 }
 
-add_object :: proc(scene: ^Scene, object: ^objects.Object) {
+scene_add_object :: proc(scene: ^Scene, object: ^objects.Object) {
 	append(&scene.objects, object)
 }
 
@@ -31,13 +33,26 @@ scene_get_num_objects :: proc(scene: ^Scene) -> uint {
 	return len(scene.objects)
 }
 
-render_scene :: proc(scene: ^Scene) {
+scene_render :: proc(scene: ^Scene) {
 	render_objects := scene.objects
 	for generic_object in render_objects {
-		#partial switch object in generic_object {
+		#partial switch &object in generic_object {
+		// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
 		case objects.Cube:
-			// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
-			vertices := objects.get_vertices(object)
+			// Interpolate between the last and the almost-next frame.
+			if time.diff(object.keyframes[object.current_keyframe].from_time, time.now()) > 0 {
+				object.current_keyframe += 1
+			}
+			last_keyframe: objects.KeyFrame = object.keyframes[object.current_keyframe]
+			next_keyframe: objects.KeyFrame =
+				object.keyframes[(object.current_keyframe + 1) % len(object.keyframes)]
+			interpolated_keyframe := render_interpolate_keyframes(
+				last_keyframe,
+				next_keyframe,
+				time.now(),
+			)
+			vertices := objects.get_vertices(object, interpolated_keyframe)
+
 			// Cube.
 			if object.id == highlighted_debug_object_id {
 				objects.color_vertices(&vertices, HIGHLIGHTED_OBJECT_COLOR)
@@ -78,6 +93,8 @@ render_scene :: proc(scene: ^Scene) {
 			gl.DeleteBuffers(1, &line_ebo)
 		}
 	}
+
+	scene._global_time = time.now()
 }
 
 render_coordinate_axes :: proc() {
@@ -108,5 +125,44 @@ render_subgrid_axes :: proc() {
 	gl.DeleteVertexArrays(1, &subgrid_axes_vao)
 	gl.DeleteBuffers(1, &subgrid_axes_vbo)
 	gl.DeleteBuffers(1, &subgrid_axes_ebo)
+}
+
+render_interpolate_keyframes :: proc(
+	keyframe_a: objects.KeyFrame,
+	keyframe_b: objects.KeyFrame,
+	current_time: time.Time,
+) -> (
+	interpolated: objects.KeyFrame,
+) {
+	start_time: time.Time = keyframe_a.from_time
+	end_time: time.Time = keyframe_b.from_time
+	duration: time.Duration = time.diff(start_time, end_time)
+	// Get parameter `t \in [t_a, t_b]`.
+	t: f32 =
+		f32(time.duration_nanoseconds(time.diff(start_time, current_time))) /
+		f32(time.duration_nanoseconds(duration))
+
+	interpolated_scale: objects.Scale = {
+		x = keyframe_a.scale.x * t + (1. - t) * keyframe_b.scale.x,
+		y = keyframe_a.scale.y * t + (1. - t) * keyframe_b.scale.y,
+		z = keyframe_a.scale.z * t + (1. - t) * keyframe_b.scale.z,
+	}
+	interpolated_orientation: objects.Orientation = objects.Orientation(
+		glm.quatSlerp(glm.quat(keyframe_a.orientation), glm.quat(keyframe_b.orientation), t),
+	)
+	interpolated_center: glm.vec3 = {
+		keyframe_a.center.x * t + (1 - t) * keyframe_b.center.x,
+		keyframe_a.center.y * t + (1 - t) * keyframe_b.center.y,
+		keyframe_a.center.z * t + (1 - t) * keyframe_b.center.z,
+	}
+
+	interpolated = {
+		scale       = interpolated_scale,
+		orientation = interpolated_orientation,
+		center      = interpolated_center,
+		from_time   = current_time,
+	}
+
+	return
 }
 
