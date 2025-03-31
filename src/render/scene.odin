@@ -4,6 +4,8 @@ import "core:fmt"
 import glm "core:math/linalg/glsl"
 import "core:time"
 
+import "base:builtin"
+
 import gl "vendor:OpenGL"
 
 import "../objects"
@@ -39,18 +41,26 @@ scene_render :: proc(scene: ^Scene) {
 		#partial switch &object in generic_object {
 		// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
 		case objects.Cube:
+			// Set appropriate keyframe.
+			objects.object_catch_up_keyframe(generic_object, time.now())
+			// fmt.println(
+			// 	time.diff(object.keyframes[object.current_keyframe].start_time, time.now()),
+			// )
 			// Interpolate between the last and the almost-next frame.
-			if time.diff(object.keyframes[object.current_keyframe].from_time, time.now()) > 0 {
-				object.current_keyframe += 1
-			}
 			last_keyframe: objects.KeyFrame = object.keyframes[object.current_keyframe]
-			next_keyframe: objects.KeyFrame =
-				object.keyframes[(object.current_keyframe + 1) % len(object.keyframes)]
+			// Only pass through the keyframes once.
+			next_keyframe_idx: uint = builtin.clamp(
+				object.current_keyframe + 1,
+				0,
+				uint(len(object.keyframes) - 1),
+			)
+			next_keyframe: objects.KeyFrame = object.keyframes[next_keyframe_idx]
 			interpolated_keyframe := render_interpolate_keyframes(
 				last_keyframe,
 				next_keyframe,
 				time.now(),
 			)
+			fmt.println(interpolated_keyframe)
 			vertices := objects.get_vertices(object, interpolated_keyframe)
 
 			// Cube.
@@ -134,8 +144,8 @@ render_interpolate_keyframes :: proc(
 ) -> (
 	interpolated: objects.KeyFrame,
 ) {
-	start_time: time.Time = keyframe_a.from_time
-	end_time: time.Time = keyframe_b.from_time
+	start_time: time.Time = keyframe_a.start_time
+	end_time: time.Time = keyframe_b.start_time
 	duration: time.Duration = time.diff(start_time, end_time)
 	// Get parameter `t \in [t_a, t_b]`.
 	t: f32 =
@@ -143,24 +153,24 @@ render_interpolate_keyframes :: proc(
 		f32(time.duration_nanoseconds(duration))
 
 	interpolated_scale: objects.Scale = {
-		x = keyframe_a.scale.x * t + (1. - t) * keyframe_b.scale.x,
-		y = keyframe_a.scale.y * t + (1. - t) * keyframe_b.scale.y,
-		z = keyframe_a.scale.z * t + (1. - t) * keyframe_b.scale.z,
+		x = keyframe_a.scale.x * (1 - t) + t * keyframe_b.scale.x,
+		y = keyframe_a.scale.y * (1 - t) + t * keyframe_b.scale.y,
+		z = keyframe_a.scale.z * (1 - t) + t * keyframe_b.scale.z,
 	}
 	interpolated_orientation: objects.Orientation = objects.Orientation(
 		glm.quatSlerp(glm.quat(keyframe_a.orientation), glm.quat(keyframe_b.orientation), t),
 	)
 	interpolated_center: glm.vec3 = {
-		keyframe_a.center.x * t + (1 - t) * keyframe_b.center.x,
-		keyframe_a.center.y * t + (1 - t) * keyframe_b.center.y,
-		keyframe_a.center.z * t + (1 - t) * keyframe_b.center.z,
+		keyframe_a.center.x * (1 - t) + t * keyframe_b.center.x,
+		keyframe_a.center.y * (1 - t) + t * keyframe_b.center.y,
+		keyframe_a.center.z * (1 - t) + t * keyframe_b.center.z,
 	}
 
 	interpolated = {
 		scale       = interpolated_scale,
 		orientation = interpolated_orientation,
 		center      = interpolated_center,
-		from_time   = current_time,
+		start_time  = current_time,
 	}
 
 	return
