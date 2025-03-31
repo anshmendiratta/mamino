@@ -2,6 +2,7 @@ package render
 
 import "core:c"
 import "core:fmt"
+import "core:time"
 
 import glm "core:math/linalg/glsl"
 import gl "vendor:OpenGL"
@@ -21,6 +22,7 @@ running: b32 = true
 vsync: b32 = false
 debugger_open: bool = true
 last_frame: f64 = 0.
+paused: b32 = false
 
 
 @(cold)
@@ -52,15 +54,19 @@ mamino_destroy_window :: proc(window: glfw.WindowHandle) {
 	// free(window)
 }
 
-current_key_frame: uint = 0
-
 key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
 	switch key {
 	case glfw.KEY_ESCAPE, glfw.KEY_Q:
 		running = false
-	case glfw.KEY_E:
+	case glfw.KEY_P:
 		if action == glfw.PRESS {
-			current_key_frame += 1
+			paused ~= true
+			if paused {
+				time_of_last_pause = time.now()
+			} else {
+				time_since_pause := time.diff(time_of_last_pause, time.now())
+				global_time = time.time_add(global_time, -time_since_pause)
+			}
 		}
 	case glfw.KEY_W, glfw.KEY_UP:
 		camera_position_spherical.z = glm.clamp(

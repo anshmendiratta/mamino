@@ -92,13 +92,10 @@ main :: proc() {
 
 	// Init debugger.
 	if .enable_debugger in mamino_configuration {
-		mamino_init_debugger(debugger, render.scene_get_num_objects(&scene))
+		mamino_init_debugger(debugger, render.scene_get_objects_count(&scene))
 	}
 
 	for (!glfw.WindowShouldClose(window) && render.running) {
-		// NOTE(Jaran): temporary "public" API to modify keyframes
-		objects.object_set_current_key_frame(&cube, render.current_key_frame)
-
 		if .enable_debugger in mamino_configuration {
 			debugger_update(debugger)
 		}

@@ -27,7 +27,7 @@ KeyFrame :: struct {
 	scale:       Scale,
 	orientation: Orientation,
 	center:      glm.vec3,
-	from_time:   time.Time,
+	start_time:  time.Time,
 }
 
 Object :: union {
@@ -58,7 +58,7 @@ object_add_keyframe :: proc(
 	scale: Maybe(Scale) = nil,
 	orientation: Maybe(Orientation) = nil,
 	translation: Maybe(glm.vec3) = glm.vec3{0., 0., 0.},
-	from_time: time.Time,
+	start_time: time.Time,
 ) {
 	#partial switch &generic_object in object {
 	case Cube:
@@ -69,11 +69,35 @@ object_add_keyframe :: proc(
 				scale = scale.? or_else generic_object.keyframes[last_index].scale,
 				orientation = orientation.? or_else generic_object.keyframes[last_index].orientation,
 				center = translation.? or_else generic_object.keyframes[last_index].center,
-				from_time = from_time,
+				start_time = start_time,
 			},
 		)
 	case:
 		return
+	}
+}
+
+object_catch_up_keyframe :: proc(object: ^Object, current_time: time.Time) {
+	#partial switch &generic_object in object {
+	case Cube:
+		current_keyframe := generic_object.keyframes[generic_object.current_keyframe]
+		time_diff_between_now_and_curr_frame := time.diff(
+			current_keyframe.start_time,
+			current_time,
+		)
+		next_keyframe_index := glm.clamp(
+			u32(generic_object.current_keyframe + 1),
+			u32(0),
+			u32(len(generic_object.keyframes) - 1),
+		)
+		current_keyframe_duration := time.diff(
+			current_keyframe.start_time,
+			generic_object.keyframes[next_keyframe_index].start_time,
+		)
+		if current_keyframe_duration < time_diff_between_now_and_curr_frame {
+			generic_object.current_keyframe = uint(next_keyframe_index)
+			object_catch_up_keyframe(object, time.now())
+		}
 	}
 }
 

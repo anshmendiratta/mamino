@@ -26,7 +26,7 @@ create_cube :: proc(
 			scale = starting_scale,
 			orientation = starting_orientation,
 			center = glm.vec3{0., 0., 0.},
-			from_time = time.now(),
+			start_time = time.now(),
 		},
 	)
 	cube := Cube {
