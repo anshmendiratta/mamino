@@ -2,7 +2,6 @@ package render
 
 import "core:c"
 import "core:fmt"
-import "core:time"
 
 import glm "core:math/linalg/glsl"
 import gl "vendor:OpenGL"
@@ -22,7 +21,6 @@ running: b32 = true
 vsync: b32 = false
 debugger_open: bool = true
 last_frame: f64 = 0.
-paused: b32 = false
 
 
 @(cold)
@@ -58,16 +56,6 @@ key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods
 	switch key {
 	case glfw.KEY_ESCAPE, glfw.KEY_Q:
 		running = false
-	case glfw.KEY_P:
-		if action == glfw.PRESS {
-			paused ~= true
-			if paused {
-				time_of_last_pause = glfw.GetTime()
-			} else {
-				time_since_pause := glfw.GetTime() - time_of_last_pause
-				global_time = global_time - time_since_pause
-			}
-		}
 	case glfw.KEY_W, glfw.KEY_UP:
 		camera_position_spherical.z = glm.clamp(
 			camera_position_spherical.z + rotation_rate,

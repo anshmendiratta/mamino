@@ -18,8 +18,6 @@ render_grid: bool = true
 
 @(private)
 global_time: f64
-@(private)
-time_of_last_pause: f64
 
 HIGHLIGHTED_OBJECT_COLOR :: glm.vec4{0.15, 0.83, 1.0, 0.5}
 
@@ -41,12 +39,6 @@ scene_get_objects_count :: proc(scene: ^Scene) -> uint {
 }
 
 scene_render :: proc(scene: ^Scene) {
-	// TODO: Fix impl of pausing.
-	if paused {
-		// Don't render a thing.
-		return
-	}
-
 	render_objects := scene.objects
 	for generic_object in render_objects {
 		#partial switch &object in generic_object {
@@ -112,10 +104,9 @@ scene_render :: proc(scene: ^Scene) {
 		}
 	}
 
-	// TODO(Ansh): Fix this to only move time forward from the last pause frame.
-	// global_time = time.time_add(global_time, time.Second)
 	global_time = glfw.GetTime()
 }
+
 
 render_coordinate_axes :: proc() {
 	axes_vao, axes_vbo, axes_ebo := get_buffer_objects()
