@@ -1,14 +1,14 @@
+# Directories
 .git/
 frames/
 src.bin.dSYM/
-./src/src.bin
-./src/src
-./src.bin
-src.bin
-src/bin
-src.o
-src.exe
+
+# Executables
+src.*
+
 .idea
-vid.mp4
-vid.mov
-imgui.ini
+# Test video exports
+vid.*
+
+# Miscellaneous files
+*.ini
