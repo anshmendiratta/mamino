@@ -158,20 +158,20 @@ render_interpolate_keyframes :: proc(
 	end_time: f64 = keyframe_b.start_time
 	duration: f64 = end_time - start_time
 	// Get parameter `t \in [t_a, t_b]`.
-	t: f32 = f32((start_time - current_time) / duration)
+	t: f32 = f32((current_time - start_time) / duration)
 
 	interpolated_scale: objects.Scale = {
-		x = keyframe_a.scale.x * t + (1 - t) * keyframe_b.scale.x,
-		y = keyframe_a.scale.y * t + (1 - t) * keyframe_b.scale.y,
-		z = keyframe_a.scale.z * t + (1 - t) * keyframe_b.scale.z,
+		x = keyframe_a.scale.x * (1 - t) + t * keyframe_b.scale.x,
+		y = keyframe_a.scale.y * (1 - t) + t * keyframe_b.scale.y,
+		z = keyframe_a.scale.z * (1 - t) + t * keyframe_b.scale.z,
 	}
 	interpolated_orientation: objects.Orientation = objects.Orientation(
 		glm.quatSlerp(glm.quat(keyframe_a.orientation), glm.quat(keyframe_b.orientation), f32(t)),
 	)
 	interpolated_center: glm.vec3 = {
-		keyframe_a.center.x * t + (1 - t) * keyframe_b.center.x,
-		keyframe_a.center.y * t + (1 - t) * keyframe_b.center.y,
-		keyframe_a.center.z * t + (1 - t) * keyframe_b.center.z,
+		keyframe_a.center.x * (1 - t) + t * keyframe_b.center.x,
+		keyframe_a.center.y * (1 - t) + t * keyframe_b.center.y,
+		keyframe_a.center.z * (1 - t) + t * keyframe_b.center.z,
 	}
 
 	interpolated = {
