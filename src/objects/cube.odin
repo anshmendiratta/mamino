@@ -1,44 +1,58 @@
+#+feature dynamic-literals
+
 package objects
 
+import "core:fmt"
 import glm "core:math/linalg/glsl"
-import "core:mem"
+import "core:time"
+
 
 Cube :: struct {
 	// Geometric center.
-	id:          ObjectID,
-	center:      glm.vec3,
-	key_frames: [dynamic]KeyFrame,
-	current_key_frame: uint,
+	id:               ObjectID,
+	keyframes:        [dynamic]KeyFrame,
+	current_keyframe: uint,
 }
 
-create_cube :: proc(center: glm.vec3 = {0., 0., 0.}, starting_scale: Scale = {1., 1., 1.}, starting_orientation: Orientation = {norm = {1., 0., 0.,}, angle = 0.}) -> Object {
-	key_frames := make([dynamic]KeyFrame)
-	append(&key_frames, KeyFrame { scale = starting_scale, orientation = starting_orientation })
+create_cube :: proc(
+	center: glm.vec3 = {0., 0., 0.},
+	starting_scale: Scale = {1., 1., 1.},
+	starting_orientation: Orientation = Orientation(glm.quat(1)),
+) -> Object {
+	keyframes: [dynamic]KeyFrame
+	append(
+		&keyframes,
+		KeyFrame {
+			scale = starting_scale,
+			orientation = starting_orientation,
+			center = glm.vec3{0., 0., 0.},
+			start_time = 0,
+		},
+	)
 	cube := Cube {
-		id = current_object_id,
-		center = center,
-		key_frames = key_frames,
-		current_key_frame = 0,
+		id               = next_object_creation_id,
+		keyframes        = keyframes,
+		current_keyframe = 0,
 	}
-
-	current_object_id += 1
+	next_object_creation_id += 1
 
 	return cube
 }
 
-get_cube_vertices :: proc(cube: Cube) -> (vertices: []Vertex) {
+get_cube_vertices :: proc(cube: Cube, keyframe: KeyFrame) -> (vertices: []Vertex) {
 	vertices = make([]Vertex, len(cube_vertices), context.temp_allocator)
 	copy(vertices, cube_vertices)
-	
-	scale := cube.key_frames[cube.current_key_frame].scale
-	orientation := cube.key_frames[cube.current_key_frame].orientation
-	
+
+	scale := keyframe.scale
+	orientation := keyframe.orientation
+	center := keyframe.center
+
 	for &vertex in vertices {
 		vertex.position.x *= scale.x
 		vertex.position.y *= scale.y
 		vertex.position.z *= scale.z
 
-		rotation_matrix := glm.mat4Rotate(orientation.norm, orientation.angle)
+		rotation_matrix := glm.mat4FromQuat(quaternion128(orientation))
 		vertex_pos_as_vec4 := glm.vec4 {
 			vertex.position.x,
 			vertex.position.y,
@@ -46,7 +60,7 @@ get_cube_vertices :: proc(cube: Cube) -> (vertices: []Vertex) {
 			1.0,
 		}
 		vertex.position = (rotation_matrix * vertex_pos_as_vec4).xyz
-		vertex.position += cube.center
+		vertex.position += center
 	}
 	return
 }
@@ -57,21 +71,19 @@ get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []Vertex) {
 	standard_y_axis: glm.vec4 = {0., 1., 0., 0.}
 	standard_z_axis: glm.vec4 = {0., 0., 1., 0.}
 
-	scale := cube.key_frames[cube.current_key_frame].scale
-	orientation := cube.key_frames[cube.current_key_frame].orientation
+	scale := cube.keyframes[cube.current_keyframe].scale
+	orientation := cube.keyframes[cube.current_keyframe].orientation
+	translation := cube.keyframes[cube.current_keyframe].center
 
-	rotation_matrix := glm.mat4Rotate(orientation.norm, orientation.angle)
+	rotation_matrix := glm.mat4FromQuat(quaternion128(orientation))
 	rotated_x_axis: glm.vec3 = (rotation_matrix * standard_x_axis).xyz
 	rotated_y_axis: glm.vec3 = (rotation_matrix * standard_y_axis).xyz
 	rotated_z_axis: glm.vec3 = (rotation_matrix * standard_z_axis).xyz
 
 	// Addition of a glm.vec3 so the endpoints stick above the faces by a defined amount.
-	rotated_x_normal: glm.vec3 =
-		(rotation_matrix * standard_x_axis).xyz * scale.x + rotated_x_axis
-	rotated_y_normal: glm.vec3 =
-		(rotation_matrix * standard_y_axis).xyz * scale.y + rotated_y_axis
-	rotated_z_normal: glm.vec3 =
-		(rotation_matrix * standard_z_axis).xyz * scale.z + rotated_z_axis
+	rotated_x_normal: glm.vec3 = (rotation_matrix * standard_x_axis).xyz * scale.x + rotated_x_axis
+	rotated_y_normal: glm.vec3 = (rotation_matrix * standard_y_axis).xyz * scale.y + rotated_y_axis
+	rotated_z_normal: glm.vec3 = (rotation_matrix * standard_z_axis).xyz * scale.z + rotated_z_axis
 
 	x_normal_color := x_axis_color
 	y_normal_color := y_axis_color
@@ -81,12 +93,12 @@ get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []Vertex) {
 	z_normal_color.a = 0.6
 
 	normals = {
-		{cube.center, x_normal_color},
-		{rotated_x_normal + cube.center, x_normal_color},
-		{cube.center, y_normal_color},
-		{rotated_y_normal + cube.center, y_normal_color},
-		{cube.center, z_normal_color},
-		{rotated_z_normal + cube.center, z_normal_color},
+		{translation, x_normal_color},
+		{rotated_x_normal + translation, x_normal_color},
+		{translation, y_normal_color},
+		{rotated_y_normal + translation, y_normal_color},
+		{translation, z_normal_color},
+		{rotated_z_normal + translation, z_normal_color},
 	}
 
 	return

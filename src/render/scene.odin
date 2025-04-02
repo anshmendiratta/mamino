@@ -1,8 +1,12 @@
 package render
 
+import "core:fmt"
 import glm "core:math/linalg/glsl"
 
+import "base:builtin"
+
 import gl "vendor:OpenGL"
+import "vendor:glfw"
 
 import "../objects"
 
@@ -12,31 +16,57 @@ render_faces: bool = false
 render_axes: bool = true
 render_grid: bool = true
 
+@(private)
+global_time: f64
+
 HIGHLIGHTED_OBJECT_COLOR :: glm.vec4{0.15, 0.83, 1.0, 0.5}
 
+
 Scene :: struct {
-	objects: [dynamic]^objects.Object
+	objects: [dynamic]^objects.Object,
 }
 
 create_scene :: proc() -> Scene {
-	return Scene {}
+	return Scene{}
 }
 
-add_object :: proc(scene: ^Scene, object: ^objects.Object) {
+scene_add_object :: proc(scene: ^Scene, object: ^objects.Object) {
 	append(&scene.objects, object)
 }
 
-render_scene :: proc(scene: ^Scene) {
+scene_get_objects_count :: proc(scene: ^Scene) -> uint {
+	return len(scene.objects)
+}
+
+scene_render :: proc(scene: ^Scene) {
 	render_objects := scene.objects
 	for generic_object in render_objects {
-		#partial switch object in generic_object {
+		#partial switch &object in generic_object {
+		// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
 		case objects.Cube:
-			// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
-			vertices := objects.get_vertices(object)
+			// Set appropriate keyframe.
+			objects.object_catch_up_keyframe(generic_object, global_time)
+			// fmt.println(
+			// 	object.current_keyframe,
+			// 	time.diff(object.keyframes[object.current_keyframe].start_time, scene.global_time),
+			// )
+			// Interpolate between the last and the almost-next frame.
+			last_keyframe: objects.KeyFrame = object.keyframes[object.current_keyframe]
+			// Only pass through the keyframes once.
+			next_keyframe_idx: u32 = glm.clamp(
+				u32(object.current_keyframe + 1),
+				u32(0),
+				u32(len(object.keyframes) - 1),
+			)
+			next_keyframe: objects.KeyFrame = object.keyframes[next_keyframe_idx]
+			interpolated_keyframe :=
+				render_interpolate_keyframes(last_keyframe, next_keyframe, global_time) if last_keyframe != next_keyframe else last_keyframe
+			vertices := objects.get_vertices(object, interpolated_keyframe)
+
 			// Cube.
-			if object.id == highlighted_debug_object_id {
-				objects.color_vertices(&vertices, HIGHLIGHTED_OBJECT_COLOR)
-			}
+			// if object.id == highlighted_debug_object_id {
+			// 	objects.color_vertices(&vertices, HIGHLIGHTED_OBJECT_COLOR)
+			// }
 			cube_vao, cube_vbo, cube_ebo := get_buffer_objects()
 			bind_data(cube_vao, cube_vbo, cube_ebo, vertices, objects.cube_indices)
 			draw_cube(vertices, i32(len(objects.cube_indices)))
@@ -73,7 +103,10 @@ render_scene :: proc(scene: ^Scene) {
 			gl.DeleteBuffers(1, &line_ebo)
 		}
 	}
+
+	global_time = glfw.GetTime()
 }
+
 
 render_coordinate_axes :: proc() {
 	axes_vao, axes_vbo, axes_ebo := get_buffer_objects()
@@ -103,5 +136,42 @@ render_subgrid_axes :: proc() {
 	gl.DeleteVertexArrays(1, &subgrid_axes_vao)
 	gl.DeleteBuffers(1, &subgrid_axes_vbo)
 	gl.DeleteBuffers(1, &subgrid_axes_ebo)
+}
+
+// NOTE(Ansh): Could also use the built-in `lerp` functions, but the overhead in calling them may outweigh the cost of our own implementation.
+render_interpolate_keyframes :: proc(
+	keyframe_a, keyframe_b: objects.KeyFrame,
+	current_time: f64,
+) -> (
+	interpolated: objects.KeyFrame,
+) {
+	start_time: f64 = keyframe_a.start_time
+	end_time: f64 = keyframe_b.start_time
+	duration: f64 = end_time - start_time
+	// Get parameter `t \in [t_a, t_b]`.
+	t: f32 = f32((current_time - start_time) / duration)
+
+	interpolated_scale: objects.Scale = {
+		x = keyframe_a.scale.x * (1 - t) + t * keyframe_b.scale.x,
+		y = keyframe_a.scale.y * (1 - t) + t * keyframe_b.scale.y,
+		z = keyframe_a.scale.z * (1 - t) + t * keyframe_b.scale.z,
+	}
+	interpolated_orientation: objects.Orientation = objects.Orientation(
+		glm.quatSlerp(glm.quat(keyframe_a.orientation), glm.quat(keyframe_b.orientation), f32(t)),
+	)
+	interpolated_center: glm.vec3 = {
+		keyframe_a.center.x * (1 - t) + t * keyframe_b.center.x,
+		keyframe_a.center.y * (1 - t) + t * keyframe_b.center.y,
+		keyframe_a.center.z * (1 - t) + t * keyframe_b.center.z,
+	}
+
+	interpolated = {
+		scale       = interpolated_scale,
+		orientation = interpolated_orientation,
+		center      = interpolated_center,
+		start_time  = current_time,
+	}
+
+	return
 }
 

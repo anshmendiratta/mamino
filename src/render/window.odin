@@ -3,10 +3,6 @@ package render
 import "core:c"
 import "core:fmt"
 
-import im "shared:dear_imgui"
-import imgl "shared:dear_imgui/gl"
-import imfw "shared:dear_imgui/glfw"
-
 import glm "core:math/linalg/glsl"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
@@ -26,45 +22,6 @@ vsync: b32 = false
 debugger_open: bool = true
 last_frame: f64 = 0.
 
-@(cold)
-@(deferred_none = mamino_deinit)
-mamino_init :: proc() {
-	if !glfw.Init() {
-		fmt.eprintln("Failed to initialize GLFW")
-		return
-	}
-}
-
-mamino_deinit :: proc() {
-	glfw.Terminate()
-}
-
-@(deferred_out = mamino_deinit_imgui)
-mamino_init_imgui :: proc(window: glfw.WindowHandle) -> (im_context: ^im.Context) {
-	// Dear ImGui
-	im_context = im.CreateContext()
-	im_context.FontSize = 20.
-	im_config_flags := im.GetIO()
-	im_config_flags.ConfigFlags += {.NavEnableKeyboard, .DockingEnable}
-
-	imfw.InitForOpenGL(window, true)
-	imgl.Init("#version 410")
-
-	im.StyleColorsDark()
-	style := im.GetStyle()
-	style.WindowRounding = 0
-	style.Colors[im.Col.WindowBg].w = 1
-
-	im.SetCurrentContext(im_context)
-
-	return
-}
-
-mamino_deinit_imgui :: proc(im_context: ^im.Context) {
-	imgl.Shutdown()
-	imfw.Shutdown()
-	im.DestroyContext(im_context)
-}
 
 @(cold)
 @(deferred_out = mamino_destroy_window)
@@ -95,16 +52,10 @@ mamino_destroy_window :: proc(window: glfw.WindowHandle) {
 	// free(window)
 }
 
-current_key_frame: uint = 0
-
 key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
 	switch key {
 	case glfw.KEY_ESCAPE, glfw.KEY_Q:
 		running = false
-	case glfw.KEY_E:
-		if action == glfw.PRESS {
-			current_key_frame += 1
-		}
 	case glfw.KEY_W, glfw.KEY_UP:
 		camera_position_spherical.z = glm.clamp(
 			camera_position_spherical.z + rotation_rate,

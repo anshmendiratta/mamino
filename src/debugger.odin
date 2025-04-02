@@ -27,17 +27,13 @@ Debugger :: struct {
 
 @(cold)
 @(deferred_in = mamino_deinit_debugger)
-mamino_init_debugger :: proc(debugger: ^Debugger, objects: []union {
-		objects.Cube,
-	}) {
+mamino_init_debugger :: proc(debugger: ^Debugger, num_objects: uint) {
 	render.last_frame = glfw.GetTime()
-	debugger.object_count = len(objects)
+	debugger.object_count = num_objects
 	debugger.camera_position = render.camera_position_cartesian
 }
 
-mamino_deinit_debugger :: proc(debugger: ^Debugger, _: []union {
-		objects.Cube,
-	}) {
+mamino_deinit_debugger :: proc(debugger: ^Debugger, _: uint) {
 	delete(debugger.frametimes)
 }
 
@@ -92,7 +88,11 @@ debugger_get_most_recent_framerate :: proc(debugger: ^Debugger) -> f64 {
 	return 1. / debugger.frametimes[len(debugger.frametimes) - 1]
 }
 
-render_debugger :: proc(debugger: ^Debugger, render_objects: ^[]objects.Object, render_objects_info: ^[]objects.ObjectInfo) {
+render_debugger :: proc(
+	debugger: ^Debugger,
+	scene: ^render.Scene,
+	render_objects_info: ^[]objects.ObjectInfo,
+) {
 	context.allocator = context.temp_allocator
 
 	imgl.NewFrame()
@@ -132,9 +132,9 @@ render_debugger :: proc(debugger: ^Debugger, render_objects: ^[]objects.Object, 
 		append(&debug_objects_display, debug_object_display_with_id)
 	}
 	highlighted_debug_object: objects.Object
-	for &obj in render_objects {
-		if objects.get_object_info(&obj).id == render.highlighted_debug_object_id {
-			highlighted_debug_object = obj
+	for &obj in scene.objects {
+		if objects.object_get_info(obj).id == render.highlighted_debug_object_id {
+			highlighted_debug_object = obj^
 			break
 		}
 	}
@@ -263,7 +263,7 @@ debugger_render_debug_objects_list :: proc(
 	im.TextWrapped(strings.clone_to_cstring("Object: "))
 	im.BulletText(
 		strings.clone_to_cstring(
-			fmt.tprintf("ID: {}", objects.get_object_id(highlighted_debug_object)),
+			fmt.tprintf("ID: {}", objects.object_get_id(highlighted_debug_object)),
 		),
 	)
 	im.BulletText(
@@ -280,7 +280,7 @@ debugger_render_debug_objects_list :: proc(
 		strings.clone_to_cstring(
 			fmt.tprintf(
 				"Orientation: {}",
-				objects.get_object_orientation(highlighted_debug_object),
+				objects.object_get_orientation(highlighted_debug_object),
 			),
 		),
 	)

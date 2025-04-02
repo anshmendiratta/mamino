@@ -1,7 +1,9 @@
 package objects
 
+import "core:math"
 import glm "core:math/linalg/glsl"
 import "core:slice"
+import "core:time"
 
 // Vertex used for drawing. Mapped directly from vertices of objects.
 Vertex :: struct {
@@ -18,14 +20,14 @@ Scale :: struct {
 
 // See: https://en.wikipedia.org/wiki/Euler%27s_rotation_theorem
 // Stores the orientation of an object as some rotation around the `norm`(al vector) by some `angle` radians.
-Orientation :: struct {
-	norm:  glm.vec3,
-	angle: f32,
-}
+// @(private)
+Orientation :: distinct glm.quat
 
 KeyFrame :: struct {
-	scale: Scale,
+	scale:       Scale,
 	orientation: Orientation,
+	center:      glm.vec3,
+	start_time:  f64,
 }
 
 Object :: union {
@@ -39,25 +41,65 @@ ObjectInfo :: struct {
 }
 
 @(private)
-current_object_id: ObjectID = 0
+next_object_creation_id: ObjectID = 0
 
-set_current_key_frame :: proc(object: ^Object, frame_index: uint) {
+object_set_current_key_frame :: proc(object: ^Object, frame_index: uint) {
 	#partial switch &generic_object in object {
-		case Cube:
-			generic_object.current_key_frame = frame_index % len(generic_object.key_frames)
-		case:
-			return
+	case Cube:
+		generic_object.current_keyframe = frame_index % len(generic_object.keyframes)
+	case:
+		return
 	}
 }
 
-add_key_frame :: proc(object: ^Object, scale: Maybe(Scale) = nil, orientation: Maybe(Orientation) = nil) {
+@(private)
+object_add_keyframe :: proc(
+	object: ^Object,
+	scale: Maybe(Scale) = nil,
+	orientation: Maybe(Orientation) = nil,
+	translation: Maybe(glm.vec3) = glm.vec3{0., 0., 0.},
+	start_time: f64,
+) {
 	#partial switch &generic_object in object {
-		case Cube:
-			last_index := len(generic_object.key_frames) - 1
-			append(&generic_object.key_frames, KeyFrame { scale = scale.? or_else generic_object.key_frames[last_index].scale, orientation = orientation.? or_else generic_object.key_frames[last_index].orientation })
-		case:
-			return
+	case Cube:
+		last_index := len(generic_object.keyframes) - 1
+		append(
+			&generic_object.keyframes,
+			KeyFrame {
+				scale = scale.? or_else generic_object.keyframes[last_index].scale,
+				orientation = orientation.? or_else generic_object.keyframes[last_index].orientation,
+				center = translation.? or_else generic_object.keyframes[last_index].center,
+				start_time = start_time,
+			},
+		)
+	case:
+		return
 	}
+}
+
+object_catch_up_keyframe :: proc(object: ^Object, current_time: f64) {
+	#partial switch &generic_object in object {
+	case Cube:
+		current_keyframe := generic_object.keyframes[generic_object.current_keyframe]
+		time_diff_between_now_and_curr_frame := current_time - current_keyframe.start_time
+		next_keyframe_index := glm.clamp(
+			u32(generic_object.current_keyframe + 1),
+			u32(0),
+			u32(len(generic_object.keyframes) - 1),
+		)
+		current_keyframe_duration :=
+			generic_object.keyframes[next_keyframe_index].start_time - current_keyframe.start_time
+
+		if current_keyframe_duration < time_diff_between_now_and_curr_frame {
+			generic_object.current_keyframe = uint(next_keyframe_index)
+			object_catch_up_keyframe(object, current_time)
+		}
+	}
+}
+
+create_orientation :: proc(axis: glm.vec3, angle: f64) -> (o: Orientation) {
+	o = Orientation(glm.quatAxisAngle(axis, glm.radians(f32(angle))))
+	return
 }
 
 get_vertices :: proc {
@@ -70,7 +112,7 @@ color_vertices :: proc(vertices: ^[]Vertex, color: glm.vec4 = {1., 1., 1., 1.}) 
 	}
 }
 
-get_object_id :: proc(object: Object) -> ObjectID {
+object_get_id :: proc(object: Object) -> ObjectID {
 	#partial switch generic_object in object {
 	case Cube:
 		return generic_object.id
@@ -79,7 +121,7 @@ get_object_id :: proc(object: Object) -> ObjectID {
 	}
 }
 
-get_object_type_string :: proc(object: Object) -> (object_type: string) {
+object_get_type_string :: proc(object: Object) -> (object_type: string) {
 	#partial switch generic_object in object {
 	case Cube:
 		object_type = "Cube"
@@ -89,10 +131,12 @@ get_object_type_string :: proc(object: Object) -> (object_type: string) {
 	return
 }
 
-get_object_center :: proc(object: Object) -> (center: glm.vec3) {
+object_get_center :: proc(object: Object) -> (center: glm.vec3) {
 	#partial switch generic_object in object {
 	case Cube:
-		center = generic_object.center
+		last_idx := len(generic_object.keyframes) - 1
+		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
+		center = last_keyframe.center
 	}
 
 	return
@@ -101,32 +145,32 @@ get_object_center :: proc(object: Object) -> (center: glm.vec3) {
 get_object_scale :: proc(object: Object) -> (scale: Scale) {
 	#partial switch generic_object in object {
 	case Cube:
-		scale = generic_object.key_frames[generic_object.current_key_frame].scale
+		scale = generic_object.keyframes[generic_object.current_keyframe].scale
 	case:
 	}
 
 	return
 }
 
-get_object_orientation :: proc(object: Object) -> (orientation: Orientation) {
+object_get_orientation :: proc(object: Object) -> (orientation: Orientation) {
 	#partial switch generic_object in object {
 	case Cube:
-		orientation = generic_object.key_frames[generic_object.current_key_frame].orientation
+		orientation = generic_object.keyframes[generic_object.current_keyframe].orientation
 	case:
 	}
 
 	return
 }
 
-get_object_info :: proc(object: ^Object) -> (object_info: ObjectInfo) {
-	object_info.type = get_object_type_string(object^)
-	object_info.id = ObjectID(get_object_id(object^))
+object_get_info :: proc(object: ^Object) -> (object_info: ObjectInfo) {
+	object_info.type = object_get_type_string(object^)
+	object_info.id = ObjectID(object_get_id(object^))
 
 	return
 }
 
 get_objects_info :: proc(objects: [dynamic]^Object) -> (objects_info: []ObjectInfo) {
-	objects_info = slice.mapper(objects[:], get_object_info)
+	objects_info = slice.mapper(objects[:], object_get_info)
 
 	return
 }
