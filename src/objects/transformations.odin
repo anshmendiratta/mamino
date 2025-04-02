@@ -1,23 +1,21 @@
 package objects
 
 import "core:fmt"
-import "core:time"
 
 import glm "core:math/linalg/glsl"
 
-// NOTE(Ansh): Duration implicitly uses seconds.
-rotate :: proc(object: ^Object, rotation: Orientation, duration: time.Duration) {
+rotate :: proc(object: ^Object, rotation: Orientation, duration_seconds: f64) {
 	#partial switch &generic_object in object {
 	case Cube:
 		last_idx := len(generic_object.keyframes) - 1
 		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
 		last_orientation: glm.quat = glm.quat(last_keyframe.orientation)
-		last_start_time: time.Time = last_keyframe.start_time
+		last_start_time: f64 = last_keyframe.start_time
 		rotation: glm.quat = glm.quat(rotation)
 		// NOTE(Jaran): testing leads to equivalent quaternions being calculated
 		// unsure if this will cause problems in the future, leaving as a left multiplication for now
 		final_rotation: glm.quat = rotation * last_orientation
-		final_start_time: time.Time = time.time_add(last_start_time, duration)
+		final_start_time: f64 = last_start_time + duration_seconds
 		fmt.println(last_start_time, final_start_time)
 
 		object_add_keyframe(
@@ -30,14 +28,13 @@ rotate :: proc(object: ^Object, rotation: Orientation, duration: time.Duration) 
 	}
 }
 
-// NOTE(Ansh): Duration implicitly uses seconds.
-translate :: proc(object: ^Object, translation: glm.vec3, duration: time.Duration) {
+translate :: proc(object: ^Object, translation: glm.vec3, duration_seconds: f64) {
 	#partial switch &generic_object in object {
 	case Cube:
 		last_idx := len(generic_object.keyframes) - 1
 		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
-		last_start_time: time.Time = last_keyframe.start_time
-		final_start_time: time.Time = time.time_add(last_start_time, duration)
+		last_start_time: f64 = last_keyframe.start_time
+		final_start_time: f64 = last_start_time + duration_seconds
 		last_center: glm.vec3 = last_keyframe.center
 		final_center: glm.vec3 = last_center + translation
 
@@ -53,13 +50,13 @@ translate :: proc(object: ^Object, translation: glm.vec3, duration: time.Duratio
 }
 
 // NOTE(Ansh): Duration implicitly uses seconds.
-scale :: proc(object: ^Object, scale: Scale, duration: time.Duration) {
+scale :: proc(object: ^Object, scale: Scale, duration_seconds: f64) {
 	#partial switch &generic_object in object {
 	case Cube:
 		last_idx := len(generic_object.keyframes) - 1
 		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
-		last_start_time: time.Time = last_keyframe.start_time
-		final_start_time: time.Time = time.time_add(last_start_time, duration)
+		last_start_time: f64 = last_keyframe.start_time
+		final_start_time: f64 = last_start_time + duration_seconds
 		last_scale: Scale = last_keyframe.scale
 		final_scale: Scale = {
 			x = last_scale.x * scale.x,
@@ -78,13 +75,13 @@ scale :: proc(object: ^Object, scale: Scale, duration: time.Duration) {
 }
 
 // NOTE(Ansh): Duration implicitly uses seconds.
-wait_for :: proc(object: ^Object, duration: time.Duration) {
+wait_for :: proc(object: ^Object, duration_seconds: f64) {
 	#partial switch &generic_object in object {
 	case Cube:
 		last_idx := len(generic_object.keyframes) - 1
 		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
-		last_start_time: time.Time = last_keyframe.start_time
-		final_start_time: time.Time = time.time_add(last_start_time, duration)
+		last_start_time: f64 = last_keyframe.start_time
+		final_start_time: f64 = last_start_time + duration_seconds
 
 		object_add_keyframe(
 			object,

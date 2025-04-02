@@ -2,11 +2,11 @@ package render
 
 import "core:fmt"
 import glm "core:math/linalg/glsl"
-import "core:time"
 
 import "base:builtin"
 
 import gl "vendor:OpenGL"
+import "vendor:glfw"
 
 import "../objects"
 
@@ -17,9 +17,9 @@ render_axes: bool = true
 render_grid: bool = true
 
 @(private)
-global_time: time.Time
+global_time: f64
 @(private)
-time_of_last_pause: time.Time
+time_of_last_pause: f64
 
 HIGHLIGHTED_OBJECT_COLOR :: glm.vec4{0.15, 0.83, 1.0, 0.5}
 
@@ -114,7 +114,7 @@ scene_render :: proc(scene: ^Scene) {
 
 	// TODO(Ansh): Fix this to only move time forward from the last pause frame.
 	// global_time = time.time_add(global_time, time.Second)
-	global_time = time.now()
+	global_time = glfw.GetTime()
 }
 
 render_coordinate_axes :: proc() {
@@ -150,17 +150,15 @@ render_subgrid_axes :: proc() {
 // NOTE(Ansh): Could also use the built-in `lerp` functions, but the overhead in calling them may outweigh the cost of our own implementation.
 render_interpolate_keyframes :: proc(
 	keyframe_a, keyframe_b: objects.KeyFrame,
-	current_time: time.Time,
+	current_time: f64,
 ) -> (
 	interpolated: objects.KeyFrame,
 ) {
-	start_time: time.Time = keyframe_a.start_time
-	end_time: time.Time = keyframe_b.start_time
-	duration: time.Duration = time.diff(start_time, end_time)
+	start_time: f64 = keyframe_a.start_time
+	end_time: f64 = keyframe_b.start_time
+	duration: f64 = end_time - start_time
 	// Get parameter `t \in [t_a, t_b]`.
-	t: f32 =
-		f32(time.duration_nanoseconds(time.diff(current_time, start_time))) /
-		f32(time.duration_nanoseconds(duration))
+	t: f32 = f32((start_time - current_time) / duration)
 
 	interpolated_scale: objects.Scale = {
 		x = keyframe_a.scale.x * t + (1 - t) * keyframe_b.scale.x,
@@ -168,7 +166,7 @@ render_interpolate_keyframes :: proc(
 		z = keyframe_a.scale.z * t + (1 - t) * keyframe_b.scale.z,
 	}
 	interpolated_orientation: objects.Orientation = objects.Orientation(
-		glm.quatSlerp(glm.quat(keyframe_a.orientation), glm.quat(keyframe_b.orientation), t),
+		glm.quatSlerp(glm.quat(keyframe_a.orientation), glm.quat(keyframe_b.orientation), f32(t)),
 	)
 	interpolated_center: glm.vec3 = {
 		keyframe_a.center.x * t + (1 - t) * keyframe_b.center.x,

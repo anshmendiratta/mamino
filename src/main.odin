@@ -1,4 +1,5 @@
 package main
+
 import "core:c"
 import "core:fmt"
 import glm "core:math/linalg/glsl"
@@ -6,7 +7,6 @@ import "core:mem"
 import "core:os/os2"
 import "core:slice"
 import "core:strings"
-import "core:time"
 
 import im "shared:dear_imgui"
 import imgl "shared:dear_imgui/gl"
@@ -70,23 +70,14 @@ main :: proc() {
 	objects.rotate(
 		object = &cube,
 		rotation = objects.create_orientation(axis = {0., 1., 0.}, angle = 45),
-		duration = 2 * time.Second,
+		duration_seconds = 2,
 	)
-	objects.translate(&cube, glm.vec3{1., 0., 0.}, 2 * time.Second)
-	objects.scale(&cube, objects.Scale{2., 1., 1.}, 2 * time.Second)
-	objects.rotate(
-		&cube,
-		objects.create_orientation(axis = {0., 1., 0.}, angle = 45),
-		2 * time.Second,
-	)
-	objects.translate(&cube, glm.vec3{0., 1., 0.}, 2 * time.Second)
-	objects.rotate(
-		&cube,
-		objects.create_orientation(axis = {0., 1., 0.}, angle = 45),
-		2 * time.Second,
-	)
-	objects.wait_for(&cube, 5 * time.Second)
-	fmt.println(cube.(objects.Cube).keyframes)
+	objects.translate(&cube, glm.vec3{1., 0., 0.}, 2)
+	objects.scale(&cube, objects.Scale{2., 1., 1.}, 2)
+	objects.rotate(&cube, objects.create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
+	objects.translate(&cube, glm.vec3{0., 1., 0.}, 2)
+	objects.rotate(&cube, objects.create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
+	objects.wait_for(&cube, 5)
 
 	render_objects_info: []objects.ObjectInfo = objects.get_objects_info(scene.objects)
 

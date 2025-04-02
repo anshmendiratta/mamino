@@ -62,10 +62,10 @@ key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods
 		if action == glfw.PRESS {
 			paused ~= true
 			if paused {
-				time_of_last_pause = time.now()
+				time_of_last_pause = glfw.GetTime()
 			} else {
-				time_since_pause := time.diff(time_of_last_pause, time.now())
-				global_time = time.time_add(global_time, -time_since_pause)
+				time_since_pause := glfw.GetTime() - time_of_last_pause
+				global_time = global_time - time_since_pause
 			}
 		}
 	case glfw.KEY_W, glfw.KEY_UP:
