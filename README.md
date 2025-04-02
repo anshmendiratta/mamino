@@ -39,10 +39,10 @@ See [goals](#goals) for a more detailed list on current features.
 - [ ] Add "ambient occlusion" to mesh face colors to indicate orientation.
 - [ ] "Spawn meshes" (and their spawn animation).
 - [ ] Smooth camera movements.
-- [ ] Allow a sequence of animations/movements to be programmed and ran.
+- [x] Allow a sequence of animations/movements to be programmed and ran.
 - [ ] Add concurrency.
 - [ ] Increase render and video resolution.
-- [ ] Think about and clean-up public API.
+- [x] Think about and clean-up public API.
 - [ ] Add example mains.
 - [ ] Reduce draw calls.
-- [ ] Add keyframe interpolation.
+- [x] Add keyframe interpolation.
