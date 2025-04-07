@@ -16,7 +16,6 @@ rotate :: proc(object: ^Object, rotation: Orientation, duration_seconds: f64) {
 		// unsure if this will cause problems in the future, leaving as a left multiplication for now
 		final_rotation: glm.quat = rotation * last_orientation
 		final_start_time: f64 = last_start_time + duration_seconds
-		fmt.println(last_start_time, final_start_time)
 
 		object_add_keyframe(
 			object,

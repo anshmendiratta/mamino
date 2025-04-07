@@ -80,3 +80,4 @@ See [goals](#goals) for a more detailed list on current features.
 - [ ] Speed up frame extraction.
 - [ ] Add concurrency.
 - [ ] Reduce draw calls.
+- [ ] Cache calculations (such as vertex calculations of spheres).

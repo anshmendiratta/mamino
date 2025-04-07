@@ -4,11 +4,10 @@ package objects
 
 import "core:fmt"
 import glm "core:math/linalg/glsl"
-import "core:time"
 
 
 Cube :: struct {
-	// Geometric center.
+	// Generic object data.
 	id:               ObjectID,
 	keyframes:        [dynamic]KeyFrame,
 	current_keyframe: uint,
@@ -39,7 +38,13 @@ create_cube :: proc(
 	return cube
 }
 
-get_cube_vertices :: proc(cube: Cube, keyframe: KeyFrame) -> (vertices: []Vertex) {
+get_cube_vertices :: proc(
+	cube: ^Cube,
+	keyframe: KeyFrame,
+) -> (
+	vertices: []Vertex,
+	indices: []u16,
+) {
 	vertices = make([]Vertex, len(cube_vertices), context.temp_allocator)
 	copy(vertices, cube_vertices)
 
@@ -47,6 +52,7 @@ get_cube_vertices :: proc(cube: Cube, keyframe: KeyFrame) -> (vertices: []Vertex
 	orientation := keyframe.orientation
 	center := keyframe.center
 
+	// Vertices.
 	for &vertex in vertices {
 		vertex.position.x *= scale.x
 		vertex.position.y *= scale.y
@@ -62,6 +68,10 @@ get_cube_vertices :: proc(cube: Cube, keyframe: KeyFrame) -> (vertices: []Vertex
 		vertex.position = (rotation_matrix * vertex_pos_as_vec4).xyz
 		vertex.position += center
 	}
+
+	// Indices.
+	indices = cube_indices[:]
+
 	return
 }
 
@@ -102,5 +112,84 @@ get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []Vertex) {
 	}
 
 	return
+}
+
+// Uses indexed drawing.
+cube_vertices: []Vertex = {
+	{{1.0, 1.0, 1.0}, cube_color}, // right    top  back
+	{{-1.0, 1.0, 1.0}, cube_color}, //  left    top  back
+	{{1.0, -1.0, 1.0}, cube_color}, // right bottom  back
+	{{1.0, 1.0, -1.0}, cube_color}, // right    top front
+	{{-1.0, -1.0, 1.0}, cube_color}, //  left bottom  back
+	{{1.0, -1.0, -1.0}, cube_color}, // right bottom front
+	{{-1.0, 1.0, -1.0}, cube_color}, //  left    top front
+	{{-1.0, -1.0, -1.0}, cube_color}, //  left bottom front
+}
+cube_color: glm.vec4 = rgb_hex_to_color(0xD3_47_3D)
+cube_indices: []u16 = {
+	0,
+	1,
+	2,
+	2,
+	4,
+	1, // back face
+	3,
+	6,
+	5,
+	5,
+	7,
+	6, // front face
+	0,
+	1,
+	3,
+	3,
+	6,
+	1, // top face
+	2,
+	4,
+	5,
+	5,
+	7,
+	4, // bottom face
+	1,
+	6,
+	4,
+	4,
+	7,
+	6, // left face
+	0,
+	3,
+	2,
+	2,
+	5,
+	3, // right face
+}
+
+cube_point_indices: []u16 = {0, 1, 2, 3, 4, 5, 6, 7}
+cube_line_indices: []u16 = {
+	0,
+	2,
+	2,
+	5,
+	5,
+	3,
+	3,
+	0, // first face.
+	6,
+	7,
+	7,
+	4,
+	4,
+	1,
+	1,
+	6, // Second face.
+	6,
+	3,
+	5,
+	7,
+	1,
+	0,
+	4,
+	2,
 }
 

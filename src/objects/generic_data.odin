@@ -32,6 +32,7 @@ KeyFrame :: struct {
 
 Object :: union {
 	Cube,
+	Sphere,
 }
 
 ObjectID :: distinct int
@@ -100,10 +101,6 @@ object_catch_up_keyframe :: proc(object: ^Object, current_time: f64) {
 create_orientation :: proc(axis: glm.vec3, angle: f64) -> (o: Orientation) {
 	o = Orientation(glm.quatAxisAngle(axis, glm.radians(f32(angle))))
 	return
-}
-
-get_vertices :: proc {
-	get_cube_vertices,
 }
 
 color_vertices :: proc(vertices: ^[]Vertex, color: glm.vec4 = {1., 1., 1., 1.}) {

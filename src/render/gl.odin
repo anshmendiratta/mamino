@@ -48,11 +48,17 @@ update_shader :: proc(uniforms: map[string]gl.Uniform_Info, window_aspect_ratio:
 	gl.Uniform1f(uniforms["aspect_ratio"].location, window_aspect_ratio)
 }
 
-draw_cube :: proc(vertices: []objects.Vertex, indices_count: i32) {
+draw_object :: proc(vertices: []objects.Vertex, indices_count: i32) {
 	gl.DepthFunc(gl.LESS)
 	// TODO: figure out why this doesn't work with `gl.DrawArrays`
 	gl.DrawElements(gl.TRIANGLES, indices_count, gl.UNSIGNED_SHORT, nil)
 }
+
+// draw_cube :: proc(vertices: []objects.Vertex, indices_count: i32) {
+// 	gl.DepthFunc(gl.LESS)
+// 	// TODO: figure out why this doesn't work with `gl.DrawArrays`
+// 	gl.DrawElements(gl.TRIANGLES, indices_count, gl.UNSIGNED_SHORT, nil)
+// }
 
 draw_points :: proc(vertices: []objects.Vertex, indices: []u16) {
 	gl.Enable(gl.PROGRAM_POINT_SIZE)

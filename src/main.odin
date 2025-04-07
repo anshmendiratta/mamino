@@ -64,6 +64,9 @@ main :: proc() {
 
 	scene := render.create_scene()
 
+	sphere := objects.create_sphere()
+	render.scene_add_object(&scene, &sphere)
+
 	cube := objects.create_cube()
 	render.scene_add_object(&scene, &cube)
 
