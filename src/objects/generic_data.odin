@@ -34,7 +34,7 @@ Object :: union {
 	Cube,
 }
 
-ObjectID :: distinct uint
+ObjectID :: distinct int
 ObjectInfo :: struct {
 	type: string,
 	id:   ObjectID,

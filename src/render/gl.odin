@@ -36,13 +36,16 @@ mamino_deinit_gl :: proc(program_id: u32, uniforms: map[string]gl.Uniform_Info) 
 	delete(uniforms)
 }
 
-update_shader :: proc(uniforms: map[string]gl.Uniform_Info) {
+update_shader :: proc(uniforms: map[string]gl.Uniform_Info, window_aspect_ratio: f32) {
 	proj := glm.mat4Perspective(glm.radians_f32(60), 1.0, 0.1, 100.0)
 	scale := f32(0.3)
 	model := glm.mat4{scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., 1}
+	// MVP matrices.
 	gl.UniformMatrix4fv(uniforms["proj"].location, 1, false, &proj[0, 0])
 	gl.UniformMatrix4fv(uniforms["view"].location, 1, false, &camera_view_matrix[0, 0])
 	gl.UniformMatrix4fv(uniforms["model"].location, 1, false, &model[0, 0])
+	// Window size.
+	gl.Uniform1f(uniforms["aspect_ratio"].location, window_aspect_ratio)
 }
 
 draw_cube :: proc(vertices: []objects.Vertex, indices_count: i32) {

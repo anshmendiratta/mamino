@@ -2,6 +2,7 @@ package render
 
 import "core:fmt"
 import glm "core:math/linalg/glsl"
+import "core:testing"
 
 import "base:builtin"
 
@@ -10,7 +11,7 @@ import "vendor:glfw"
 
 import "../objects"
 
-highlighted_debug_object_id: objects.ObjectID
+highlighted_debug_object_id: objects.ObjectID = -1
 render_normals: bool = false
 render_faces: bool = false
 render_axes: bool = true
@@ -46,10 +47,6 @@ scene_render :: proc(scene: ^Scene) {
 		case objects.Cube:
 			// Set appropriate keyframe.
 			objects.object_catch_up_keyframe(generic_object, global_time)
-			// fmt.println(
-			// 	object.current_keyframe,
-			// 	time.diff(object.keyframes[object.current_keyframe].start_time, scene.global_time),
-			// )
 			// Interpolate between the last and the almost-next frame.
 			last_keyframe: objects.KeyFrame = object.keyframes[object.current_keyframe]
 			// Only pass through the keyframes once.
@@ -64,9 +61,9 @@ scene_render :: proc(scene: ^Scene) {
 			vertices := objects.get_vertices(object, interpolated_keyframe)
 
 			// Cube.
-			// if object.id == highlighted_debug_object_id {
-			// 	objects.color_vertices(&vertices, HIGHLIGHTED_OBJECT_COLOR)
-			// }
+			if object.id == highlighted_debug_object_id {
+				objects.color_vertices(&vertices, HIGHLIGHTED_OBJECT_COLOR)
+			}
 			cube_vao, cube_vbo, cube_ebo := get_buffer_objects()
 			bind_data(cube_vao, cube_vbo, cube_ebo, vertices, objects.cube_indices)
 			draw_cube(vertices, i32(len(objects.cube_indices)))

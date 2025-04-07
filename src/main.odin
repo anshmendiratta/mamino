@@ -99,7 +99,8 @@ main :: proc() {
 		glfw.PollEvents()
 		render.update_camera()
 		// Update (rotate) the vertices every frame.
-		render.update_shader(uniforms)
+		window_width, window_height := glfw.GetWindowSize(window)
+		render.update_shader(uniforms, f32(window_width / window_height))
 
 		render.scene_render(&scene)
 		if render.render_axes {
