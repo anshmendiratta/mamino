@@ -38,12 +38,13 @@ create_cube :: proc(
 	return cube
 }
 
-get_cube_vertices :: proc(
+get_cube_data :: proc(
 	cube: ^Cube,
 	keyframe: KeyFrame,
 ) -> (
 	vertices: []Vertex,
 	indices: []u16,
+	line_indices: []u16,
 ) {
 	vertices = make([]Vertex, len(cube_vertices), context.temp_allocator)
 	copy(vertices, cube_vertices)
@@ -71,6 +72,7 @@ get_cube_vertices :: proc(
 
 	// Indices.
 	indices = cube_indices[:]
+	line_indices = cube_line_indices
 
 	return
 }

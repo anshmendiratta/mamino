@@ -67,20 +67,20 @@ main :: proc() {
 	sphere := objects.create_sphere()
 	render.scene_add_object(&scene, &sphere)
 
-	// cube := objects.create_cube()
-	// render.scene_add_object(&scene, &cube)
+	cube := objects.create_cube()
+	render.scene_add_object(&scene, &cube)
 
-	// objects.rotate(
-	// 	object = &cube,
-	// 	rotation = objects.create_orientation(axis = {0., 1., 0.}, angle = 45),
-	// 	duration_seconds = 2,
-	// )
-	// objects.translate(&cube, glm.vec3{1., 0., 0.}, 2)
-	// objects.scale(&cube, objects.Scale{2., 1., 1.}, 2)
-	// objects.rotate(&cube, objects.create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
-	// objects.translate(&cube, glm.vec3{0., 1., 0.}, 2)
-	// objects.rotate(&cube, objects.create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
-	// objects.wait_for(&cube, 5)
+	objects.rotate(
+		object = &cube,
+		rotation = objects.create_orientation(axis = {0., 1., 0.}, angle = 45),
+		duration_seconds = 2,
+	)
+	objects.translate(&cube, glm.vec3{1., 0., 0.}, 2)
+	objects.scale(&cube, objects.Scale{2., 1., 1.}, 2)
+	objects.rotate(&cube, objects.create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
+	objects.translate(&cube, glm.vec3{0., 1., 0.}, 2)
+	objects.rotate(&cube, objects.create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
+	objects.wait_for(&cube, 5)
 
 	render_objects_info: []objects.ObjectInfo = objects.get_objects_info(scene.objects)
 

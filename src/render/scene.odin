@@ -85,7 +85,7 @@ scene_render_cube :: proc(object: ^objects.Object, cube: ^objects.Cube) {
 	next_keyframe: objects.KeyFrame = cube.keyframes[next_keyframe_idx]
 	interpolated_keyframe :=
 		scene_interpolate_keyframes(last_keyframe, next_keyframe, global_time) if last_keyframe != next_keyframe else last_keyframe
-	vertices, indices := objects.get_cube_vertices(cube, interpolated_keyframe)
+	vertices, indices, line_indices := objects.get_cube_data(cube, interpolated_keyframe)
 
 	// Cube.
 	if cube.id == highlighted_debug_object_id {
@@ -102,8 +102,8 @@ scene_render_cube :: proc(object: ^objects.Object, cube: ^objects.Cube) {
 	// Lines.
 	line_vao, line_vbo, line_ebo := get_buffer_objects()
 	objects.color_vertices(&vertices, objects.line_color)
-	bind_data(line_vao, line_vbo, line_ebo, vertices, indices)
-	draw_lines(vertices, i32(len(indices)))
+	bind_data(line_vao, line_vbo, line_ebo, vertices, line_indices)
+	draw_lines(vertices, i32(len(line_indices)))
 
 	gl.DeleteVertexArrays(1, &cube_vao)
 	gl.DeleteBuffers(1, &cube_vbo)
@@ -129,7 +129,7 @@ scene_render_sphere :: proc(object: ^objects.Object, sphere: ^objects.Sphere) {
 	next_keyframe: objects.KeyFrame = sphere.keyframes[next_keyframe_idx]
 	interpolated_keyframe :=
 		scene_interpolate_keyframes(last_keyframe, next_keyframe, global_time) if last_keyframe != next_keyframe else last_keyframe
-	vertices, indices, line_indices := objects.get_sphere_vertices(sphere, interpolated_keyframe)
+	vertices, indices, line_indices := objects.get_sphere_data(sphere, interpolated_keyframe)
 
 	// sphere.
 	if sphere.id == highlighted_debug_object_id {
