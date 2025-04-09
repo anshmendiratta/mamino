@@ -58,6 +58,7 @@ See [goals](#goals) for a more detailed list on current features.
 - [x] "Capture" frames from OpenGL/GLFW and composite them into a video.
 - [x] Add configuration for video export.
 - [x] Add debug panel with scene information.
+- [x] Add sphere.
 - [ ] Add tiling textures on faces.
 - [ ] Add translucency to select faces.
 - [ ] "Spawn meshes" (and their spawn animation).
