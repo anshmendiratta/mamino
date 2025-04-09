@@ -14,8 +14,6 @@ import "../objects"
 highlighted_debug_object_id: objects.ObjectID = -1
 render_normals: bool = false
 render_faces: bool = false
-render_axes: bool = true
-render_grid: bool = true
 
 @(private)
 global_time: f64
@@ -39,34 +37,42 @@ scene_get_objects_count :: proc(scene: ^Scene) -> uint {
 	return len(scene.objects)
 }
 
-scene_render :: proc(scene: ^Scene) {
+scene_render :: proc(scene: ^Scene, configuration: MaminoConfiguration) {
+
 	render_objects := scene.objects
 	for generic_object in render_objects {
 		#partial switch &object in generic_object {
 		// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
 		case objects.Cube:
-			render_cube(generic_object, &generic_object.(objects.Cube))
+			scene_render_cube(generic_object, &generic_object.(objects.Cube))
 
 			// FIX(Ansh): Normal rendering doesn't want to happen on debug mode. Probably to do with setting the PolygonMode.
 			if ODIN_DEBUG && render_normals {
 				normal_vao, normal_vbo, normal_ebo := get_buffer_objects()
 				face_normals := objects.get_cube_normals_coordinates(object)
 				bind_data(normal_vao, normal_vbo, normal_ebo, face_normals, {0, 1, 2, 3, 4, 5})
-				draw_lines(face_normals, {0, 1, 2, 3, 4, 5})
+				draw_lines(face_normals, 6)
 
 				gl.DeleteVertexArrays(1, &normal_vao)
 				gl.DeleteBuffers(1, &normal_vbo)
 				gl.DeleteBuffers(1, &normal_ebo)
 			}
 		case objects.Sphere:
-			render_sphere(generic_object, &generic_object.(objects.Sphere))
+			scene_render_sphere(generic_object, &generic_object.(objects.Sphere))
 		}
+	}
+
+	if .render_axes in configuration {
+		scene_render_coordinate_axes()
+	}
+	if .render_axes_subgrid in configuration {
+		scene_render_subgrid_axes()
 	}
 
 	global_time = glfw.GetTime()
 }
 
-render_cube :: proc(object: ^objects.Object, cube: ^objects.Cube) {
+scene_render_cube :: proc(object: ^objects.Object, cube: ^objects.Cube) {
 	objects.object_catch_up_keyframe(object, global_time) // Set appropriate keyframe.
 	// Interpolate between the last and the almost-next frame.
 	last_keyframe: objects.KeyFrame = cube.keyframes[cube.current_keyframe]
@@ -78,7 +84,7 @@ render_cube :: proc(object: ^objects.Object, cube: ^objects.Cube) {
 	)
 	next_keyframe: objects.KeyFrame = cube.keyframes[next_keyframe_idx]
 	interpolated_keyframe :=
-		render_interpolate_keyframes(last_keyframe, next_keyframe, global_time) if last_keyframe != next_keyframe else last_keyframe
+		scene_interpolate_keyframes(last_keyframe, next_keyframe, global_time) if last_keyframe != next_keyframe else last_keyframe
 	vertices, indices := objects.get_cube_vertices(cube, interpolated_keyframe)
 
 	// Cube.
@@ -97,7 +103,7 @@ render_cube :: proc(object: ^objects.Object, cube: ^objects.Cube) {
 	line_vao, line_vbo, line_ebo := get_buffer_objects()
 	objects.color_vertices(&vertices, objects.line_color)
 	bind_data(line_vao, line_vbo, line_ebo, vertices, indices)
-	draw_lines(vertices, indices)
+	draw_lines(vertices, i32(len(indices)))
 
 	gl.DeleteVertexArrays(1, &cube_vao)
 	gl.DeleteBuffers(1, &cube_vbo)
@@ -110,7 +116,7 @@ render_cube :: proc(object: ^objects.Object, cube: ^objects.Cube) {
 	gl.DeleteBuffers(1, &line_ebo)
 }
 
-render_sphere :: proc(object: ^objects.Object, sphere: ^objects.Sphere) {
+scene_render_sphere :: proc(object: ^objects.Object, sphere: ^objects.Sphere) {
 	objects.object_catch_up_keyframe(object, global_time) // Set appropriate keyframe.
 	// Interpolate between the last and the almost-next frame.
 	last_keyframe: objects.KeyFrame = sphere.keyframes[sphere.current_keyframe]
@@ -122,10 +128,8 @@ render_sphere :: proc(object: ^objects.Object, sphere: ^objects.Sphere) {
 	)
 	next_keyframe: objects.KeyFrame = sphere.keyframes[next_keyframe_idx]
 	interpolated_keyframe :=
-		render_interpolate_keyframes(last_keyframe, next_keyframe, global_time) if last_keyframe != next_keyframe else last_keyframe
-	vertices_dyn, indices_dyn := objects.get_sphere_vertices(sphere, interpolated_keyframe)
-	vertices := vertices_dyn[:]
-	indices := indices_dyn[:]
+		scene_interpolate_keyframes(last_keyframe, next_keyframe, global_time) if last_keyframe != next_keyframe else last_keyframe
+	vertices, indices, line_indices := objects.get_sphere_vertices(sphere, interpolated_keyframe)
 
 	// sphere.
 	if sphere.id == highlighted_debug_object_id {
@@ -142,8 +146,8 @@ render_sphere :: proc(object: ^objects.Object, sphere: ^objects.Sphere) {
 	// Lines.
 	line_vao, line_vbo, line_ebo := get_buffer_objects()
 	objects.color_vertices(&vertices, objects.line_color)
-	bind_data(line_vao, line_vbo, line_ebo, vertices, indices)
-	draw_lines(vertices, indices)
+	bind_data(line_vao, line_vbo, line_ebo, vertices, line_indices)
+	draw_lines(vertices, i32(len(line_indices)))
 
 	gl.DeleteVertexArrays(1, &sphere_vao)
 	gl.DeleteBuffers(1, &sphere_vbo)
@@ -156,7 +160,7 @@ render_sphere :: proc(object: ^objects.Object, sphere: ^objects.Sphere) {
 	gl.DeleteBuffers(1, &line_ebo)
 }
 
-render_coordinate_axes :: proc() {
+scene_render_coordinate_axes :: proc() {
 	axes_vao, axes_vbo, axes_ebo := get_buffer_objects()
 	bind_data(
 		axes_vao,
@@ -165,13 +169,13 @@ render_coordinate_axes :: proc() {
 		objects.coordinate_axes_vertices,
 		objects.coordinate_axes_indices,
 	)
-	draw_axes(objects.coordinate_axes_indices)
+	draw_axes(i32(len(objects.coordinate_axes_indices)))
 	gl.DeleteVertexArrays(1, &axes_vao)
 	gl.DeleteBuffers(1, &axes_vbo)
 	gl.DeleteBuffers(1, &axes_ebo)
 }
 
-render_subgrid_axes :: proc() {
+scene_render_subgrid_axes :: proc() {
 	subgrid_axes_vao, subgrid_axes_vbo, subgrid_axes_ebo := get_buffer_objects()
 	bind_data(
 		subgrid_axes_vao,
@@ -180,14 +184,14 @@ render_subgrid_axes :: proc() {
 		objects.subgrid_axes_vertices,
 		objects.subgrid_axes_indices,
 	)
-	draw_axes(objects.subgrid_axes_indices)
+	draw_axes(i32(len(objects.subgrid_axes_indices)))
 	gl.DeleteVertexArrays(1, &subgrid_axes_vao)
 	gl.DeleteBuffers(1, &subgrid_axes_vbo)
 	gl.DeleteBuffers(1, &subgrid_axes_ebo)
 }
 
 // NOTE(Ansh): Could also use the built-in `lerp` functions, but the overhead in calling them may outweigh the cost of our own implementation.
-render_interpolate_keyframes :: proc(
+scene_interpolate_keyframes :: proc(
 	keyframe_a, keyframe_b: objects.KeyFrame,
 	current_time: f64,
 ) -> (

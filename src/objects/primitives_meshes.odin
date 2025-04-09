@@ -84,11 +84,11 @@ get_subgrid_axes_vertices :: proc() -> (subgrid_axes_vertices: [dynamic]Vertex) 
 }
 
 get_subgrid_axes_indices :: proc() -> (subgrid_axes_indices: [dynamic]u16) {
-	for idx in 0 ..< (NUM_SUBGRIDS * 2 * 3 * 2) - 2 {
-		append(&subgrid_axes_indices, u16(idx))
-		append(&subgrid_axes_indices, u16(idx + 1))
-		append(&subgrid_axes_indices, u16(idx + 1))
-		append(&subgrid_axes_indices, u16(idx + 2))
+	for idx in 0 ..< u16((NUM_SUBGRIDS * 2 * 3 * 2) - 2) {
+		append(&subgrid_axes_indices, idx)
+		append(&subgrid_axes_indices, idx + 1)
+		append(&subgrid_axes_indices, idx + 1)
+		append(&subgrid_axes_indices, idx + 2)
 	}
 	return
 }

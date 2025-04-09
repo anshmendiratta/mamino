@@ -22,7 +22,7 @@ test_frame_interpolation :: proc(_: ^testing.T) {
 		center      = glm.vec3{0., 0., 0.},
 		start_time  = 1,
 	}
-	interpolated_keyframe := render.render_interpolate_keyframes(keyframe_a, keyframe_b, 0.)
+	interpolated_keyframe := render.scene_interpolate_keyframes(keyframe_a, keyframe_b, 0.)
 	expected_keyframe := objects.KeyFrame {
 		scale       = objects.Scale{1., 1., 1.},
 		orientation = objects.Orientation(glm.quat(0)),

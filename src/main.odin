@@ -45,10 +45,10 @@ main :: proc() {
 		}
 	}
 
+	using render
 	// Init.
-	mamino_configuration: MaminoConfiguration = {}
-	// mamino_configuration += {.enable_debugger, .export_video}
-	mamino_init(mamino_configuration)
+	mamino_configuration += {.render_axes, .render_axes_subgrid}
+	mamino_init(render.mamino_configuration)
 	window := render.mamino_create_window()
 
 	if .enable_debugger in mamino_configuration {
@@ -67,20 +67,20 @@ main :: proc() {
 	sphere := objects.create_sphere()
 	render.scene_add_object(&scene, &sphere)
 
-	cube := objects.create_cube()
-	render.scene_add_object(&scene, &cube)
+	// cube := objects.create_cube()
+	// render.scene_add_object(&scene, &cube)
 
-	objects.rotate(
-		object = &cube,
-		rotation = objects.create_orientation(axis = {0., 1., 0.}, angle = 45),
-		duration_seconds = 2,
-	)
-	objects.translate(&cube, glm.vec3{1., 0., 0.}, 2)
-	objects.scale(&cube, objects.Scale{2., 1., 1.}, 2)
-	objects.rotate(&cube, objects.create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
-	objects.translate(&cube, glm.vec3{0., 1., 0.}, 2)
-	objects.rotate(&cube, objects.create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
-	objects.wait_for(&cube, 5)
+	// objects.rotate(
+	// 	object = &cube,
+	// 	rotation = objects.create_orientation(axis = {0., 1., 0.}, angle = 45),
+	// 	duration_seconds = 2,
+	// )
+	// objects.translate(&cube, glm.vec3{1., 0., 0.}, 2)
+	// objects.scale(&cube, objects.Scale{2., 1., 1.}, 2)
+	// objects.rotate(&cube, objects.create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
+	// objects.translate(&cube, glm.vec3{0., 1., 0.}, 2)
+	// objects.rotate(&cube, objects.create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
+	// objects.wait_for(&cube, 5)
 
 	render_objects_info: []objects.ObjectInfo = objects.get_objects_info(scene.objects)
 
@@ -105,13 +105,7 @@ main :: proc() {
 		window_width, window_height := glfw.GetWindowSize(window)
 		render.update_shader(uniforms, f32(window_width / window_height))
 
-		render.scene_render(&scene)
-		if render.render_axes {
-			render.render_coordinate_axes()
-		}
-		if render.render_grid {
-			render.render_subgrid_axes()
-		}
+		render.scene_render(&scene, mamino_configuration)
 
 		if .enable_debugger in mamino_configuration {
 			if render.debugger_open {

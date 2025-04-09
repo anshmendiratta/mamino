@@ -54,31 +54,25 @@ draw_object :: proc(vertices: []objects.Vertex, indices_count: i32) {
 	gl.DrawElements(gl.TRIANGLES, indices_count, gl.UNSIGNED_SHORT, nil)
 }
 
-// draw_cube :: proc(vertices: []objects.Vertex, indices_count: i32) {
-// 	gl.DepthFunc(gl.LESS)
-// 	// TODO: figure out why this doesn't work with `gl.DrawArrays`
-// 	gl.DrawElements(gl.TRIANGLES, indices_count, gl.UNSIGNED_SHORT, nil)
-// }
-
 draw_points :: proc(vertices: []objects.Vertex, indices: []u16) {
 	gl.Enable(gl.PROGRAM_POINT_SIZE)
 	gl.DrawElements(gl.POINTS, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 
-draw_lines :: proc(vertices: []objects.Vertex, indices: []u16) {
+draw_lines :: proc(vertices: []objects.Vertex, indices_count: i32) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
 	gl.LineWidth(1.)
-	gl.DrawElements(gl.LINES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
+	gl.DrawElements(gl.LINES, indices_count, gl.UNSIGNED_SHORT, nil)
 }
 
-draw_axes :: proc(indices: []u16) {
+draw_axes :: proc(indices_count: i32) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
 	gl.LineWidth(1.)
 	gl.Enable(gl.BLEND)
 	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-	gl.DrawElements(gl.LINES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
+	gl.DrawElements(gl.LINES, indices_count, gl.UNSIGNED_SHORT, nil)
 }
 
 get_buffer_objects :: proc() -> (vao: u32, vbo: u32, ebo: u32) {
@@ -147,15 +141,5 @@ bind_data :: proc(vao: u32, vbo: u32, ebo: u32, data: []objects.Vertex, indices:
 		raw_data(indices),
 		gl.STATIC_DRAW,
 	)
-}
-
-bind_text_data :: proc(vao: u32, vbo: u32, data: any) {
-	gl.BindVertexArray(vao)
-	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
-	gl.BufferData(gl.ARRAY_BUFFER, 6 * 4 * size_of(f32), nil, gl.DYNAMIC_DRAW)
-	gl.EnableVertexAttribArray(0)
-	gl.VertexAttribPointer(0, 4, gl.FLOAT, gl.FALSE, 4 * size_of(f32), 0)
-	gl.BindBuffer(gl.ARRAY_BUFFER, 0)
-	gl.BindVertexArray(0)
 }
 
