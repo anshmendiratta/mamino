@@ -36,16 +36,19 @@ mamino_deinit_gl :: proc(program_id: u32, uniforms: map[string]gl.Uniform_Info) 
 	delete(uniforms)
 }
 
-update_shader :: proc(uniforms: map[string]gl.Uniform_Info) {
+update_shader :: proc(uniforms: map[string]gl.Uniform_Info, window_aspect_ratio: f32) {
 	proj := glm.mat4Perspective(glm.radians_f32(60), 1.0, 0.1, 100.0)
 	scale := f32(0.3)
 	model := glm.mat4{scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., 1}
+	// MVP matrices.
 	gl.UniformMatrix4fv(uniforms["proj"].location, 1, false, &proj[0, 0])
 	gl.UniformMatrix4fv(uniforms["view"].location, 1, false, &camera_view_matrix[0, 0])
 	gl.UniformMatrix4fv(uniforms["model"].location, 1, false, &model[0, 0])
+	// Window size.
+	gl.Uniform1f(uniforms["aspect_ratio"].location, window_aspect_ratio)
 }
 
-draw_cube :: proc(vertices: []objects.Vertex, indices_count: i32) {
+draw_object :: proc(vertices: []objects.Vertex, indices_count: i32) {
 	gl.DepthFunc(gl.LESS)
 	// TODO: figure out why this doesn't work with `gl.DrawArrays`
 	gl.DrawElements(gl.TRIANGLES, indices_count, gl.UNSIGNED_SHORT, nil)
@@ -56,20 +59,20 @@ draw_points :: proc(vertices: []objects.Vertex, indices: []u16) {
 	gl.DrawElements(gl.POINTS, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
 }
 
-draw_lines :: proc(vertices: []objects.Vertex, indices: []u16) {
+draw_lines :: proc(vertices: []objects.Vertex, indices_count: i32) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
 	gl.LineWidth(1.)
-	gl.DrawElements(gl.LINES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
+	gl.DrawElements(gl.LINES, indices_count, gl.UNSIGNED_SHORT, nil)
 }
 
-draw_axes :: proc(indices: []u16) {
+draw_axes :: proc(indices_count: i32) {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.LINE_SMOOTH)
 	gl.LineWidth(1.)
 	gl.Enable(gl.BLEND)
 	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-	gl.DrawElements(gl.LINES, i32(len(indices)), gl.UNSIGNED_SHORT, nil)
+	gl.DrawElements(gl.LINES, indices_count, gl.UNSIGNED_SHORT, nil)
 }
 
 get_buffer_objects :: proc() -> (vao: u32, vbo: u32, ebo: u32) {
@@ -138,15 +141,5 @@ bind_data :: proc(vao: u32, vbo: u32, ebo: u32, data: []objects.Vertex, indices:
 		raw_data(indices),
 		gl.STATIC_DRAW,
 	)
-}
-
-bind_text_data :: proc(vao: u32, vbo: u32, data: any) {
-	gl.BindVertexArray(vao)
-	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
-	gl.BufferData(gl.ARRAY_BUFFER, 6 * 4 * size_of(f32), nil, gl.DYNAMIC_DRAW)
-	gl.EnableVertexAttribArray(0)
-	gl.VertexAttribPointer(0, 4, gl.FLOAT, gl.FALSE, 4 * size_of(f32), 0)
-	gl.BindBuffer(gl.ARRAY_BUFFER, 0)
-	gl.BindVertexArray(0)
 }
 

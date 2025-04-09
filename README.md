@@ -44,6 +44,8 @@ Finally, execute `odin run` with no additional flags.
 See [goals](#goals) for a more detailed list on current features.
 
 ### Goals
+
+## Features
 - [x] Render vertices as points (respecting z-index).
 - [x] Render cubes using indexed drawing.
 - [x] Camera rotation with spherical coordinates.
@@ -56,16 +58,26 @@ See [goals](#goals) for a more detailed list on current features.
 - [x] "Capture" frames from OpenGL/GLFW and composite them into a video.
 - [x] Add configuration for video export.
 - [x] Add debug panel with scene information.
-- [ ] Speed up frame extraction.
 - [ ] Add tiling textures on faces.
 - [ ] Add translucency to select faces.
-- [ ] Add "ambient occlusion" to mesh face colors to indicate orientation.
 - [ ] "Spawn meshes" (and their spawn animation).
 - [ ] Smooth camera movements.
 - [x] Allow a sequence of animations/movements to be programmed and ran.
-- [ ] Add concurrency.
 - [ ] Increase render and video resolution.
+- [x] Add keyframe interpolation.
+- [ ] Add new polyhedra.
+- [ ] Import models.
+
+## Quality of Life
+- [ ] Add "ambient occlusion" to mesh face colors to indicate orientation.
+- [ ] Make drawing aspect-ratio-independent.
+
+## Documentation
 - [x] Think about and clean-up public API.
 - [ ] Add example mains.
+
+## Performance
+- [ ] Speed up frame extraction.
+- [ ] Add concurrency.
 - [ ] Reduce draw calls.
-- [x] Add keyframe interpolation.
+- [ ] Cache calculations (such as vertex calculations of spheres).

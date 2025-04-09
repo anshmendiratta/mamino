@@ -8,12 +8,14 @@ import imfw "shared:dear_imgui/glfw"
 
 import "vendor:glfw"
 
+import "render"
+
+
 debugger: ^Debugger = &{}
-mamino_configuration: ^MaminoConfiguration = &{}
 
 @(cold)
 @(deferred_none = mamino_deinit)
-mamino_init :: proc(mamino_configuration: MaminoConfiguration) {
+mamino_init :: proc(mamino_configuration: render.MaminoConfiguration) {
 	if !glfw.Init() {
 		fmt.eprintln("Failed to initialize GLFW")
 		return

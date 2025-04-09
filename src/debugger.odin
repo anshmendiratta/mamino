@@ -218,11 +218,19 @@ debugger_render_toggle_render_buttons :: proc(debugger: ^Debugger) {
 	}
 	im.SameLine()
 	if im.Button(strings.clone_to_cstring("Render axes", context.temp_allocator)) {
-		render.render_axes ~= true
+		if .render_axes in render.mamino_configuration {
+			render.mamino_configuration -= {.render_axes}
+		} else {
+			render.mamino_configuration += {.render_axes}
+		}
 	}
 	im.SameLine()
 	if im.Button(strings.clone_to_cstring("Render grid", context.temp_allocator)) {
-		render.render_grid ~= true
+		if .render_axes_subgrid in render.mamino_configuration {
+			render.mamino_configuration -= {.render_axes_subgrid}
+		} else {
+			render.mamino_configuration += {.render_axes_subgrid}
+		}
 	}
 }
 
