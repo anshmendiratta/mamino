@@ -9,9 +9,8 @@ This project may be rewritten in Vulkan in the future if deemed necesssary.
 ## Dependencies
 - [glfw](https://www.glfw.org/)
 - [OpenGL 4.1](https://www.opengl.org/)
-- [freetype](https://freetype.org/)
-- [ffmpeg](https://www.ffmpeg.org/)
-- [imgui](https://github.com/ocornut/imgui)
+- [ffmpeg](https://www.ffmpeg.org/) (for exporting videos)
+- [imgui](https://github.com/ocornut/imgui) (for rendering the debugger)
 
 `freetype` is imported from the `shared/` directory -- this is located in `ODIN_ROOT` (to find out where this is, you can use `odin root`). Place your files inside the `freetype/` directory after creating it, and things should just work. For this project, we used [odin-freetype](https://github.com/englerj/odin-freetype).
 
