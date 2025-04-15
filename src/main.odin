@@ -45,51 +45,70 @@ main :: proc() {
 		}
 	}
 
+	// Namespace.
 	using render
+	using objects
 	// Init.
 	mamino_configuration += {.render_axes, .render_axes_subgrid}
-	mamino_init(render.mamino_configuration)
-	window := render.mamino_create_window()
+	mamino_init(mamino_configuration)
+	window := mamino_create_window()
 
 	if .enable_debugger in mamino_configuration {
-		// render.highlighted_debug_object_id = ~objects.ObjectID(0)
+		// highlighted_debug_object_id = ~ObjectID(0)
 		mamino_init_imgui(window)
-		// render.highlighted_debug_object_id = 0
+		// highlighted_debug_object_id = 0
 	}
 
-	program_id, uniforms := render.mamino_init_gl()
+	program_id, uniforms := mamino_init_gl()
 	if .export_video in mamino_configuration {
 		sequencing.mamino_frame_capture_init()
 	}
 
-	scene := render.create_scene()
+	scene := create_scene()
+	defer delete(scene.objects)
 
-	sphere := objects.create_sphere()
-	render.scene_add_object(&scene, &sphere)
+	sphere := create_sphere()
+	defer delete(sphere.(Sphere).keyframes)
+	scene_add_object(&scene, &sphere)
 
-	cube := objects.create_cube()
-	render.scene_add_object(&scene, &cube)
-
-	objects.rotate(
-		object = &cube,
-		rotation = objects.create_orientation(axis = {0., 1., 0.}, angle = 45),
+	rotate(
+		object = &sphere,
+		rotation = create_orientation({1., 0., 0.}, 90),
 		duration_seconds = 2,
+		easing = EasingFunction.Sine,
 	)
-	objects.translate(&cube, glm.vec3{1., 0., 0.}, 2)
-	objects.scale(&cube, objects.Scale{2., 1., 1.}, 2)
-	objects.rotate(&cube, objects.create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
-	objects.translate(&cube, glm.vec3{0., 1., 0.}, 2)
-	objects.rotate(&cube, objects.create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
-	objects.wait_for(&cube, 5)
+	scale(&sphere, Scale{2., 1., 2.}, duration_seconds = 2, easing = EasingFunction.Sine)
+	rotate(
+		object = &sphere,
+		rotation = create_orientation({0., 1., 1.}, 90),
+		duration_seconds = 2,
+		easing = EasingFunction.Sine,
+	)
 
-	render_objects_info: []objects.ObjectInfo = objects.get_objects_info(scene.objects)
+	// cube := create_cube()
+	// defer delete(cube)
+	// scene_add_object(&scene, &cube)
+
+	// rotate(
+	// 	object = &cube,
+	// 	rotation = create_orientation(axis = {0., 1., 0.}, angle = 45),
+	// 	duration_seconds = 2,
+	// )
+	// translate(&cube, glm.vec3{1., 0., 0.}, 2)
+	// scale(&cube, Scale{2., 1., 1.}, 2)
+	// rotate(&cube, create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
+	// translate(&cube, glm.vec3{0., 1., 0.}, 2)
+	// rotate(&cube, create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
+	// wait_for(&cube, 5)
+
+	render_objects_info: []ObjectInfo = get_objects_info(scene.objects)
 
 	// Init debugger.
 	if .enable_debugger in mamino_configuration {
-		mamino_init_debugger(debugger, render.scene_get_objects_count(&scene))
+		mamino_init_debugger(debugger, scene_get_objects_count(&scene))
 	}
 
-	for (!glfw.WindowShouldClose(window) && render.running) {
+	for (!glfw.WindowShouldClose(window) && running) {
 		if .enable_debugger in mamino_configuration {
 			debugger_update(debugger)
 		}
@@ -100,15 +119,15 @@ main :: proc() {
 
 		// Input handling.
 		glfw.PollEvents()
-		render.update_camera()
+		update_camera()
 		// Update (rotate) the vertices every frame.
 		window_width, window_height := glfw.GetWindowSize(window)
-		render.update_shader(uniforms, f32(window_width / window_height))
+		update_shader(uniforms, f32(window_width / window_height))
 
-		render.scene_render(&scene, mamino_configuration)
+		scene_render(&scene, mamino_configuration)
 
 		if .enable_debugger in mamino_configuration {
-			if render.debugger_open {
+			if debugger_open {
 				render_debugger(debugger, &scene, &render_objects_info)
 			}
 		}
@@ -117,7 +136,7 @@ main :: proc() {
 			sequencing.mamino_capture_frame()
 		}
 
-		render.WINDOW_WIDTH, render.WINDOW_HEIGHT = glfw.GetWindowSize(window)
+		WINDOW_WIDTH, WINDOW_HEIGHT = glfw.GetWindowSize(window)
 
 		glfw.SwapBuffers(window)
 		free_all(context.temp_allocator) // Frees most of the frames initializations.

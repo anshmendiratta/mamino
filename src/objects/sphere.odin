@@ -11,13 +11,11 @@ Sphere :: struct {
 	keyframes:        [dynamic]KeyFrame,
 	current_keyframe: uint,
 	// Sphere specific fields.
-	radius:           f32,
 	sectors:          uint, // Number of subidivions for \theta.
 	stacks:           uint, // Number of subidivions for \phi.
 }
 
 create_sphere :: proc(
-	radius: f32 = 1.,
 	starting_center: glm.vec3 = {0., 0., 0.},
 	starting_scale: Scale = {1., 1., 1.},
 	starting_orientation: Orientation = Orientation(glm.quat(1)),
@@ -38,7 +36,6 @@ create_sphere :: proc(
 		id               = next_object_creation_id,
 		keyframes        = keyframes,
 		current_keyframe = 0,
-		radius           = radius,
 		sectors          = sectors,
 		stacks           = stacks,
 	}
@@ -61,6 +58,8 @@ get_sphere_data :: proc(
 	indices_dyn: [dynamic]u16
 	line_indices_dyn: [dynamic]u16
 
+	rotation_matrix := glm.mat4FromQuat(glm.quat(keyframe.orientation))
+
 	phi_step := glm.PI / f32(sphere.stacks)
 	theta_step := 2 * glm.PI / f32(sphere.sectors)
 	// Vertices.
@@ -68,12 +67,15 @@ get_sphere_data :: proc(
 		phi := phi_step * f32(i)
 		for j in 0 ..= sphere.sectors {
 			theta := theta_step * f32(j)
-			x := sphere.radius * glm.sin_f32(phi) * glm.cos_f32(theta)
-			// Calculation for `y` stored as `z` since OpenGL is right-handed.
-			z := sphere.radius * glm.sin_f32(phi) * glm.sin_f32(theta)
-			y := sphere.radius * glm.cos_f32(phi)
 
-			append(&vertices_dyn, Vertex{position = glm.vec3{x, y, z}, color = sphere_color})
+			x := keyframe.scale.x * glm.sin_f32(phi) * glm.cos_f32(theta)
+			// Calculation for `y` stored as `z` since OpenGL is right-handed.
+			y := keyframe.scale.y * glm.sin_f32(phi) * glm.sin_f32(theta)
+			z := keyframe.scale.z * glm.cos_f32(phi)
+
+			rotated_vertex_pos_as_vec4 := rotation_matrix * glm.vec4{x, z, y, 1.}
+			center := keyframe.center + rotated_vertex_pos_as_vec4.xyz
+			append(&vertices_dyn, Vertex{position = center, color = sphere_color})
 		}
 	}
 

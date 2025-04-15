@@ -1,6 +1,7 @@
 package render
 
 import "core:fmt"
+import "core:math"
 import glm "core:math/linalg/glsl"
 import "core:testing"
 
@@ -130,6 +131,9 @@ scene_render_sphere :: proc(object: ^objects.Object, sphere: ^objects.Sphere) {
 	interpolated_keyframe :=
 		scene_interpolate_keyframes(last_keyframe, next_keyframe, global_time) if last_keyframe != next_keyframe else last_keyframe
 	vertices, indices, line_indices := objects.get_sphere_data(sphere, interpolated_keyframe)
+	defer delete(vertices)
+	defer delete(indices)
+	defer delete(line_indices)
 
 	// sphere.
 	if sphere.id == highlighted_debug_object_id {
@@ -203,25 +207,58 @@ scene_interpolate_keyframes :: proc(
 	// Get parameter `t \in [t_a, t_b]`.
 	t: f32 = f32((current_time - start_time) / duration)
 
-	interpolated_scale: objects.Scale = {
-		x = keyframe_a.scale.x * (1 - t) + t * keyframe_b.scale.x,
-		y = keyframe_a.scale.y * (1 - t) + t * keyframe_b.scale.y,
-		z = keyframe_a.scale.z * (1 - t) + t * keyframe_b.scale.z,
-	}
-	interpolated_orientation: objects.Orientation = objects.Orientation(
-		glm.quatSlerp(glm.quat(keyframe_a.orientation), glm.quat(keyframe_b.orientation), f32(t)),
-	)
-	interpolated_center: glm.vec3 = {
-		keyframe_a.center.x * (1 - t) + t * keyframe_b.center.x,
-		keyframe_a.center.y * (1 - t) + t * keyframe_b.center.y,
-		keyframe_a.center.z * (1 - t) + t * keyframe_b.center.z,
-	}
-
-	interpolated = {
-		scale       = interpolated_scale,
-		orientation = interpolated_orientation,
-		center      = interpolated_center,
-		start_time  = current_time,
+	switch keyframe_a.easing {
+	case objects.EasingFunction.Linear:
+		interpolated_scale: objects.Scale = {
+			x = keyframe_a.scale.x * (1 - t) + t * keyframe_b.scale.x,
+			y = keyframe_a.scale.y * (1 - t) + t * keyframe_b.scale.y,
+			z = keyframe_a.scale.z * (1 - t) + t * keyframe_b.scale.z,
+		}
+		interpolated_orientation: objects.Orientation = objects.Orientation(
+			glm.quatSlerp(
+				glm.quat(keyframe_a.orientation),
+				glm.quat(keyframe_b.orientation),
+				f32(t),
+			),
+		)
+		interpolated_center: glm.vec3 = {
+			keyframe_a.center.x * (1 - t) + t * keyframe_b.center.x,
+			keyframe_a.center.y * (1 - t) + t * keyframe_b.center.y,
+			keyframe_a.center.z * (1 - t) + t * keyframe_b.center.z,
+		}
+		interpolated = {
+			scale       = interpolated_scale,
+			orientation = interpolated_orientation,
+			center      = interpolated_center,
+			start_time  = current_time,
+		}
+	case objects.EasingFunction.Quad:
+	case objects.EasingFunction.Cubic:
+	case objects.EasingFunction.Sine:
+		sine_easein := 1 - math.cos((t * glm.PI) / 2)
+		interpolated_scale: objects.Scale = {
+			x = keyframe_a.scale.x * (1 - sine_easein) + sine_easein * keyframe_b.scale.x,
+			y = keyframe_a.scale.y * (1 - sine_easein) + sine_easein * keyframe_b.scale.y,
+			z = keyframe_a.scale.z * (1 - sine_easein) + sine_easein * keyframe_b.scale.z,
+		}
+		interpolated_orientation: objects.Orientation = objects.Orientation(
+			glm.quatSlerp(
+				glm.quat(keyframe_a.orientation),
+				glm.quat(keyframe_b.orientation),
+				f32(sine_easein),
+			),
+		)
+		interpolated_center: glm.vec3 = {
+			keyframe_a.center.x * (1 - sine_easein) + sine_easein * keyframe_b.center.x,
+			keyframe_a.center.y * (1 - sine_easein) + sine_easein * keyframe_b.center.y,
+			keyframe_a.center.z * (1 - sine_easein) + sine_easein * keyframe_b.center.z,
+		}
+		interpolated = {
+			scale       = interpolated_scale,
+			orientation = interpolated_orientation,
+			center      = interpolated_center,
+			start_time  = current_time,
+		}
 	}
 
 	return

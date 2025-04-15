@@ -37,6 +37,7 @@ mamino_capture_frame :: proc() {
 	frame_data = capture_frame(current_pbo_idx)
 	frame_copy := slice.clone(frame_data)
 	defer delete(frame_data)
+	defer delete(frame_copy)
 	append(&stored_frames, frame_copy)
 	current_pbo_idx = current_pbo_idx ~ 1
 }

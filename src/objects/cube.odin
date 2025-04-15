@@ -14,9 +14,9 @@ Cube :: struct {
 }
 
 create_cube :: proc(
-	center: glm.vec3 = {0., 0., 0.},
+	starting_center: glm.vec3 = {0., 0., 0.},
 	starting_scale: Scale = {1., 1., 1.},
-	starting_orientation: Orientation = Orientation(glm.quat(1)),
+	starting_orientation: Orientation = Orientation(glm.quat(1)), // Multiplicative identity quaternion.
 ) -> Object {
 	keyframes: [dynamic]KeyFrame
 	append(
@@ -37,6 +37,8 @@ create_cube :: proc(
 
 	return cube
 }
+
+cube_color: glm.vec4 = rgb_hex_to_color(0xD3_47_3D)
 
 get_cube_data :: proc(
 	cube: ^Cube,
@@ -59,7 +61,7 @@ get_cube_data :: proc(
 		vertex.position.y *= scale.y
 		vertex.position.z *= scale.z
 
-		rotation_matrix := glm.mat4FromQuat(quaternion128(orientation))
+		rotation_matrix := glm.mat4FromQuat(glm.quat(orientation))
 		vertex_pos_as_vec4 := glm.vec4 {
 			vertex.position.x,
 			vertex.position.y,
@@ -85,9 +87,9 @@ get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []Vertex) {
 
 	scale := cube.keyframes[cube.current_keyframe].scale
 	orientation := cube.keyframes[cube.current_keyframe].orientation
-	translation := cube.keyframes[cube.current_keyframe].center
+	center := cube.keyframes[cube.current_keyframe].center
 
-	rotation_matrix := glm.mat4FromQuat(quaternion128(orientation))
+	rotation_matrix := glm.mat4FromQuat(glm.quat(orientation))
 	rotated_x_axis: glm.vec3 = (rotation_matrix * standard_x_axis).xyz
 	rotated_y_axis: glm.vec3 = (rotation_matrix * standard_y_axis).xyz
 	rotated_z_axis: glm.vec3 = (rotation_matrix * standard_z_axis).xyz
@@ -105,12 +107,12 @@ get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []Vertex) {
 	z_normal_color.a = 0.6
 
 	normals = {
-		{translation, x_normal_color},
-		{rotated_x_normal + translation, x_normal_color},
-		{translation, y_normal_color},
-		{rotated_y_normal + translation, y_normal_color},
-		{translation, z_normal_color},
-		{rotated_z_normal + translation, z_normal_color},
+		{center, x_normal_color},
+		{rotated_x_normal + center, x_normal_color},
+		{center, y_normal_color},
+		{rotated_y_normal + center, y_normal_color},
+		{center, z_normal_color},
+		{rotated_z_normal + center, z_normal_color},
 	}
 
 	return
@@ -127,7 +129,6 @@ cube_vertices: []Vertex = {
 	{{-1.0, 1.0, -1.0}, cube_color}, //  left    top front
 	{{-1.0, -1.0, -1.0}, cube_color}, //  left bottom front
 }
-cube_color: glm.vec4 = rgb_hex_to_color(0xD3_47_3D)
 cube_indices: []u16 = {
 	0,
 	1,

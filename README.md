@@ -65,12 +65,12 @@ See [goals](#goals) for a more detailed list on current features.
 - [x] Allow a sequence of animations/movements to be programmed and ran.
 - [ ] Increase render and video resolution.
 - [x] Add keyframe interpolation.
-- [ ] Add new polyhedra.
 - [ ] Import models.
 
 ## Quality of Life
 - [ ] Add "ambient occlusion" to mesh face colors to indicate orientation.
 - [ ] Make drawing aspect-ratio-independent.
+- [ ] Easing modes for animations.
 
 ## Documentation
 - [x] Think about and clean-up public API.

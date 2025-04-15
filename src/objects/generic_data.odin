@@ -24,10 +24,19 @@ Scale :: struct {
 Orientation :: distinct glm.quat
 
 KeyFrame :: struct {
-	scale:       Scale,
-	orientation: Orientation,
-	center:      glm.vec3,
 	start_time:  f64,
+	scale:       Scale,
+	center:      glm.vec3,
+	orientation: Orientation,
+	easing:      EasingFunction,
+}
+
+// EaseIn.
+EasingFunction :: enum {
+	Linear,
+	Quad,
+	Cubic,
+	Sine,
 }
 
 Object :: union {
@@ -48,6 +57,8 @@ object_set_current_key_frame :: proc(object: ^Object, frame_index: uint) {
 	#partial switch &generic_object in object {
 	case Cube:
 		generic_object.current_keyframe = frame_index % len(generic_object.keyframes)
+	case Sphere:
+		generic_object.current_keyframe = frame_index % len(generic_object.keyframes)
 	case:
 		return
 	}
@@ -60,6 +71,7 @@ object_add_keyframe :: proc(
 	orientation: Maybe(Orientation) = nil,
 	translation: Maybe(glm.vec3) = glm.vec3{0., 0., 0.},
 	start_time: f64,
+	easing: EasingFunction = EasingFunction.Linear,
 ) {
 	#partial switch &generic_object in object {
 	case Cube:
@@ -71,6 +83,19 @@ object_add_keyframe :: proc(
 				orientation = orientation.? or_else generic_object.keyframes[last_index].orientation,
 				center = translation.? or_else generic_object.keyframes[last_index].center,
 				start_time = start_time,
+				easing = easing,
+			},
+		)
+	case Sphere:
+		last_index := len(generic_object.keyframes) - 1
+		append(
+			&generic_object.keyframes,
+			KeyFrame {
+				scale = scale.? or_else generic_object.keyframes[last_index].scale,
+				orientation = orientation.? or_else generic_object.keyframes[last_index].orientation,
+				center = translation.? or_else generic_object.keyframes[last_index].center,
+				start_time = start_time,
+				easing = easing,
 			},
 		)
 	case:
@@ -81,6 +106,29 @@ object_add_keyframe :: proc(
 object_catch_up_keyframe :: proc(object: ^Object, current_time: f64) {
 	#partial switch &generic_object in object {
 	case Cube:
+		// Check if we're done with all animation sequences.
+		if generic_object.current_keyframe == len(generic_object.keyframes) - 1 {
+			return
+		}
+		current_keyframe := generic_object.keyframes[generic_object.current_keyframe]
+		time_diff_between_now_and_curr_frame := current_time - current_keyframe.start_time
+		next_keyframe_index := glm.clamp(
+			u32(generic_object.current_keyframe + 1),
+			u32(0),
+			u32(len(generic_object.keyframes) - 1),
+		)
+		current_keyframe_duration :=
+			generic_object.keyframes[next_keyframe_index].start_time - current_keyframe.start_time
+
+		if current_keyframe_duration < time_diff_between_now_and_curr_frame {
+			generic_object.current_keyframe = uint(next_keyframe_index)
+			object_catch_up_keyframe(object, current_time)
+		}
+	case Sphere:
+		// Check if we're done with all animation sequences.
+		if generic_object.current_keyframe == len(generic_object.keyframes) - 1 {
+			return
+		}
 		current_keyframe := generic_object.keyframes[generic_object.current_keyframe]
 		time_diff_between_now_and_curr_frame := current_time - current_keyframe.start_time
 		next_keyframe_index := glm.clamp(
@@ -113,6 +161,8 @@ object_get_id :: proc(object: Object) -> ObjectID {
 	#partial switch generic_object in object {
 	case Cube:
 		return generic_object.id
+	case Sphere:
+		return generic_object.id
 	case:
 		return 0
 	}
@@ -122,6 +172,8 @@ object_get_type_string :: proc(object: Object) -> (object_type: string) {
 	#partial switch generic_object in object {
 	case Cube:
 		object_type = "Cube"
+	case Sphere:
+		object_type = ""
 	case:
 	}
 
@@ -134,6 +186,10 @@ object_get_center :: proc(object: Object) -> (center: glm.vec3) {
 		last_idx := len(generic_object.keyframes) - 1
 		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
 		center = last_keyframe.center
+	case Sphere:
+		last_idx := len(generic_object.keyframes) - 1
+		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
+		center = last_keyframe.center
 	}
 
 	return
@@ -142,6 +198,8 @@ object_get_center :: proc(object: Object) -> (center: glm.vec3) {
 get_object_scale :: proc(object: Object) -> (scale: Scale) {
 	#partial switch generic_object in object {
 	case Cube:
+		scale = generic_object.keyframes[generic_object.current_keyframe].scale
+	case Sphere:
 		scale = generic_object.keyframes[generic_object.current_keyframe].scale
 	case:
 	}
@@ -152,6 +210,8 @@ get_object_scale :: proc(object: Object) -> (scale: Scale) {
 object_get_orientation :: proc(object: Object) -> (orientation: Orientation) {
 	#partial switch generic_object in object {
 	case Cube:
+		orientation = generic_object.keyframes[generic_object.current_keyframe].orientation
+	case Sphere:
 		orientation = generic_object.keyframes[generic_object.current_keyframe].orientation
 	case:
 	}
