@@ -66,6 +66,7 @@ See [goals](#goals) for a more detailed list on current features.
 - [ ] Increase render and video resolution.
 - [x] Add keyframe interpolation.
 - [ ] Import models.
+- [ ] Camera panning (and other sequences).
 
 ## Quality of Life
 - [ ] Add "ambient occlusion" to mesh face colors to indicate orientation.
