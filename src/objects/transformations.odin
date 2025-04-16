@@ -4,21 +4,6 @@ import "core:fmt"
 
 import glm "core:math/linalg/glsl"
 
-// Since we store an initial keyframe to instantiate the object, we copy over the easing from the first added keyframe to this initial keyframe.
-validate_object :: proc(object: ^Object) {
-	#partial switch &generic_object in object {
-	case Cube:
-		for keyframe_idx in 0 ..< len(generic_object.keyframes) - 1 {
-			last_added_keyframe := generic_object.keyframes[keyframe_idx + 1]
-			generic_object.keyframes[keyframe_idx].easing = last_added_keyframe.easing
-		}
-	case Sphere:
-		for keyframe_idx in 0 ..< len(generic_object.keyframes) - 1 {
-			last_added_keyframe := generic_object.keyframes[keyframe_idx + 1]
-			generic_object.keyframes[keyframe_idx].easing = last_added_keyframe.easing
-		}
-	}
-}
 
 rotate :: proc(
 	object: ^Object,
@@ -30,6 +15,8 @@ rotate :: proc(
 	case Cube:
 		last_idx := len(generic_object.keyframes) - 1
 		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
+		// NOTE(Ansh): Modify the last keyframe to share the newest easing to shift all the easings one to the left. Covers the initial keyframe created at object instantiation.
+		generic_object.keyframes[last_idx].easing = easing
 		last_orientation: glm.quat = glm.quat(last_keyframe.orientation)
 		last_start_time: f64 = last_keyframe.start_time
 		rotation: glm.quat = glm.quat(rotation)
@@ -49,6 +36,8 @@ rotate :: proc(
 	case Sphere:
 		last_idx := len(generic_object.keyframes) - 1
 		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
+		// NOTE(Ansh): Modify the last keyframe to share the newest easing to shift all the easings one to the left. Covers the initial keyframe created at object instantiation.
+		generic_object.keyframes[last_idx].easing = easing
 		last_orientation: glm.quat = glm.quat(last_keyframe.orientation)
 		last_start_time: f64 = last_keyframe.start_time
 		rotation: glm.quat = glm.quat(rotation)
@@ -78,6 +67,8 @@ translate :: proc(
 	case Cube:
 		last_idx := len(generic_object.keyframes) - 1
 		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
+		// NOTE(Ansh): Modify the last keyframe to share the newest easing to shift all the easings one to the left. Covers the initial keyframe created at object instantiation.
+		generic_object.keyframes[last_idx].easing = easing
 		last_start_time: f64 = last_keyframe.start_time
 		final_start_time: f64 = last_start_time + duration_seconds
 		last_center: glm.vec3 = last_keyframe.center
@@ -94,6 +85,8 @@ translate :: proc(
 	case Sphere:
 		last_idx := len(generic_object.keyframes) - 1
 		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
+		// NOTE(Ansh): Modify the last keyframe to share the newest easing to shift all the easings one to the left. Covers the initial keyframe created at object instantiation.
+		generic_object.keyframes[last_idx].easing = easing
 		last_start_time: f64 = last_keyframe.start_time
 		final_start_time: f64 = last_start_time + duration_seconds
 		last_center: glm.vec3 = last_keyframe.center
@@ -122,6 +115,8 @@ scale :: proc(
 	case Cube:
 		last_idx := len(generic_object.keyframes) - 1
 		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
+		// NOTE(Ansh): Modify the last keyframe to share the newest easing to shift all the easings one to the left. Covers the initial keyframe created at object instantiation.
+		generic_object.keyframes[last_idx].easing = easing
 		last_start_time: f64 = last_keyframe.start_time
 		final_start_time: f64 = last_start_time + duration_seconds
 		last_scale: Scale = last_keyframe.scale
@@ -142,6 +137,8 @@ scale :: proc(
 	case Sphere:
 		last_idx := len(generic_object.keyframes) - 1
 		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
+		// NOTE(Ansh): Modify the last keyframe to share the newest easing to shift all the easings one to the left. Covers the initial keyframe created at object instantiation.
+		generic_object.keyframes[last_idx].easing = easing
 		last_start_time: f64 = last_keyframe.start_time
 		final_start_time: f64 = last_start_time + duration_seconds
 		last_scale: Scale = last_keyframe.scale
@@ -172,6 +169,8 @@ wait_for :: proc(
 	case Cube:
 		last_idx := len(generic_object.keyframes) - 1
 		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
+		// NOTE(Ansh): Modify the last keyframe to share the newest easing to shift all the easings one to the left. Covers the initial keyframe created at object instantiation.
+		generic_object.keyframes[last_idx].easing = easing
 		last_start_time: f64 = last_keyframe.start_time
 		final_start_time: f64 = last_start_time + duration_seconds
 
@@ -186,6 +185,8 @@ wait_for :: proc(
 	case Sphere:
 		last_idx := len(generic_object.keyframes) - 1
 		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
+		// NOTE(Ansh): Modify the last keyframe to share the newest easing to shift all the easings one to the left. Covers the initial keyframe created at object instantiation.
+		generic_object.keyframes[last_idx].easing = easing
 		last_start_time: f64 = last_keyframe.start_time
 		final_start_time: f64 = last_start_time + duration_seconds
 
