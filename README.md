@@ -71,7 +71,7 @@ See [goals](#goals) for a more detailed list on current features.
 ## Quality of Life
 - [ ] Add "ambient occlusion" to mesh face colors to indicate orientation.
 - [ ] Make drawing aspect-ratio-independent.
-- [ ] Easing modes for animations.
+- [x] Easing modes for animations.
 
 ## Documentation
 - [x] Think about and clean-up public API.
