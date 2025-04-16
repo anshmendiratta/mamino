@@ -222,8 +222,15 @@ scene_interpolate_keyframes :: proc(
 		} else {
 			t = 1 - math.pow_f32(-2 * t + 2, 3) / 2
 		}
-	case objects.EasingFunction.SineInOut:
+	case objects.EasingFunction.Sine:
 		t = -(math.cos(glm.PI * t) - 1) / 2
+	case objects.EasingFunction.Elastic:
+		c_5 := f32(2 * glm.PI / 4.5)
+		if t < 0.5 {
+			t = -math.pow_f32(2, 20 * t - 10) * math.sin((20 * t - 11.125) * c_5) / 2
+		} else {
+			t = math.pow_f32(2, -20 * t + 10) * math.sin((20 * t - 11.125) * c_5) / 2 + 1
+		}
 	}
 
 	interpolated_scale: objects.Scale = {

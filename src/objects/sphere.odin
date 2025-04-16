@@ -44,7 +44,7 @@ create_sphere :: proc(
 	return sphere
 }
 
-sphere_color: glm.vec4 = rgb_hex_to_color(0xd3_3d_a4)
+sphere_color: glm.vec4 = rgb_hex_to_color(0xd3_3d_60)
 
 get_sphere_data :: proc(
 	sphere: ^Sphere,

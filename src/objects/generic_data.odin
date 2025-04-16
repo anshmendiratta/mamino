@@ -36,7 +36,8 @@ EasingFunction :: enum {
 	Linear,
 	Quad,
 	Cubic,
-	SineInOut,
+	Sine,
+	Elastic,
 }
 
 Object :: union {
