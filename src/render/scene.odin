@@ -206,58 +206,44 @@ scene_interpolate_keyframes :: proc(
 	// Get parameter `t \in [t_a, t_b]`.
 	t: f32 = f32((current_time - start_time) / duration)
 
+	// Just rewrite `t` depending on the required easing function.
 	switch keyframe_a.easing {
 	case objects.EasingFunction.Linear:
-		interpolated_scale: objects.Scale = {
-			x = keyframe_a.scale.x * (1 - t) + t * keyframe_b.scale.x,
-			y = keyframe_a.scale.y * (1 - t) + t * keyframe_b.scale.y,
-			z = keyframe_a.scale.z * (1 - t) + t * keyframe_b.scale.z,
-		}
-		interpolated_orientation: objects.Orientation = objects.Orientation(
-			glm.quatSlerp(
-				glm.quat(keyframe_a.orientation),
-				glm.quat(keyframe_b.orientation),
-				f32(t),
-			),
-		)
-		interpolated_center: glm.vec3 = {
-			keyframe_a.center.x * (1 - t) + t * keyframe_b.center.x,
-			keyframe_a.center.y * (1 - t) + t * keyframe_b.center.y,
-			keyframe_a.center.z * (1 - t) + t * keyframe_b.center.z,
-		}
-		interpolated = {
-			scale       = interpolated_scale,
-			orientation = interpolated_orientation,
-			center      = interpolated_center,
-			start_time  = current_time,
-		}
+		t = t
 	case objects.EasingFunction.Quad:
+		if t < 0.5 {
+			t = 2 * math.pow_f32(t, 2)
+		} else {
+			t = 1 - math.pow_f32(-2 * t + 2, 2) / 2
+		}
 	case objects.EasingFunction.Cubic:
+		if t < 0.5 {
+			t = 4 * math.pow_f32(t, 3)
+		} else {
+			t = 1 - math.pow_f32(-2 * t + 2, 3) / 2
+		}
 	case objects.EasingFunction.SineInOut:
-		sine_easeinout := -(math.cos(glm.PI * t) - 1) / 2
-		interpolated_scale: objects.Scale = {
-			x = keyframe_a.scale.x * (1 - sine_easeinout) + sine_easeinout * keyframe_b.scale.x,
-			y = keyframe_a.scale.y * (1 - sine_easeinout) + sine_easeinout * keyframe_b.scale.y,
-			z = keyframe_a.scale.z * (1 - sine_easeinout) + sine_easeinout * keyframe_b.scale.z,
-		}
-		interpolated_orientation: objects.Orientation = objects.Orientation(
-			glm.quatSlerp(
-				glm.quat(keyframe_a.orientation),
-				glm.quat(keyframe_b.orientation),
-				f32(sine_easeinout),
-			),
-		)
-		interpolated_center: glm.vec3 = {
-			keyframe_a.center.x * (1 - sine_easeinout) + sine_easeinout * keyframe_b.center.x,
-			keyframe_a.center.y * (1 - sine_easeinout) + sine_easeinout * keyframe_b.center.y,
-			keyframe_a.center.z * (1 - sine_easeinout) + sine_easeinout * keyframe_b.center.z,
-		}
-		interpolated = {
-			scale       = interpolated_scale,
-			orientation = interpolated_orientation,
-			center      = interpolated_center,
-			start_time  = current_time,
-		}
+		t = -(math.cos(glm.PI * t) - 1) / 2
+	}
+
+	interpolated_scale: objects.Scale = {
+		x = keyframe_a.scale.x * (1 - t) + t * keyframe_b.scale.x,
+		y = keyframe_a.scale.y * (1 - t) + t * keyframe_b.scale.y,
+		z = keyframe_a.scale.z * (1 - t) + t * keyframe_b.scale.z,
+	}
+	interpolated_orientation: objects.Orientation = objects.Orientation(
+		glm.quatSlerp(glm.quat(keyframe_a.orientation), glm.quat(keyframe_b.orientation), f32(t)),
+	)
+	interpolated_center: glm.vec3 = {
+		keyframe_a.center.x * (1 - t) + t * keyframe_b.center.x,
+		keyframe_a.center.y * (1 - t) + t * keyframe_b.center.y,
+		keyframe_a.center.z * (1 - t) + t * keyframe_b.center.z,
+	}
+	interpolated = {
+		scale       = interpolated_scale,
+		orientation = interpolated_orientation,
+		center      = interpolated_center,
+		start_time  = current_time,
 	}
 
 	return
