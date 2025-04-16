@@ -31,12 +31,12 @@ KeyFrame :: struct {
 	easing:      EasingFunction,
 }
 
-// EaseIn.
+// EaseInOut.
 EasingFunction :: enum {
 	Linear,
 	Quad,
 	Cubic,
-	Sine,
+	SineInOut,
 }
 
 Object :: union {

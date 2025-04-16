@@ -75,15 +75,16 @@ main :: proc() {
 		object = &sphere,
 		rotation = create_orientation({1., 0., 0.}, 90),
 		duration_seconds = 2,
-		easing = EasingFunction.Sine,
+		easing = EasingFunction.Linear,
 	)
-	scale(&sphere, Scale{2., 1., 2.}, duration_seconds = 2, easing = EasingFunction.Sine)
+	scale(&sphere, Scale{2., 1., 2.}, duration_seconds = 2, easing = EasingFunction.SineInOut)
 	rotate(
 		object = &sphere,
 		rotation = create_orientation({0., 1., 1.}, 90),
 		duration_seconds = 2,
-		easing = EasingFunction.Sine,
+		easing = EasingFunction.SineInOut,
 	)
+	validate_object(&sphere)
 
 	// cube := create_cube()
 	// defer delete(cube)

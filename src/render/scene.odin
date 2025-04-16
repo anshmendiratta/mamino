@@ -39,7 +39,6 @@ scene_get_objects_count :: proc(scene: ^Scene) -> uint {
 }
 
 scene_render :: proc(scene: ^Scene, configuration: MaminoConfiguration) {
-
 	render_objects := scene.objects
 	for generic_object in render_objects {
 		#partial switch &object in generic_object {
@@ -234,24 +233,24 @@ scene_interpolate_keyframes :: proc(
 		}
 	case objects.EasingFunction.Quad:
 	case objects.EasingFunction.Cubic:
-	case objects.EasingFunction.Sine:
-		sine_easein := 1 - math.cos((t * glm.PI) / 2)
+	case objects.EasingFunction.SineInOut:
+		sine_easeinout := -(math.cos(glm.PI * t) - 1) / 2
 		interpolated_scale: objects.Scale = {
-			x = keyframe_a.scale.x * (1 - sine_easein) + sine_easein * keyframe_b.scale.x,
-			y = keyframe_a.scale.y * (1 - sine_easein) + sine_easein * keyframe_b.scale.y,
-			z = keyframe_a.scale.z * (1 - sine_easein) + sine_easein * keyframe_b.scale.z,
+			x = keyframe_a.scale.x * (1 - sine_easeinout) + sine_easeinout * keyframe_b.scale.x,
+			y = keyframe_a.scale.y * (1 - sine_easeinout) + sine_easeinout * keyframe_b.scale.y,
+			z = keyframe_a.scale.z * (1 - sine_easeinout) + sine_easeinout * keyframe_b.scale.z,
 		}
 		interpolated_orientation: objects.Orientation = objects.Orientation(
 			glm.quatSlerp(
 				glm.quat(keyframe_a.orientation),
 				glm.quat(keyframe_b.orientation),
-				f32(sine_easein),
+				f32(sine_easeinout),
 			),
 		)
 		interpolated_center: glm.vec3 = {
-			keyframe_a.center.x * (1 - sine_easein) + sine_easein * keyframe_b.center.x,
-			keyframe_a.center.y * (1 - sine_easein) + sine_easein * keyframe_b.center.y,
-			keyframe_a.center.z * (1 - sine_easein) + sine_easein * keyframe_b.center.z,
+			keyframe_a.center.x * (1 - sine_easeinout) + sine_easeinout * keyframe_b.center.x,
+			keyframe_a.center.y * (1 - sine_easeinout) + sine_easeinout * keyframe_b.center.y,
+			keyframe_a.center.z * (1 - sine_easeinout) + sine_easeinout * keyframe_b.center.z,
 		}
 		interpolated = {
 			scale       = interpolated_scale,

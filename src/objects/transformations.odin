@@ -4,6 +4,22 @@ import "core:fmt"
 
 import glm "core:math/linalg/glsl"
 
+// Since we store an initial keyframe to instantiate the object, we copy over the easing from the first added keyframe to this initial keyframe.
+validate_object :: proc(object: ^Object) {
+	#partial switch &generic_object in object {
+	case Cube:
+		for keyframe_idx in 0 ..< len(generic_object.keyframes) - 1 {
+			last_added_keyframe := generic_object.keyframes[keyframe_idx + 1]
+			generic_object.keyframes[keyframe_idx].easing = last_added_keyframe.easing
+		}
+	case Sphere:
+		for keyframe_idx in 0 ..< len(generic_object.keyframes) - 1 {
+			last_added_keyframe := generic_object.keyframes[keyframe_idx + 1]
+			generic_object.keyframes[keyframe_idx].easing = last_added_keyframe.easing
+		}
+	}
+}
+
 rotate :: proc(
 	object: ^Object,
 	rotation: Orientation,
@@ -28,6 +44,7 @@ rotate :: proc(
 			orientation = Orientation(final_rotation),
 			translation = last_keyframe.center,
 			start_time = final_start_time,
+			easing = easing,
 		)
 	case Sphere:
 		last_idx := len(generic_object.keyframes) - 1
@@ -46,6 +63,7 @@ rotate :: proc(
 			orientation = Orientation(final_rotation),
 			translation = last_keyframe.center,
 			start_time = final_start_time,
+			easing = easing,
 		)
 	}
 }
@@ -71,6 +89,7 @@ translate :: proc(
 			orientation = last_keyframe.orientation,
 			translation = final_center,
 			start_time = final_start_time,
+			easing = easing,
 		)
 	case Sphere:
 		last_idx := len(generic_object.keyframes) - 1
@@ -86,6 +105,7 @@ translate :: proc(
 			orientation = last_keyframe.orientation,
 			translation = final_center,
 			start_time = final_start_time,
+			easing = easing,
 		)
 	}
 
@@ -117,6 +137,7 @@ scale :: proc(
 			orientation = last_keyframe.orientation,
 			translation = last_keyframe.center,
 			start_time = final_start_time,
+			easing = easing,
 		)
 	case Sphere:
 		last_idx := len(generic_object.keyframes) - 1
@@ -136,6 +157,7 @@ scale :: proc(
 			orientation = last_keyframe.orientation,
 			translation = last_keyframe.center,
 			start_time = final_start_time,
+			easing = easing,
 		)
 	}
 }
@@ -159,6 +181,7 @@ wait_for :: proc(
 			orientation = last_keyframe.orientation,
 			translation = last_keyframe.center,
 			start_time = final_start_time,
+			easing = easing,
 		)
 	case Sphere:
 		last_idx := len(generic_object.keyframes) - 1
