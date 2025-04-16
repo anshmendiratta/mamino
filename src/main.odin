@@ -75,14 +75,14 @@ main :: proc() {
 		object = &sphere,
 		rotation = create_orientation({1., 0., 0.}, 90),
 		duration_seconds = 2,
-		easing = EasingFunction.Elastic,
+		easing = EasingFunction.Circ,
 	)
-	scale(&sphere, Scale{2., 1., 2.}, duration_seconds = 2, easing = EasingFunction.Elastic)
+	scale(&sphere, Scale{2., 1., 2.}, duration_seconds = 2, easing = EasingFunction.Circ)
 	rotate(
 		object = &sphere,
 		rotation = create_orientation({0., 1., 1.}, 90),
 		duration_seconds = 2,
-		easing = EasingFunction.Elastic,
+		easing = EasingFunction.Circ,
 	)
 	validate_object(&sphere)
 

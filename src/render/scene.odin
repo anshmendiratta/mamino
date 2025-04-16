@@ -194,6 +194,7 @@ scene_render_subgrid_axes :: proc() {
 }
 
 // NOTE(Ansh): Could also use the built-in `lerp` functions, but the overhead in calling them may outweigh the cost of our own implementation.
+// NOTE(Ansh): All the reassignments are taken from https://easings.net/.
 scene_interpolate_keyframes :: proc(
 	keyframe_a, keyframe_b: objects.KeyFrame,
 	current_time: f64,
@@ -230,6 +231,12 @@ scene_interpolate_keyframes :: proc(
 			t = -math.pow_f32(2, 20 * t - 10) * math.sin((20 * t - 11.125) * c_5) / 2
 		} else {
 			t = math.pow_f32(2, -20 * t + 10) * math.sin((20 * t - 11.125) * c_5) / 2 + 1
+		}
+	case objects.EasingFunction.Circ:
+		if t < 0.5 {
+			t = (1 - math.sqrt(1 - math.pow_f32(2 * t, 2))) / 2
+		} else {
+			t = (math.sqrt(1 - math.pow_f32(-2 * t + 2, 2)) + 1) / 2
 		}
 	}
 

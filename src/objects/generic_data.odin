@@ -38,6 +38,7 @@ EasingFunction :: enum {
 	Cubic,
 	Sine,
 	Elastic,
+	Circ,
 }
 
 Object :: union {
