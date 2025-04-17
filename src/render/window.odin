@@ -41,6 +41,7 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 	glfw.MakeContextCurrent(window)
 	glfw.SwapInterval(0)
 	glfw.SetKeyCallback(window, key_callback)
+	glfw.SetCursorPosCallback(window, cursor_position_callback)
 	glfw.SetFramebufferSizeCallback(window, size_callback)
 	gl.load_up_to(int(GL_MAJOR_VERSION), GL_MINOR_VERSION, glfw.gl_set_proc_address)
 
@@ -52,26 +53,56 @@ mamino_destroy_window :: proc(window: glfw.WindowHandle) {
 	// free(window)
 }
 
+previous_cursor_x_pos, previous_cursor_y_pos: c.double = 0, 0
+
+cursor_position_callback :: proc "c" (window: glfw.WindowHandle, x_pos, y_pos: c.double) {
+	if glfw.GetMouseButton(window, glfw.MOUSE_BUTTON_LEFT) == glfw.PRESS {
+	}
+
+	if glfw.GetMouseButton(window, glfw.MOUSE_BUTTON_LEFT) == glfw.RELEASE {
+		return
+	}
+
+	// Calculate cursor offsets and cache positions.
+	delta_x := f32(previous_cursor_x_pos - x_pos)
+	delta_y := f32(previous_cursor_y_pos - y_pos)
+
+	previous_cursor_x_pos = x_pos
+	previous_cursor_y_pos = y_pos
+
+	// Cursor is dragging (holding down button).
+	camera_position_spherical.z = glm.clamp(
+		camera_position_spherical.z - cursor_sensitivity * delta_y,
+		-theta_bound,
+		theta_bound,
+	)
+	camera_position_spherical.y = glm.clamp(
+		camera_position_spherical.y - cursor_sensitivity * delta_x,
+		-theta_bound,
+		theta_bound,
+	)
+}
+
 key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
 	switch key {
 	case glfw.KEY_ESCAPE, glfw.KEY_Q:
 		running = false
 	case glfw.KEY_W, glfw.KEY_UP:
 		camera_position_spherical.z = glm.clamp(
-			camera_position_spherical.z + rotation_rate,
+			camera_position_spherical.z + keyboard_rotation_rate,
 			-theta_bound,
 			theta_bound,
 		)
 	case glfw.KEY_A, glfw.KEY_LEFT:
-		camera_position_spherical.y += rotation_rate
+		camera_position_spherical.y += keyboard_rotation_rate
 	case glfw.KEY_S, glfw.KEY_DOWN:
 		camera_position_spherical.z = glm.clamp(
-			camera_position_spherical.z - rotation_rate,
+			camera_position_spherical.z - keyboard_rotation_rate,
 			-theta_bound,
 			theta_bound,
 		)
 	case glfw.KEY_D, glfw.KEY_RIGHT:
-		camera_position_spherical.y -= rotation_rate
+		camera_position_spherical.y -= keyboard_rotation_rate
 	case glfw.KEY_EQUAL:
 		camera_position_spherical.x -= zoom_rate
 	case glfw.KEY_MINUS:

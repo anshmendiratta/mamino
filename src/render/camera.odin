@@ -13,7 +13,8 @@ camera_target: glm.vec3 = {0., 0., 0.}
 theta_bound :: (glm.PI / 2.0) - 0.00001
 
 // rates of rotation and zoom
-rotation_rate :: 0.1
+keyboard_rotation_rate :: 0.1
+cursor_sensitivity :: 0.001
 zoom_rate :: 0.1
 
 // Direction vectors.
