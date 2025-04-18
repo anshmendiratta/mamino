@@ -30,7 +30,7 @@ Debugger :: struct {
 mamino_init_debugger :: proc(debugger: ^Debugger, num_objects: uint) {
 	render.last_frame = glfw.GetTime()
 	debugger.object_count = num_objects
-	debugger.camera_position = render.camera_position_cartesian
+	debugger.camera_position = render.camera_get_cartesian_coordinates(&render.camera)
 }
 
 mamino_deinit_debugger :: proc(debugger: ^Debugger, _: uint) {
@@ -77,7 +77,7 @@ debugger_update :: proc(debugger: ^Debugger) {
 
 	// FIX(Ansh): Find a way to avoid calculating this every frame. Not too expensive, but would be nice to have gone.
 	// Camera position.
-	debugger.camera_position = render.get_cartesian_coordinates(&render.camera)
+	debugger.camera_position = render.camera_get_cartesian_coordinates(&render.camera)
 }
 
 debugger_get_most_recent_frametime :: proc(debugger: ^Debugger) -> f64 {

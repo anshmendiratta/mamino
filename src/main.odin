@@ -120,7 +120,7 @@ main :: proc() {
 
 		// Input handling.
 		glfw.PollEvents()
-		update_camera()
+		update_camera_matrix()
 		// Update (rotate) the vertices every frame.
 		window_width, window_height := glfw.GetWindowSize(window)
 		update_shader(uniforms, f32(window_width) / f32(window_height))
