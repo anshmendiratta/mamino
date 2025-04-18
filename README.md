@@ -1,4 +1,4 @@
-# [![Mamino Banner](gh_assets/mamino_banner.jpg)](https://github.com/anshmendiratta/mamino)
+# [![Mamino Banner](gh_assets/mamino_banner.png)](https://github.com/anshmendiratta/mamino)
 
 # mamino
 A [manim](https://www.manim.community/) inspired 3D renderer that supports coordinate based object animation in Odin.
