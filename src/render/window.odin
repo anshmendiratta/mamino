@@ -84,11 +84,11 @@ key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods
 	case glfw.KEY_ESCAPE, glfw.KEY_Q:
 		running = false
 	case glfw.KEY_W, glfw.KEY_UP:
-		camera.phi = glm.clamp(camera.phi + keyboard_rotation_rate, -phi_bound, phi_bound)
+		camera.phi = glm.clamp(camera.phi - keyboard_rotation_rate, 0, phi_bound)
 	case glfw.KEY_A, glfw.KEY_LEFT:
 		camera.theta += keyboard_rotation_rate
 	case glfw.KEY_S, glfw.KEY_DOWN:
-		camera.phi = glm.clamp(camera.phi - keyboard_rotation_rate, -phi_bound, phi_bound)
+		camera.phi = glm.clamp(camera.phi + keyboard_rotation_rate, 0, phi_bound)
 	case glfw.KEY_D, glfw.KEY_RIGHT:
 		camera.theta -= keyboard_rotation_rate
 	case glfw.KEY_EQUAL:

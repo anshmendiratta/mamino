@@ -19,7 +19,7 @@ camera_position_spherical: Camera = get_spherical_coordinates(camera_position_ca
 camera_target: glm.vec3 = {0., 0., 0.}
 
 // Bound of theta to avoid going upside down.
-phi_bound :: (glm.PI / 2.0) - 0.00001
+phi_bound :: glm.PI - 1e-5
 
 // Rates of rotation and zoom.
 keyboard_rotation_rate :: 0.1
@@ -41,9 +41,9 @@ update_camera :: proc() {
 }
 
 get_spherical_coordinates :: proc(cartesian: glm.vec3) -> (spherical_camera: Camera) {
-	spherical_camera.r = glm.length(cartesian) // radius
-	spherical_camera.phi = glm.atan2(cartesian.z / cartesian.x, cartesian.x) // phi
-	spherical_camera.theta = glm.acos(cartesian.y / spherical_camera.r) // theta
+	spherical_camera.r = glm.length(cartesian)
+	spherical_camera.phi = glm.atan2(cartesian.z / cartesian.x, cartesian.x)
+	spherical_camera.theta = glm.acos(cartesian.y / spherical_camera.r)
 
 	if cartesian.x < 0 {
 		spherical_camera.phi += glm.PI
@@ -57,9 +57,9 @@ get_cartesian_coordinates :: proc(camera: ^Camera) -> (cartesian: glm.vec3) {
 	phi := camera.phi
 	theta := camera.theta
 
-	cartesian.x = radius * glm.cos(phi) * glm.cos(theta)
-	cartesian.y = radius * glm.sin(phi)
-	cartesian.z = radius * glm.cos(phi) * glm.sin(theta)
+	cartesian.x = radius * glm.sin(phi) * glm.cos(theta)
+	cartesian.y = radius * glm.cos(phi)
+	cartesian.z = radius * glm.sin(phi) * glm.sin(theta)
 
 	return
 }
