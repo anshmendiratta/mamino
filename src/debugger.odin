@@ -77,7 +77,7 @@ debugger_update :: proc(debugger: ^Debugger) {
 
 	// FIX(Ansh): Find a way to avoid calculating this every frame. Not too expensive, but would be nice to have gone.
 	// Camera position.
-	debugger.camera_position = render.get_cartesian_coordinates(render.camera_position_spherical)
+	debugger.camera_position = render.get_cartesian_coordinates(&render.camera)
 }
 
 debugger_get_most_recent_frametime :: proc(debugger: ^Debugger) -> f64 {
