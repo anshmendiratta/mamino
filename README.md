@@ -1,10 +1,19 @@
 # mamino
 A [manim](https://www.manim.community/) inspired 3D renderer that supports coordinate based object animation in Odin.
 
+
+## Table of Contents
+1. [Why?](#why?)
+2. [Usage](#usage)
+3. [Features/Goals](#features/goals)
+4. [For Maintainers](#maintainers)
+
+
 ## Why?
 To explore and learn both [Odin](https://odin-lang.org/) and 3D rendering and coordinate animation techniques (like those employed by [manim](https://www.manim.community/)) more deeply.
 
 This project may be rewritten in Vulkan in the future if deemed necesssary.
+
 
 ## Dependencies
 - [glfw](https://www.glfw.org/)
@@ -34,17 +43,14 @@ shared/
 ```
 Of course, you may choose to edit the source of this library to match the structure of your `shared/`.
 
+
 ## Usage
 Add the project files to Odin's `shared` or otherwise a place to import the library from. Next, fill in the blanks and guess a way to use this library.
-
 Finally, execute `odin run` with no additional flags.
 
-## Features
-See [goals](#goals) for a more detailed list on current features.
 
-### Goals
-
-## Features
+## Features/Goals
+### Most important
 - [x] Render vertices as points (respecting z-index).
 - [x] Render cubes using indexed drawing.
 - [x] Camera rotation with spherical coordinates.
@@ -69,17 +75,22 @@ See [goals](#goals) for a more detailed list on current features.
 - [ ] Camera panning (and other sequences).
 - [x] Camera mouse dragging behavior.
 
-## Quality of Life
+### Quality of Life
 - [ ] Add "ambient occlusion" to mesh face colors to indicate orientation.
 - [ ] Make drawing aspect-ratio-independent.
 - [x] Easing modes for animations.
 
-## Documentation
+### Documentation
 - [x] Think about and clean-up public API.
 - [ ] Add example mains.
 
-## Performance
+### Performance
 - [ ] Speed up frame extraction.
 - [ ] Add concurrency.
 - [ ] Reduce draw calls.
 - [ ] Cache calculations (such as vertex calculations of spheres).
+
+
+## For Maintainers
+
+Any and all Math in the repository follows the *Math* convention unless otherwise noted. Do not use the *Physics* convention if possible, but note it as such if used regardless.

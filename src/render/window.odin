@@ -70,7 +70,7 @@ cursor_position_callback :: proc "c" (window: glfw.WindowHandle, x_pos, y_pos: c
 	// Calculate cursor offsets and cache positions.
 	delta_x := f32(previous_cursor_x_pos - x_pos)
 	delta_y := f32(previous_cursor_y_pos - y_pos)
-
+	// Cache positions.
 	previous_cursor_x_pos = x_pos
 	previous_cursor_y_pos = y_pos
 
