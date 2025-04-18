@@ -123,7 +123,7 @@ main :: proc() {
 		update_camera()
 		// Update (rotate) the vertices every frame.
 		window_width, window_height := glfw.GetWindowSize(window)
-		update_shader(uniforms, f32(window_width / window_height))
+		update_shader(uniforms, f32(window_width) / f32(window_height))
 
 		scene_render(&scene, mamino_configuration)
 
