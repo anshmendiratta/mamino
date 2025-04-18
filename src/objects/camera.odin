@@ -1,4 +1,4 @@
-package render
+package objects
 
 import "core:fmt"
 

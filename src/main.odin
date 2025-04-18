@@ -84,7 +84,6 @@ main :: proc() {
 		duration_seconds = 2,
 		easing = EasingFunction.Circ,
 	)
-	validate_object(&sphere)
 
 	// cube := create_cube()
 	// defer delete(cube)

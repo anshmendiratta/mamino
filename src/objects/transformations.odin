@@ -4,21 +4,7 @@ import "core:fmt"
 
 import glm "core:math/linalg/glsl"
 
-// Since we store an initial keyframe to instantiate the object, we copy over the easing from the first added keyframe to this initial keyframe.
-validate_object :: proc(object: ^Object) {
-	#partial switch &generic_object in object {
-	case Cube:
-		for keyframe_idx in 0 ..< len(generic_object.keyframes) - 1 {
-			last_added_keyframe := generic_object.keyframes[keyframe_idx + 1]
-			generic_object.keyframes[keyframe_idx].easing = last_added_keyframe.easing
-		}
-	case Sphere:
-		for keyframe_idx in 0 ..< len(generic_object.keyframes) - 1 {
-			last_added_keyframe := generic_object.keyframes[keyframe_idx + 1]
-			generic_object.keyframes[keyframe_idx].easing = last_added_keyframe.easing
-		}
-	}
-}
+pan :: proc(camera: ^Camera)
 
 rotate :: proc(
 	object: ^Object,

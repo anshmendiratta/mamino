@@ -42,7 +42,7 @@ update_shader :: proc(uniforms: map[string]gl.Uniform_Info, window_aspect_ratio:
 	model := glm.mat4{scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., scale, 0., 0., 0., 0., 1}
 	// MVP matrices.
 	gl.UniformMatrix4fv(uniforms["proj"].location, 1, false, &proj[0, 0])
-	gl.UniformMatrix4fv(uniforms["view"].location, 1, false, &camera_view_matrix[0, 0])
+	gl.UniformMatrix4fv(uniforms["view"].location, 1, false, &objects.camera_view_matrix[0, 0])
 	gl.UniformMatrix4fv(uniforms["model"].location, 1, false, &model[0, 0])
 	// Window size.
 	gl.Uniform1f(uniforms["aspect_ratio"].location, window_aspect_ratio)
