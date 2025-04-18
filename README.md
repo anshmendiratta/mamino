@@ -77,7 +77,7 @@ Finally, execute `odin run` with no additional flags.
 
 ### Quality of Life
 - [ ] Add "ambient occlusion" to mesh face colors to indicate orientation.
-- [ ] Make drawing aspect-ratio-independent.
+- [x] Make drawing aspect-ratio-independent.
 - [x] Easing modes for animations.
 
 ### Documentation
