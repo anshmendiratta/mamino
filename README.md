@@ -1,3 +1,5 @@
+![Mamino Banner](mamino_banner.png)
+
 # mamino
 A [manim](https://www.manim.community/) inspired 3D renderer that supports coordinate based object animation in Odin.
 
