@@ -6,7 +6,7 @@ A [manim](https://www.manim.community/) inspired 3D renderer that supports coord
 1. [Why?](#why?)
 2. [Usage](#usage)
 3. [Features/Goals](#features/goals)
-4. [For Maintainers](#maintainers)
+4. [For Maintainers](#for-maintainers)
 
 
 ## Why?
