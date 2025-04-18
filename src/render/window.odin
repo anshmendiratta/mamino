@@ -75,8 +75,8 @@ cursor_position_callback :: proc "c" (window: glfw.WindowHandle, x_pos, y_pos: c
 	previous_cursor_y_pos = y_pos
 
 	// Cursor is dragging (holding down button).
-	camera.theta = camera.theta - cursor_sensitivity * delta_y
-	camera.phi = glm.clamp(camera.phi - cursor_sensitivity * delta_y, -phi_bound, phi_bound)
+	camera.theta = camera.theta - cursor_sensitivity * delta_x
+	camera.phi = glm.clamp(camera.phi + cursor_sensitivity * delta_y, -phi_bound, phi_bound)
 }
 
 key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
