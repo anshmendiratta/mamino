@@ -67,6 +67,7 @@ See [goals](#goals) for a more detailed list on current features.
 - [x] Add keyframe interpolation.
 - [ ] Import models.
 - [ ] Camera panning (and other sequences).
+- [x] Camera mouse dragging behavior.
 
 ## Quality of Life
 - [ ] Add "ambient occlusion" to mesh face colors to indicate orientation.
