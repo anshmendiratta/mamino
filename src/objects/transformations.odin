@@ -4,7 +4,10 @@ import "core:fmt"
 
 import glm "core:math/linalg/glsl"
 
-pan :: proc(camera: ^Camera)
+pan :: proc(camera: ^Camera, to: glm.vec3) {
+	// next_camera_keyframe := KeyFrame 
+
+}
 
 rotate :: proc(
 	object: ^Object,
@@ -149,11 +152,7 @@ scale :: proc(
 }
 
 // NOTE(Ansh): Duration implicitly uses seconds.
-wait_for :: proc(
-	object: ^Object,
-	duration_seconds: f64,
-	easing: EasingFunction = EasingFunction.Linear,
-) {
+wait_for :: proc(object: ^Object, duration_seconds: f64) {
 	#partial switch &generic_object in object {
 	case Cube:
 		last_idx := len(generic_object.keyframes) - 1
@@ -167,7 +166,7 @@ wait_for :: proc(
 			orientation = last_keyframe.orientation,
 			translation = last_keyframe.center,
 			start_time = final_start_time,
-			easing = easing,
+			easing = last_keyframe.easing,
 		)
 	case Sphere:
 		last_idx := len(generic_object.keyframes) - 1
@@ -181,7 +180,7 @@ wait_for :: proc(
 			orientation = last_keyframe.orientation,
 			translation = last_keyframe.center,
 			start_time = final_start_time,
-			easing = easing,
+			easing = last_keyframe.easing,
 		)
 	}
 }

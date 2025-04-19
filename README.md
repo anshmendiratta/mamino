@@ -89,7 +89,7 @@ Finally, execute `odin run` with no additional flags.
 ### Performance
 - [ ] Speed up frame extraction.
 - [ ] Add concurrency.
-- [ ] Reduce draw calls.
+- [?] Reduce draw calls.
 - [ ] Cache calculations (such as vertex calculations of spheres).
 
 

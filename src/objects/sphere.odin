@@ -10,6 +10,7 @@ Sphere :: struct {
 	id:               ObjectID,
 	keyframes:        [dynamic]KeyFrame,
 	current_keyframe: uint,
+	color:            int "Hex code",
 	// Sphere specific fields.
 	sectors:          uint, // Number of subidivions for \theta.
 	stacks:           uint, // Number of subidivions for \phi.
@@ -19,6 +20,7 @@ create_sphere :: proc(
 	starting_center: glm.vec3 = {0., 0., 0.},
 	starting_scale: Scale = {1., 1., 1.},
 	starting_orientation: Orientation = Orientation(glm.quat(1)),
+	color: int = 0x22_d6_ac,
 	sectors: uint = 16,
 	stacks: uint = 16,
 ) -> Object {
@@ -36,6 +38,7 @@ create_sphere :: proc(
 		id               = next_object_creation_id,
 		keyframes        = keyframes,
 		current_keyframe = 0,
+		color            = color,
 		sectors          = sectors,
 		stacks           = stacks,
 	}
@@ -44,7 +47,6 @@ create_sphere :: proc(
 	return sphere
 }
 
-sphere_color: glm.vec4 = rgb_hex_to_color(0xd3_3d_60)
 
 get_sphere_data :: proc(
 	sphere: ^Sphere,
@@ -75,6 +77,7 @@ get_sphere_data :: proc(
 
 			rotated_vertex_pos_as_vec4 := rotation_matrix * glm.vec4{x, z, y, 1.}
 			center := keyframe.center + rotated_vertex_pos_as_vec4.xyz
+			sphere_color := rgb_hex_to_color(sphere.color)
 			append(&vertices_dyn, Vertex{position = center, color = sphere_color})
 		}
 	}
