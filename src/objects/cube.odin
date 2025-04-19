@@ -11,12 +11,14 @@ Cube :: struct {
 	id:               ObjectID,
 	keyframes:        [dynamic]KeyFrame,
 	current_keyframe: uint,
+	color:            int "Hex code",
 }
 
 create_cube :: proc(
 	starting_center: glm.vec3 = {0., 0., 0.},
 	starting_scale: Scale = {1., 1., 1.},
 	starting_orientation: Orientation = Orientation(glm.quat(1)), // Multiplicative identity quaternion.
+	color: int = 0xd6_76_22,
 ) -> Object {
 	keyframes: [dynamic]KeyFrame
 	append(
@@ -24,7 +26,7 @@ create_cube :: proc(
 		KeyFrame {
 			scale = starting_scale,
 			orientation = starting_orientation,
-			center = glm.vec3{0., 0., 0.},
+			center = starting_center,
 			start_time = 0,
 		},
 	)
@@ -32,13 +34,13 @@ create_cube :: proc(
 		id               = next_object_creation_id,
 		keyframes        = keyframes,
 		current_keyframe = 0,
+		color            = color,
 	}
 	next_object_creation_id += 1
 
 	return cube
 }
 
-cube_color: glm.vec4 = rgb_hex_to_color(0xD3_47_3D)
 
 get_cube_data :: proc(
 	cube: ^Cube,
@@ -69,6 +71,7 @@ get_cube_data :: proc(
 			1.0,
 		}
 		vertex.position = (rotation_matrix * vertex_pos_as_vec4).xyz
+		vertex.color = rgb_hex_to_color(cube.color)
 		vertex.position += center
 	}
 
@@ -120,14 +123,14 @@ get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []Vertex) {
 
 // Uses indexed drawing.
 cube_vertices: []Vertex = {
-	{{1.0, 1.0, 1.0}, cube_color}, // right    top  back
-	{{-1.0, 1.0, 1.0}, cube_color}, //  left    top  back
-	{{1.0, -1.0, 1.0}, cube_color}, // right bottom  back
-	{{1.0, 1.0, -1.0}, cube_color}, // right    top front
-	{{-1.0, -1.0, 1.0}, cube_color}, //  left bottom  back
-	{{1.0, -1.0, -1.0}, cube_color}, // right bottom front
-	{{-1.0, 1.0, -1.0}, cube_color}, //  left    top front
-	{{-1.0, -1.0, -1.0}, cube_color}, //  left bottom front
+	{{1.0, 1.0, 1.0}, {}}, // right    top  back
+	{{-1.0, 1.0, 1.0}, {}}, //  left    top  back
+	{{1.0, -1.0, 1.0}, {}}, // right bottom  back
+	{{1.0, 1.0, -1.0}, {}}, // right    top front
+	{{-1.0, -1.0, 1.0}, {}}, //  left bottom  back
+	{{1.0, -1.0, -1.0}, {}}, // right bottom front
+	{{-1.0, 1.0, -1.0}, {}}, //  left    top front
+	{{-1.0, -1.0, -1.0}, {}}, //  left bottom front
 }
 cube_indices: []u16 = {
 	0,

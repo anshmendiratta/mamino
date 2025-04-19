@@ -7,6 +7,9 @@ import glm "core:math/linalg/glsl"
 import gl "vendor:OpenGL"
 import "vendor:glfw"
 
+import "../objects"
+
+
 @(private)
 PROGRAM_NAME :: "mamino"
 @(private)
@@ -75,8 +78,12 @@ cursor_position_callback :: proc "c" (window: glfw.WindowHandle, x_pos, y_pos: c
 	previous_cursor_y_pos = y_pos
 
 	// Cursor is dragging (holding down button).
-	camera.theta = camera.theta - cursor_sensitivity * delta_x
-	camera.phi = glm.clamp(camera.phi + cursor_sensitivity * delta_y, -phi_bound, phi_bound)
+	objects.camera.theta = objects.camera.theta - objects.cursor_sensitivity * delta_x
+	objects.camera.phi = glm.clamp(
+		objects.camera.phi + objects.cursor_sensitivity * delta_y,
+		-objects.phi_bound,
+		objects.phi_bound,
+	)
 }
 
 key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods: i32) {
@@ -84,17 +91,25 @@ key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods
 	case glfw.KEY_ESCAPE, glfw.KEY_Q:
 		running = false
 	case glfw.KEY_W, glfw.KEY_UP:
-		camera.phi = glm.clamp(camera.phi - keyboard_rotation_rate, 0, phi_bound)
+		objects.camera.phi = glm.clamp(
+			objects.camera.phi - objects.keyboard_rotation_rate,
+			0,
+			objects.phi_bound,
+		)
 	case glfw.KEY_A, glfw.KEY_LEFT:
-		camera.theta += keyboard_rotation_rate
+		objects.camera.theta += objects.keyboard_rotation_rate
 	case glfw.KEY_S, glfw.KEY_DOWN:
-		camera.phi = glm.clamp(camera.phi + keyboard_rotation_rate, 0, phi_bound)
+		objects.camera.phi = glm.clamp(
+			objects.camera.phi + objects.keyboard_rotation_rate,
+			0,
+			objects.phi_bound,
+		)
 	case glfw.KEY_D, glfw.KEY_RIGHT:
-		camera.theta -= keyboard_rotation_rate
+		objects.camera.theta -= objects.keyboard_rotation_rate
 	case glfw.KEY_EQUAL:
-		camera.r -= zoom_rate
+		objects.camera.r -= objects.zoom_rate
 	case glfw.KEY_MINUS:
-		camera.r += zoom_rate
+		objects.camera.r += objects.zoom_rate
 	}
 }
 

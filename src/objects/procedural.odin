@@ -5,6 +5,7 @@ import "core:fmt"
 import glm "core:math/linalg/glsl"
 import rand "core:math/rand"
 
+
 generate_n_colors :: proc(n: u32) -> [dynamic]glm.vec3 {
 	colors: [dynamic]glm.vec3
 	lower_bound: f32 = 0.4

@@ -6,9 +6,10 @@ A [manim](https://www.manim.community/) inspired 3D renderer that supports coord
 
 ## Table of Contents
 1. [Why?](#why?)
-2. [Usage](#usage)
-3. [Features/Goals](#features/goals)
-4. [For Maintainers](#for-maintainers)
+2. [Dependencies](#dependencies)
+3. [Usage](#usage)
+4. [Features/Goals](#features/goals)
+5. [For Maintainers](#for-maintainers)
 
 
 ## Why?
@@ -76,6 +77,7 @@ Finally, execute `odin run` with no additional flags.
 - [ ] Import models.
 - [ ] Camera panning (and other sequences).
 - [x] Camera mouse dragging behavior.
+- [x] Allow the coloring of objects.
 
 ### Quality of Life
 - [ ] Add "ambient occlusion" to mesh face colors to indicate orientation.
@@ -89,7 +91,7 @@ Finally, execute `odin run` with no additional flags.
 ### Performance
 - [ ] Speed up frame extraction.
 - [ ] Add concurrency.
-- [ ] Reduce draw calls.
+- [?] Reduce draw calls.
 - [ ] Cache calculations (such as vertex calculations of spheres).
 
 

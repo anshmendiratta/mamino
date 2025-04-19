@@ -48,15 +48,14 @@ main :: proc() {
 	// Namespace.
 	using render
 	using objects
+
 	// Init.
 	mamino_configuration += {.render_axes, .render_axes_subgrid}
 	mamino_init(mamino_configuration)
 	window := mamino_create_window()
 
 	if .enable_debugger in mamino_configuration {
-		// highlighted_debug_object_id = ~ObjectID(0)
 		mamino_init_imgui(window)
-		// highlighted_debug_object_id = 0
 	}
 
 	program_id, uniforms := mamino_init_gl()
@@ -67,7 +66,8 @@ main :: proc() {
 	scene := create_scene()
 	defer delete(scene.objects)
 
-	sphere := create_sphere()
+	// Sphere.
+	sphere := create_sphere(color = 0x2261d6)
 	defer delete(sphere.(Sphere).keyframes)
 	scene_add_object(&scene, &sphere)
 
@@ -84,23 +84,33 @@ main :: proc() {
 		duration_seconds = 2,
 		easing = EasingFunction.Circ,
 	)
-	validate_object(&sphere)
 
-	// cube := create_cube()
-	// defer delete(cube)
-	// scene_add_object(&scene, &cube)
+	// Cube.
+	cube := create_cube(starting_center = {2., 0., 2.}, color = 0x7d4ed4)
+	defer delete(cube.(objects.Cube).keyframes)
+	scene_add_object(&scene, &cube)
 
-	// rotate(
-	// 	object = &cube,
-	// 	rotation = create_orientation(axis = {0., 1., 0.}, angle = 45),
-	// 	duration_seconds = 2,
-	// )
-	// translate(&cube, glm.vec3{1., 0., 0.}, 2)
-	// scale(&cube, Scale{2., 1., 1.}, 2)
-	// rotate(&cube, create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
-	// translate(&cube, glm.vec3{0., 1., 0.}, 2)
-	// rotate(&cube, create_orientation(axis = {0., 1., 0.}, angle = 45), 2)
-	// wait_for(&cube, 5)
+	rotate(
+		object = &cube,
+		rotation = create_orientation(axis = {0., 1., 0.}, angle = 45),
+		duration_seconds = 1,
+		easing = EasingFunction.Elastic,
+	)
+	translate(&cube, glm.vec3{1., 0., 0.}, 2, easing = EasingFunction.Elastic)
+	scale(&cube, Scale{2., 1., 1.}, 2, easing = EasingFunction.Elastic)
+	rotate(
+		&cube,
+		create_orientation(axis = {0., 1., 0.}, angle = 45),
+		2,
+		easing = EasingFunction.Elastic,
+	)
+	translate(&cube, glm.vec3{0., 1., 0.}, 2, easing = EasingFunction.Elastic)
+	rotate(
+		&cube,
+		create_orientation(axis = {0., 1., 0.}, angle = 45),
+		2,
+		easing = EasingFunction.Elastic,
+	)
 
 	render_objects_info: []ObjectInfo = get_objects_info(scene.objects)
 
