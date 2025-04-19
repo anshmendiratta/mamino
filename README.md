@@ -6,9 +6,10 @@ A [manim](https://www.manim.community/) inspired 3D renderer that supports coord
 
 ## Table of Contents
 1. [Why?](#why?)
-2. [Usage](#usage)
-3. [Features/Goals](#features/goals)
-4. [For Maintainers](#for-maintainers)
+2. [Dependencies](#dependencies)
+3. [Usage](#usage)
+4. [Features/Goals](#features/goals)
+5. [For Maintainers](#for-maintainers)
 
 
 ## Why?
