@@ -12,7 +12,8 @@ camera_target: glm.vec3 = {0., 0., 0.}
 phi_bound :: glm.PI - 1e-5
 // Rates of rotation and zoom.
 keyboard_rotation_rate :: 0.1
-cursor_sensitivity :: 0.005
+cursor_drag_sensitivity :: 0.005
+cursor_scroll_sensitivity :: 0.3
 zoom_rate :: 0.1
 // Direction vectors.
 world_up: glm.vec3 = {0., 1., 0.}
@@ -74,4 +75,3 @@ camera_get_cartesian_coordinates :: proc(camera: ^Camera) -> (cartesian: glm.vec
 
 	return
 }
-

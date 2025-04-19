@@ -46,6 +46,7 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 	glfw.SetKeyCallback(window, key_callback)
 	glfw.SetCursorPosCallback(window, cursor_position_callback)
 	glfw.SetMouseButtonCallback(window, cursor_button_callback)
+	glfw.SetScrollCallback(window, cursor_scroll_callback)
 	glfw.SetFramebufferSizeCallback(window, size_callback)
 	gl.load_up_to(int(GL_MAJOR_VERSION), GL_MINOR_VERSION, glfw.gl_set_proc_address)
 
@@ -55,6 +56,10 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 // TODO: Find out why doesn't need to free the window.
 mamino_destroy_window :: proc(window: glfw.WindowHandle) {
 	// free(window)
+}
+
+cursor_scroll_callback :: proc "c" (window: glfw.WindowHandle, x_offset, y_offset: f64) {
+	objects.camera.r -= f32(objects.cursor_scroll_sensitivity * y_offset)
 }
 
 cursor_button_callback :: proc "c" (window: glfw.WindowHandle, button, action, modifiers: i32) {
@@ -78,9 +83,9 @@ cursor_position_callback :: proc "c" (window: glfw.WindowHandle, x_pos, y_pos: c
 	previous_cursor_y_pos = y_pos
 
 	// Cursor is dragging (holding down button).
-	objects.camera.theta = objects.camera.theta - objects.cursor_sensitivity * delta_x
+	objects.camera.theta = objects.camera.theta - objects.cursor_drag_sensitivity * delta_x
 	objects.camera.phi = glm.clamp(
-		objects.camera.phi + objects.cursor_sensitivity * delta_y,
+		objects.camera.phi + objects.cursor_drag_sensitivity * delta_y,
 		-objects.phi_bound,
 		objects.phi_bound,
 	)
@@ -116,4 +121,3 @@ key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods
 size_callback :: proc "c" (window: glfw.WindowHandle, width, height: i32) {
 	gl.Viewport(0, 0, width, height)
 }
-
