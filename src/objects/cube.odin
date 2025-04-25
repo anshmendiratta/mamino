@@ -9,24 +9,24 @@ import glm "core:math/linalg/glsl"
 Cube :: struct {
 	// Generic object data.
 	id:               ObjectID,
-	keyframes:        [dynamic]KeyFrame,
+	keyframes:        [dynamic]ModelKeyFrame,
 	current_keyframe: uint,
 	color:            int "Hex code",
 }
 
 create_cube :: proc(
-	starting_center: glm.vec3 = {0., 0., 0.},
+	starting_position: glm.vec3 = {0., 0., 0.},
 	starting_scale: Scale = {1., 1., 1.},
 	starting_orientation: Orientation = Orientation(glm.quat(1)), // Multiplicative identity quaternion.
 	color: int = 0xd6_76_22,
 ) -> Object {
-	keyframes: [dynamic]KeyFrame
+	keyframes: [dynamic]ModelKeyFrame
 	append(
 		&keyframes,
-		KeyFrame {
+		ModelKeyFrame {
 			scale = starting_scale,
 			orientation = starting_orientation,
-			center = starting_center,
+			position = starting_position,
 			start_time = 0,
 		},
 	)
@@ -44,7 +44,7 @@ create_cube :: proc(
 
 get_cube_data :: proc(
 	cube: ^Cube,
-	keyframe: KeyFrame,
+	keyframe: ModelKeyFrame,
 ) -> (
 	vertices: []Vertex,
 	indices: []u16,
@@ -55,7 +55,7 @@ get_cube_data :: proc(
 
 	scale := keyframe.scale
 	orientation := keyframe.orientation
-	center := keyframe.center
+	position := keyframe.position
 
 	// Vertices.
 	for &vertex in vertices {
@@ -72,7 +72,7 @@ get_cube_data :: proc(
 		}
 		vertex.position = (rotation_matrix * vertex_pos_as_vec4).xyz
 		vertex.color = rgb_hex_to_color(cube.color)
-		vertex.position += center
+		vertex.position += position
 	}
 
 	// Indices.
@@ -90,7 +90,7 @@ get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []Vertex) {
 
 	scale := cube.keyframes[cube.current_keyframe].scale
 	orientation := cube.keyframes[cube.current_keyframe].orientation
-	center := cube.keyframes[cube.current_keyframe].center
+	position := cube.keyframes[cube.current_keyframe].position
 
 	rotation_matrix := glm.mat4FromQuat(glm.quat(orientation))
 	rotated_x_axis: glm.vec3 = (rotation_matrix * standard_x_axis).xyz
@@ -110,12 +110,12 @@ get_cube_normals_coordinates :: proc(cube: Cube) -> (normals: []Vertex) {
 	z_normal_color.a = 0.6
 
 	normals = {
-		{center, x_normal_color},
-		{rotated_x_normal + center, x_normal_color},
-		{center, y_normal_color},
-		{rotated_y_normal + center, y_normal_color},
-		{center, z_normal_color},
-		{rotated_z_normal + center, z_normal_color},
+		{position, x_normal_color},
+		{rotated_x_normal + position, x_normal_color},
+		{position, y_normal_color},
+		{rotated_y_normal + position, y_normal_color},
+		{position, z_normal_color},
+		{rotated_z_normal + position, z_normal_color},
 	}
 
 	return

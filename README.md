@@ -78,6 +78,8 @@ Finally, execute `odin run` with no additional flags.
 - [ ] Camera panning (and other sequences).
 - [x] Camera mouse dragging behavior.
 - [x] Allow the coloring of objects.
+- [ ] Draw points.
+- [ ] Draw straight/curved lines.
 
 ### Quality of Life
 - [ ] Add "ambient occlusion" to mesh face colors to indicate orientation.

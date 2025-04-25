@@ -17,7 +17,7 @@ render_normals: bool = false
 render_faces: bool = false
 
 @(private)
-global_time: f64
+global_time: f32
 
 HIGHLIGHTED_OBJECT_COLOR :: glm.vec4{0.15, 0.83, 1.0, 0.5}
 
@@ -68,23 +68,51 @@ scene_render :: proc(scene: ^Scene, configuration: MaminoConfiguration) {
 	if .render_axes_subgrid in configuration {
 		scene_render_subgrid_axes()
 	}
+	// if !(.manual_camera in configuration) {
+	scene_update_camera(&objects.camera)
+	// }
 
-	global_time = glfw.GetTime()
+	global_time = f32(glfw.GetTime())
+}
+
+scene_update_camera :: proc(camera: ^objects.Camera) {
+	objects.object_catch_up_keyframe(&objects.camera, global_time)
+	last_keyframe: objects.CameraKeyFrame =
+		objects.camera.keyframes[objects.camera.current_keyframe]
+	// Only pass through the keyframes once.
+	next_keyframe_idx: u32 = glm.clamp(
+		u32(objects.camera.current_keyframe + 1),
+		u32(0),
+		u32(len(objects.camera.keyframes) - 1),
+	)
+	next_keyframe: objects.CameraKeyFrame = objects.camera.keyframes[next_keyframe_idx]
+	interpolated_keyframe := scene_interpolate_camera_keyframes(
+		last_keyframe,
+		next_keyframe,
+		global_time,
+	)
+	camera_position_spherical := objects.get_cartesian_coordinates_from_spherical(
+		glm.vec3{interpolated_keyframe.r, interpolated_keyframe.theta, interpolated_keyframe.phi},
+	)
+	objects.update_camera_matrix(
+		camera_target = interpolated_keyframe.look_at,
+		camera_position = camera_position_spherical,
+	)
 }
 
 scene_render_cube :: proc(object: ^objects.Object, cube: ^objects.Cube) {
 	objects.object_catch_up_keyframe(object, global_time) // Set appropriate keyframe.
 	// Interpolate between the last and the almost-next frame.
-	last_keyframe: objects.KeyFrame = cube.keyframes[cube.current_keyframe]
+	last_keyframe: objects.ModelKeyFrame = cube.keyframes[cube.current_keyframe]
 	// Only pass through the keyframes once.
 	next_keyframe_idx: u32 = glm.clamp(
 		u32(cube.current_keyframe + 1),
 		u32(0),
 		u32(len(cube.keyframes) - 1),
 	)
-	next_keyframe: objects.KeyFrame = cube.keyframes[next_keyframe_idx]
+	next_keyframe: objects.ModelKeyFrame = cube.keyframes[next_keyframe_idx]
 	interpolated_keyframe :=
-		scene_interpolate_keyframes(last_keyframe, next_keyframe, global_time) if last_keyframe != next_keyframe else last_keyframe
+		scene_interpolate_model_keyframes(last_keyframe, next_keyframe, global_time) if last_keyframe != next_keyframe else last_keyframe
 	vertices, indices, line_indices := objects.get_cube_data(cube, interpolated_keyframe)
 
 	// Cube.
@@ -119,16 +147,16 @@ scene_render_cube :: proc(object: ^objects.Object, cube: ^objects.Cube) {
 scene_render_sphere :: proc(object: ^objects.Object, sphere: ^objects.Sphere) {
 	objects.object_catch_up_keyframe(object, global_time) // Set appropriate keyframe.
 	// Interpolate between the last and the almost-next frame.
-	last_keyframe: objects.KeyFrame = sphere.keyframes[sphere.current_keyframe]
+	last_keyframe: objects.ModelKeyFrame = sphere.keyframes[sphere.current_keyframe]
 	// Only pass through the keyframes once.
 	next_keyframe_idx: u32 = glm.clamp(
 		u32(sphere.current_keyframe + 1),
 		u32(0),
 		u32(len(sphere.keyframes) - 1),
 	)
-	next_keyframe: objects.KeyFrame = sphere.keyframes[next_keyframe_idx]
+	next_keyframe: objects.ModelKeyFrame = sphere.keyframes[next_keyframe_idx]
 	interpolated_keyframe :=
-		scene_interpolate_keyframes(last_keyframe, next_keyframe, global_time) if last_keyframe != next_keyframe else last_keyframe
+		scene_interpolate_model_keyframes(last_keyframe, next_keyframe, global_time) if last_keyframe != next_keyframe else last_keyframe
 	vertices, indices, line_indices := objects.get_sphere_data(sphere, interpolated_keyframe)
 	defer delete(vertices)
 	defer delete(indices)
@@ -195,17 +223,24 @@ scene_render_subgrid_axes :: proc() {
 
 // NOTE(Ansh): Could also use the built-in `lerp` functions, but the overhead in calling them may outweigh the cost of our own implementation.
 // NOTE(Ansh): All the reassignments are taken from https://easings.net/.
-scene_interpolate_keyframes :: proc(
-	keyframe_a, keyframe_b: objects.KeyFrame,
-	current_time: f64,
+scene_interpolate_model_keyframes :: proc(
+	keyframe_a, keyframe_b: objects.ModelKeyFrame,
+	current_time: f32,
 ) -> (
-	interpolated: objects.KeyFrame,
+	interpolated: objects.ModelKeyFrame,
 ) {
-	start_time: f64 = keyframe_a.start_time
-	end_time: f64 = keyframe_b.start_time
-	duration: f64 = end_time - start_time
-	// Get parameter `t \in [t_a, t_b]`.
-	t: f32 = f32((current_time - start_time) / duration)
+	start_time: f32 = keyframe_a.start_time
+	end_time: f32 = keyframe_b.start_time
+	duration: f32
+	t: f32
+	if start_time != end_time {
+		duration = end_time - start_time
+		// Get parameter `t \in [t_a, t_b]`.
+		t = (current_time - start_time) / duration
+	} else {
+		duration = 0
+		t = 0
+	}
 
 	// Just rewrite `t` depending on the required easing function.
 	switch keyframe_a.easing {
@@ -241,24 +276,78 @@ scene_interpolate_keyframes :: proc(
 	}
 
 	interpolated_scale: objects.Scale = {
-		x = keyframe_a.scale.x * (1 - t) + t * keyframe_b.scale.x,
-		y = keyframe_a.scale.y * (1 - t) + t * keyframe_b.scale.y,
-		z = keyframe_a.scale.z * (1 - t) + t * keyframe_b.scale.z,
+		keyframe_a.scale.x * (1 - t) + t * keyframe_b.scale.x,
+		keyframe_a.scale.y * (1 - t) + t * keyframe_b.scale.y,
+		keyframe_a.scale.z * (1 - t) + t * keyframe_b.scale.z,
 	}
 	interpolated_orientation: objects.Orientation = objects.Orientation(
 		glm.quatSlerp(glm.quat(keyframe_a.orientation), glm.quat(keyframe_b.orientation), f32(t)),
 	)
-	interpolated_center: glm.vec3 = {
-		keyframe_a.center.x * (1 - t) + t * keyframe_b.center.x,
-		keyframe_a.center.y * (1 - t) + t * keyframe_b.center.y,
-		keyframe_a.center.z * (1 - t) + t * keyframe_b.center.z,
+	interpolated_position: glm.vec3 = {
+		keyframe_a.position.x * (1 - t) + t * keyframe_b.position.x,
+		keyframe_a.position.y * (1 - t) + t * keyframe_b.position.y,
+		keyframe_a.position.z * (1 - t) + t * keyframe_b.position.z,
 	}
 	interpolated = {
 		scale       = interpolated_scale,
 		orientation = interpolated_orientation,
-		center      = interpolated_center,
+		position    = interpolated_position,
 		start_time  = current_time,
 	}
+
+	return
+}
+
+
+scene_interpolate_camera_keyframes :: proc(
+	keyframe_a, keyframe_b: objects.CameraKeyFrame,
+	current_time: f32,
+) -> (
+	interpolated: objects.CameraKeyFrame,
+) {
+	start_time: f32 = keyframe_a.start_time
+	end_time: f32 = keyframe_b.start_time
+	duration: f32
+	t: f32
+	if start_time != end_time {
+		duration = end_time - start_time
+		// Get parameter `t \in [t_a, t_b]`.
+		t = (current_time - start_time) / duration
+	} else {
+		duration = 0
+		t = 0
+	}
+
+	interpolated_r: f32 = glm.lerp(keyframe_a.r, keyframe_b.r, t)
+	interpolated_theta: f32 = glm.lerp(keyframe_a.theta, keyframe_b.theta, t)
+	interpolated_phi: f32 = glm.lerp(keyframe_a.phi, keyframe_b.phi, t)
+
+	last_look_at_spherical := objects.get_spherical_coordinates_from_cartesian(keyframe_a.look_at)
+	final_look_at_spherical := objects.get_spherical_coordinates_from_cartesian(keyframe_b.look_at)
+	// fmt.println(last_look_at_spherical, final_look_at_spherical, t)
+	interpolated_look_at_spherical := glm.vec3 {
+		glm.lerp(last_look_at_spherical.x, final_look_at_spherical.x, t),
+		glm.lerp(last_look_at_spherical.y, final_look_at_spherical.y, t),
+		glm.lerp(last_look_at_spherical.z, final_look_at_spherical.z, t),
+	}
+	interpolated_look_at_cartesian := objects.get_cartesian_coordinates_from_spherical(
+		interpolated_look_at_spherical,
+	)
+
+	interpolated = {
+		r          = interpolated_r,
+		theta      = interpolated_theta,
+		phi        = interpolated_phi,
+		look_at    = interpolated_look_at_cartesian,
+		start_time = current_time,
+	}
+
+	fmt.println(
+		"cartesian =",
+		objects.get_cartesian_coordinates_from_spherical(
+			glm.vec3{interpolated.r, interpolated.theta, interpolated.phi},
+		),
+	)
 
 	return
 }

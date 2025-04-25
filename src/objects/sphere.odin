@@ -8,7 +8,7 @@ import glm "core:math/linalg/glsl"
 Sphere :: struct {
 	// Generic object data.
 	id:               ObjectID,
-	keyframes:        [dynamic]KeyFrame,
+	keyframes:        [dynamic]ModelKeyFrame,
 	current_keyframe: uint,
 	color:            int "Hex code",
 	// Sphere specific fields.
@@ -17,20 +17,20 @@ Sphere :: struct {
 }
 
 create_sphere :: proc(
-	starting_center: glm.vec3 = {0., 0., 0.},
+	starting_position: glm.vec3 = {0., 0., 0.},
 	starting_scale: Scale = {1., 1., 1.},
 	starting_orientation: Orientation = Orientation(glm.quat(1)),
 	color: int = 0x22_d6_ac,
 	sectors: uint = 16,
 	stacks: uint = 16,
 ) -> Object {
-	keyframes: [dynamic]KeyFrame
+	keyframes: [dynamic]ModelKeyFrame
 	append(
 		&keyframes,
-		KeyFrame {
+		ModelKeyFrame {
 			scale = starting_scale,
 			orientation = starting_orientation,
-			center = starting_center,
+			position = starting_position,
 			start_time = 0,
 		},
 	)
@@ -50,7 +50,7 @@ create_sphere :: proc(
 
 get_sphere_data :: proc(
 	sphere: ^Sphere,
-	keyframe: KeyFrame,
+	keyframe: ModelKeyFrame,
 ) -> (
 	vertices: []Vertex,
 	indices: []u16,
@@ -76,9 +76,9 @@ get_sphere_data :: proc(
 			z := keyframe.scale.z * glm.cos_f32(phi)
 
 			rotated_vertex_pos_as_vec4 := rotation_matrix * glm.vec4{x, z, y, 1.}
-			center := keyframe.center + rotated_vertex_pos_as_vec4.xyz
+			position := keyframe.position + rotated_vertex_pos_as_vec4.xyz
 			sphere_color := rgb_hex_to_color(sphere.color)
-			append(&vertices_dyn, Vertex{position = center, color = sphere_color})
+			append(&vertices_dyn, Vertex{position = position, color = sphere_color})
 		}
 	}
 

@@ -20,7 +20,7 @@ import "render"
 
 
 Debugger :: struct {
-	frametimes:      [dynamic]f64,
+	frametimes:      [dynamic]f32,
 	object_count:    uint,
 	camera_position: glm.vec3,
 }
@@ -28,9 +28,11 @@ Debugger :: struct {
 @(cold)
 @(deferred_in = mamino_deinit_debugger)
 mamino_init_debugger :: proc(debugger: ^Debugger, num_objects: uint) {
-	render.last_frame = glfw.GetTime()
+	render.last_frame = f32(glfw.GetTime())
 	debugger.object_count = num_objects
-	debugger.camera_position = objects.camera_get_cartesian_coordinates(&objects.camera)
+	debugger.camera_position = objects.camera_get_cartesian_coordinates(
+		&objects.camera.keyframes[objects.camera.current_keyframe],
+	)
 }
 
 mamino_deinit_debugger :: proc(debugger: ^Debugger, _: uint) {
@@ -38,53 +40,55 @@ mamino_deinit_debugger :: proc(debugger: ^Debugger, _: uint) {
 }
 
 // Only using the newest 80% of frames.
-debugger_calculate_avg_fps :: proc(times_per_frame: [dynamic]f64) -> (avg: uint) {
-	total_fps: f64 = 0
-	LOWER_BOUND_TO_IGNORE: f64 : 0.2
-	cutoff := uint(f64(len(times_per_frame)) * LOWER_BOUND_TO_IGNORE)
+debugger_calculate_avg_fps :: proc(times_per_frame: [dynamic]f32) -> (avg: uint) {
+	total_fps: f32 = 0
+	LOWER_BOUND_TO_IGNORE: f32 : 0.2
+	cutoff := uint(f32(len(times_per_frame)) * LOWER_BOUND_TO_IGNORE)
 	for time_per_frame in times_per_frame[cutoff:] {
 		total_fps += 1 / time_per_frame
 	}
-	avg = uint(total_fps / f64(len(times_per_frame)) * 1. / (1. - LOWER_BOUND_TO_IGNORE))
+	avg = uint(total_fps / f32(len(times_per_frame)) * 1. / (1. - LOWER_BOUND_TO_IGNORE))
 	return
 }
 
 debugger_calculate_percent_low_fps :: proc(
-	times_per_frame: [dynamic]f64,
+	times_per_frame: [dynamic]f32,
 ) -> (
 	percent_low_fps: uint,
 ) {
 	slice.reverse_sort(times_per_frame[:])
 	percent_low_frametimes := times_per_frame[0:max(len(times_per_frame) / 100, 1)]
-	useful_frame_fps: [dynamic]f64
+	useful_frame_fps: [dynamic]f32
 	defer delete(useful_frame_fps)
 	for frametime in percent_low_frametimes {
 		append(&useful_frame_fps, 1 / frametime)
 	}
-	total_low_fps: f64 = 0
+	total_low_fps: f32 = 0
 	for percent_low_fps in useful_frame_fps {
 		total_low_fps += percent_low_fps
 	}
-	percent_low_fps = uint(total_low_fps / f64(len(useful_frame_fps)))
+	percent_low_fps = uint(total_low_fps / f32(len(useful_frame_fps)))
 
 	return
 }
 
 debugger_update :: proc(debugger: ^Debugger) {
-	time_for_frame := glfw.GetTime() - render.last_frame
-	render.last_frame = glfw.GetTime()
+	time_for_frame := f32(glfw.GetTime() - f64(render.last_frame))
+	render.last_frame = f32(glfw.GetTime())
 	append(&debugger^.frametimes, time_for_frame)
 
 	// FIX(Ansh): Find a way to avoid calculating this every frame. Not too expensive, but would be nice to have gone.
 	// Camera position.
-	debugger.camera_position = objects.camera_get_cartesian_coordinates(&objects.camera)
+	debugger.camera_position = objects.camera_get_cartesian_coordinates(
+		&objects.camera.keyframes[objects.camera.current_keyframe],
+	)
 }
 
-debugger_get_most_recent_frametime :: proc(debugger: ^Debugger) -> f64 {
+debugger_get_most_recent_frametime :: proc(debugger: ^Debugger) -> f32 {
 	return debugger.frametimes[len(debugger.frametimes) - 1]
 }
 
-debugger_get_most_recent_framerate :: proc(debugger: ^Debugger) -> f64 {
+debugger_get_most_recent_framerate :: proc(debugger: ^Debugger) -> f32 {
 	return 1. / debugger.frametimes[len(debugger.frametimes) - 1]
 }
 
