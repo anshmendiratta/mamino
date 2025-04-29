@@ -342,12 +342,12 @@ scene_interpolate_camera_keyframes :: proc(
 		start_time = current_time,
 	}
 
-	fmt.println(
-		"cartesian =",
-		objects.get_cartesian_coordinates_from_spherical(
-			glm.vec3{interpolated.r, interpolated.theta, interpolated.phi},
-		),
-	)
+	// fmt.println(
+	// 	"cartesian =",
+	// 	objects.get_cartesian_coordinates_from_spherical(
+	// 		glm.vec3{interpolated.r, interpolated.theta, interpolated.phi},
+	// 	),
+	// )
 
 	return
 }

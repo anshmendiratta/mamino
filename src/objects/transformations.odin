@@ -12,7 +12,6 @@ pan_camera :: proc(
 ) {
 	last_keyframe := camera.keyframes[camera.current_keyframe]
 	new_position_spherical := get_spherical_coordinates_from_cartesian(new_position)
-	fmt.println(new_position_spherical)
 	next_keyframe := CameraKeyFrame {
 		r          = new_position_spherical.x,
 		theta      = new_position_spherical.y,

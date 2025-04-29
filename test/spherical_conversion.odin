@@ -1,5 +1,7 @@
 package test
 
+import "core:fmt"
+
 import glm "core:math/linalg/glsl"
 import "core:testing"
 
@@ -9,7 +11,7 @@ import "../src/objects"
 
 @(test)
 test_cartesian_to_spherical :: proc(_: ^testing.T) {
-	cartesian: glm.vec3 = {1., 2., 3.}
+	cartesian: glm.vec3 = {1., glm.sqrt(f32(2)), 1.}
 	expected_spherical: glm.vec3
 
 	expected_spherical.x = glm.length(cartesian)
@@ -34,10 +36,9 @@ test_spherical_to_cartesian :: proc(_: ^testing.T) {
 	theta := spherical.y
 	phi := spherical.z
 
-	expected_cartesian: glm.vec3
-	expected_cartesian.x = radius * glm.sin(phi) * glm.cos(theta)
-	expected_cartesian.y = radius * glm.cos(phi)
-	expected_cartesian.z = radius * glm.sin(phi) * glm.sin(theta)
+	expected_cartesian: glm.vec3 = {1., 1., glm.sqrt(f32(2))}
+
+	fmt.println(expected_cartesian, objects.get_cartesian_coordinates_from_spherical(spherical))
 
 	assert(
 		expected_cartesian == objects.get_cartesian_coordinates_from_spherical(spherical),

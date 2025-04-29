@@ -70,9 +70,9 @@ main :: proc() {
 	// Test pan.
 	pan_camera(
 		&camera,
-		new_position = {-0.9754, 0.7794, -1.5624},
+		new_position = {2., 2., 2.},
 		new_look_at = {0., 0., 0.},
-		duration_seconds = 4,
+		duration_seconds = 2,
 	)
 
 	// Sphere.

@@ -70,8 +70,9 @@ get_spherical_coordinates_from_cartesian :: proc(cartesian: glm.vec3) -> (spheri
 		return
 	}
 
+	// TODO(Ansh): \theta and \phi are switched for some reason. Figure out why.
 	spherical.x = glm.length(cartesian)
-	spherical.y = glm.acos(cartesian.y / spherical.r)
+	spherical.y = glm.acos(cartesian.y / spherical.x)
 	spherical.z = glm.atan2(cartesian.z, cartesian.x)
 
 	if cartesian.x < 0 {
