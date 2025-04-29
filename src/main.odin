@@ -50,7 +50,7 @@ main :: proc() {
 	using objects
 
 	// Init.
-	mamino_configuration += {.render_axes, .render_axes_subgrid}
+	mamino_configuration += {.render_axes, .render_axes_subgrid, .manual_camera}
 	mamino_init(mamino_configuration)
 	window := mamino_create_window()
 
@@ -65,6 +65,15 @@ main :: proc() {
 
 	scene := create_scene()
 	defer delete(scene.objects)
+	init_camera()
+
+	// Test pan.
+	pan_camera(
+		&camera,
+		new_position = {2., 2., 2.},
+		new_look_at = {0., 0., 0.},
+		duration_seconds = 2,
+	)
 
 	// Sphere.
 	sphere := create_sphere(color = 0x2261d6)
@@ -86,7 +95,7 @@ main :: proc() {
 	)
 
 	// Cube.
-	cube := create_cube(starting_center = {2., 0., 2.}, color = 0x7d4ed4)
+	cube := create_cube(starting_position = {2., 0., 2.}, color = 0x7d4ed4)
 	defer delete(cube.(objects.Cube).keyframes)
 	scene_add_object(&scene, &cube)
 
@@ -126,11 +135,10 @@ main :: proc() {
 
 		// Set background.
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-		gl.ClearColor(0., 0., 0., 1.0)
+		gl.ClearColor(186. / 255., 190. / 255., 194. / 255., 1.)
 
 		// Input handling.
 		glfw.PollEvents()
-		update_camera_matrix()
 		// Update (rotate) the vertices every frame.
 		window_width, window_height := glfw.GetWindowSize(window)
 		update_shader(uniforms, f32(window_width) / f32(window_height))

@@ -23,10 +23,10 @@ Scale :: struct {
 // @(private)
 Orientation :: distinct glm.quat
 
-KeyFrame :: struct {
-	start_time:  f64,
+ModelKeyFrame :: struct {
+	start_time:  f32,
 	scale:       Scale,
-	center:      glm.vec3,
+	position:    glm.vec3,
 	orientation: Orientation,
 	easing:      EasingFunction,
 }
@@ -72,7 +72,7 @@ object_add_keyframe :: proc(
 	scale: Maybe(Scale) = nil,
 	orientation: Maybe(Orientation) = nil,
 	translation: Maybe(glm.vec3) = glm.vec3{0., 0., 0.},
-	start_time: f64,
+	start_time: f32,
 	easing: EasingFunction = EasingFunction.Linear,
 ) {
 	#partial switch &generic_object in object {
@@ -80,10 +80,10 @@ object_add_keyframe :: proc(
 		last_index := len(generic_object.keyframes) - 1
 		append(
 			&generic_object.keyframes,
-			KeyFrame {
+			ModelKeyFrame {
 				scale = scale.? or_else generic_object.keyframes[last_index].scale,
 				orientation = orientation.? or_else generic_object.keyframes[last_index].orientation,
-				center = translation.? or_else generic_object.keyframes[last_index].center,
+				position = translation.? or_else generic_object.keyframes[last_index].position,
 				start_time = start_time,
 				easing = easing,
 			},
@@ -92,10 +92,10 @@ object_add_keyframe :: proc(
 		last_index := len(generic_object.keyframes) - 1
 		append(
 			&generic_object.keyframes,
-			KeyFrame {
+			ModelKeyFrame {
 				scale = scale.? or_else generic_object.keyframes[last_index].scale,
 				orientation = orientation.? or_else generic_object.keyframes[last_index].orientation,
-				center = translation.? or_else generic_object.keyframes[last_index].center,
+				position = translation.? or_else generic_object.keyframes[last_index].position,
 				start_time = start_time,
 				easing = easing,
 			},
@@ -105,50 +105,78 @@ object_add_keyframe :: proc(
 	}
 }
 
-object_catch_up_keyframe :: proc(object: ^Object, current_time: f64) {
-	#partial switch &generic_object in object {
-	case Cube:
+object_catch_up_keyframe :: proc(object: union {
+		^Object,
+		^Camera,
+	}, current_time: f32) {
+	switch &cam_or_model in object {
+	case ^Camera:
+		camera := cam_or_model
 		// Check if we're done with all animation sequences.
-		if generic_object.current_keyframe == len(generic_object.keyframes) - 1 {
+		if camera.current_keyframe == len(camera.keyframes) - 1 {
 			return
 		}
-		current_keyframe := generic_object.keyframes[generic_object.current_keyframe]
+		current_keyframe := camera.keyframes[camera.current_keyframe]
 		time_diff_between_now_and_curr_frame := current_time - current_keyframe.start_time
 		next_keyframe_index := glm.clamp(
-			u32(generic_object.current_keyframe + 1),
+			u32(camera.current_keyframe + 1),
 			u32(0),
-			u32(len(generic_object.keyframes) - 1),
+			u32(len(camera.keyframes) - 1),
 		)
 		current_keyframe_duration :=
-			generic_object.keyframes[next_keyframe_index].start_time - current_keyframe.start_time
+			camera.keyframes[next_keyframe_index].start_time - current_keyframe.start_time
 
 		if current_keyframe_duration < time_diff_between_now_and_curr_frame {
-			generic_object.current_keyframe = uint(next_keyframe_index)
+			camera.current_keyframe = uint(next_keyframe_index)
 			object_catch_up_keyframe(object, current_time)
 		}
-	case Sphere:
-		// Check if we're done with all animation sequences.
-		if generic_object.current_keyframe == len(generic_object.keyframes) - 1 {
-			return
-		}
-		current_keyframe := generic_object.keyframes[generic_object.current_keyframe]
-		time_diff_between_now_and_curr_frame := current_time - current_keyframe.start_time
-		next_keyframe_index := glm.clamp(
-			u32(generic_object.current_keyframe + 1),
-			u32(0),
-			u32(len(generic_object.keyframes) - 1),
-		)
-		current_keyframe_duration :=
-			generic_object.keyframes[next_keyframe_index].start_time - current_keyframe.start_time
+	case ^Object:
+		#partial switch &generic_object in cam_or_model {
+		case Cube:
+			// Check if we're done with all animation sequences.
+			if generic_object.current_keyframe == len(generic_object.keyframes) - 1 {
+				return
+			}
+			current_keyframe := generic_object.keyframes[generic_object.current_keyframe]
+			time_diff_between_now_and_curr_frame := current_time - current_keyframe.start_time
+			next_keyframe_index := glm.clamp(
+				u32(generic_object.current_keyframe + 1),
+				u32(0),
+				u32(len(generic_object.keyframes) - 1),
+			)
+			current_keyframe_duration :=
+				generic_object.keyframes[next_keyframe_index].start_time -
+				current_keyframe.start_time
 
-		if current_keyframe_duration < time_diff_between_now_and_curr_frame {
-			generic_object.current_keyframe = uint(next_keyframe_index)
-			object_catch_up_keyframe(object, current_time)
+			if current_keyframe_duration < time_diff_between_now_and_curr_frame {
+				generic_object.current_keyframe = uint(next_keyframe_index)
+				object_catch_up_keyframe(object, current_time)
+			}
+		case Sphere:
+			// Check if we're done with all animation sequences.
+			if generic_object.current_keyframe == len(generic_object.keyframes) - 1 {
+				return
+			}
+			current_keyframe := generic_object.keyframes[generic_object.current_keyframe]
+			time_diff_between_now_and_curr_frame := current_time - current_keyframe.start_time
+			next_keyframe_index := glm.clamp(
+				u32(generic_object.current_keyframe + 1),
+				u32(0),
+				u32(len(generic_object.keyframes) - 1),
+			)
+			current_keyframe_duration :=
+				generic_object.keyframes[next_keyframe_index].start_time -
+				current_keyframe.start_time
+
+			if current_keyframe_duration < time_diff_between_now_and_curr_frame {
+				generic_object.current_keyframe = uint(next_keyframe_index)
+				object_catch_up_keyframe(object, current_time)
+			}
 		}
 	}
 }
 
-create_orientation :: proc(axis: glm.vec3, angle: f64) -> (o: Orientation) {
+create_orientation :: proc(axis: glm.vec3, angle: f32) -> (o: Orientation) {
 	o = Orientation(glm.quatAxisAngle(axis, glm.radians(f32(angle))))
 	return
 }
@@ -182,16 +210,16 @@ object_get_type_string :: proc(object: Object) -> (object_type: string) {
 	return
 }
 
-object_get_center :: proc(object: Object) -> (center: glm.vec3) {
+position :: proc(object: Object) -> (position: glm.vec3) {
 	#partial switch generic_object in object {
 	case Cube:
 		last_idx := len(generic_object.keyframes) - 1
-		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
-		center = last_keyframe.center
+		last_keyframe: ModelKeyFrame = generic_object.keyframes[last_idx]
+		position = last_keyframe.position
 	case Sphere:
 		last_idx := len(generic_object.keyframes) - 1
-		last_keyframe: KeyFrame = generic_object.keyframes[last_idx]
-		center = last_keyframe.center
+		last_keyframe: ModelKeyFrame = generic_object.keyframes[last_idx]
+		position = last_keyframe.position
 	}
 
 	return

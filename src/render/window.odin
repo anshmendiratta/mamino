@@ -23,7 +23,7 @@ WINDOW_HEIGHT: i32 = 1024
 running: b32 = true
 vsync: b32 = false
 debugger_open: bool = true
-last_frame: f64 = 0.
+last_frame: f32 = 0.
 
 
 @(cold)
@@ -46,7 +46,6 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 	glfw.SetKeyCallback(window, key_callback)
 	glfw.SetCursorPosCallback(window, cursor_position_callback)
 	glfw.SetMouseButtonCallback(window, cursor_button_callback)
-	glfw.SetScrollCallback(window, cursor_scroll_callback)
 	glfw.SetFramebufferSizeCallback(window, size_callback)
 	gl.load_up_to(int(GL_MAJOR_VERSION), GL_MINOR_VERSION, glfw.gl_set_proc_address)
 
@@ -56,10 +55,6 @@ mamino_create_window :: proc() -> (window: glfw.WindowHandle) {
 // TODO: Find out why doesn't need to free the window.
 mamino_destroy_window :: proc(window: glfw.WindowHandle) {
 	// free(window)
-}
-
-cursor_scroll_callback :: proc "c" (window: glfw.WindowHandle, x_offset, y_offset: f64) {
-	objects.camera.r -= f32(objects.cursor_scroll_sensitivity * y_offset)
 }
 
 cursor_button_callback :: proc "c" (window: glfw.WindowHandle, button, action, modifiers: i32) {
@@ -83,9 +78,12 @@ cursor_position_callback :: proc "c" (window: glfw.WindowHandle, x_pos, y_pos: c
 	previous_cursor_y_pos = y_pos
 
 	// Cursor is dragging (holding down button).
-	objects.camera.theta = objects.camera.theta - objects.cursor_drag_sensitivity * delta_x
-	objects.camera.phi = glm.clamp(
-		objects.camera.phi + objects.cursor_drag_sensitivity * delta_y,
+	objects.camera.keyframes[objects.camera.current_keyframe].theta =
+		objects.camera.keyframes[objects.camera.current_keyframe].theta -
+		objects.cursor_drag_sensitivity * delta_x
+	objects.camera.keyframes[objects.camera.current_keyframe].phi = glm.clamp(
+		objects.camera.keyframes[objects.camera.current_keyframe].phi +
+		objects.cursor_drag_sensitivity * delta_y,
 		-objects.phi_bound,
 		objects.phi_bound,
 	)
@@ -96,28 +94,33 @@ key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods
 	case glfw.KEY_ESCAPE, glfw.KEY_Q:
 		running = false
 	case glfw.KEY_W, glfw.KEY_UP:
-		objects.camera.phi = glm.clamp(
-			objects.camera.phi - objects.keyboard_rotation_rate,
+		objects.camera.keyframes[objects.camera.current_keyframe].phi = glm.clamp(
+			objects.camera.keyframes[objects.camera.current_keyframe].phi -
+			objects.keyboard_rotation_rate,
 			0,
 			objects.phi_bound,
 		)
 	case glfw.KEY_A, glfw.KEY_LEFT:
-		objects.camera.theta += objects.keyboard_rotation_rate
+		objects.camera.keyframes[objects.camera.current_keyframe].theta +=
+			objects.keyboard_rotation_rate
 	case glfw.KEY_S, glfw.KEY_DOWN:
-		objects.camera.phi = glm.clamp(
-			objects.camera.phi + objects.keyboard_rotation_rate,
+		objects.camera.keyframes[objects.camera.current_keyframe].phi = glm.clamp(
+			objects.camera.keyframes[objects.camera.current_keyframe].phi +
+			objects.keyboard_rotation_rate,
 			0,
 			objects.phi_bound,
 		)
 	case glfw.KEY_D, glfw.KEY_RIGHT:
-		objects.camera.theta -= objects.keyboard_rotation_rate
+		objects.camera.keyframes[objects.camera.current_keyframe].theta -=
+			objects.keyboard_rotation_rate
 	case glfw.KEY_EQUAL:
-		objects.camera.r -= objects.zoom_rate
+		objects.camera.keyframes[objects.camera.current_keyframe].r -= objects.zoom_rate
 	case glfw.KEY_MINUS:
-		objects.camera.r += objects.zoom_rate
+		objects.camera.keyframes[objects.camera.current_keyframe].r += objects.zoom_rate
 	}
 }
 
 size_callback :: proc "c" (window: glfw.WindowHandle, width, height: i32) {
 	gl.Viewport(0, 0, width, height)
 }
+
