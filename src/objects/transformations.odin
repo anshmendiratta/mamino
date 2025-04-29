@@ -37,6 +37,8 @@ rotate :: proc(
 	case Cube:
 		last_idx := len(generic_object.keyframes) - 1
 		last_keyframe: ModelKeyFrame = generic_object.keyframes[last_idx]
+		// NOTE(Ansh): Modify the last keyframe to share the newest easing to shift all the easings one to the left. Covers the initial keyframe created at object instantiation.
+		generic_object.keyframes[last_idx].easing = easing
 		last_orientation: glm.quat = glm.quat(last_keyframe.orientation)
 		last_start_time: f32 = last_keyframe.start_time
 		rotation: glm.quat = glm.quat(rotation)
@@ -56,6 +58,8 @@ rotate :: proc(
 	case Sphere:
 		last_idx := len(generic_object.keyframes) - 1
 		last_keyframe: ModelKeyFrame = generic_object.keyframes[last_idx]
+		// NOTE(Ansh): Modify the last keyframe to share the newest easing to shift all the easings one to the left. Covers the initial keyframe created at object instantiation.
+		generic_object.keyframes[last_idx].easing = easing
 		last_orientation: glm.quat = glm.quat(last_keyframe.orientation)
 		last_start_time: f32 = last_keyframe.start_time
 		rotation: glm.quat = glm.quat(rotation)
