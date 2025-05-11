@@ -10,8 +10,12 @@ pan_camera :: proc(
 	new_look_at: glm.vec3 = {0., 0., 0.},
 	duration_seconds: f32,
 ) {
-	last_keyframe := camera.keyframes[camera.current_keyframe]
+	last_idx := len(camera.keyframes) - 1
+	last_keyframe := camera.keyframes[last_idx]
 	new_position_spherical := get_spherical_coordinates_from_cartesian(new_position)
+
+	fmt.println(last_keyframe.start_time + duration_seconds)
+
 	next_keyframe := CameraKeyFrame {
 		r          = new_position_spherical.x,
 		theta      = new_position_spherical.y,

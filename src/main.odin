@@ -68,12 +68,9 @@ main :: proc() {
 	init_camera()
 
 	// Test pan.
-	pan_camera(
-		&camera,
-		new_position = {2., 2., 2.},
-		new_look_at = {0., 0., 0.},
-		duration_seconds = 2,
-	)
+	pan_camera(&camera, new_position = {2., 2., 2.}, duration_seconds = 2)
+	pan_camera(&camera, new_position = {-2., -1., 2.}, duration_seconds = 2)
+	fmt.println(camera.keyframes)
 
 	// Sphere.
 	sphere := create_sphere(color = 0x2261d6)
