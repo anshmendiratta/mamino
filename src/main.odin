@@ -70,7 +70,12 @@ main :: proc() {
 	// Test pan.
 	pan_camera(&camera, new_position = {2., 2., 2.}, duration_seconds = 2)
 	pan_camera(&camera, new_position = {-2., -1., 2.}, duration_seconds = 2)
-	fmt.println(camera.keyframes)
+
+	// Import model.
+	// model := import_model("assets/duck.gltf")
+	// model_vertices := get_model_vertices(model, "assets/duck.gltf", "assets/Duck0.bin", 0)
+	// defer delete(model_vertices)
+	// fmt.println(model_vertices)
 
 	// Sphere.
 	sphere := create_sphere(color = 0x2261d6)

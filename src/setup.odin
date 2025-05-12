@@ -26,6 +26,7 @@ mamino_deinit :: proc() {
 	glfw.Terminate()
 }
 
+// TODO(Ansh): fix init for imgui opengl3.
 @(deferred_out = mamino_deinit_imgui)
 mamino_init_imgui :: proc(window: glfw.WindowHandle) -> (im_context: ^im.Context) {
 	// Dear ImGui
