@@ -5,6 +5,7 @@ src.bin.dSYM/
 
 # Executables
 src.*
+*.exe
 
 .idea
 # Test video exports
