@@ -85,6 +85,7 @@ Finally, execute `odin run` with no additional flags.
 - [ ] Add "ambient occlusion" to mesh face colors to indicate orientation.
 - [x] Make drawing aspect-ratio-independent.
 - [x] Easing modes for animations.
+- [ ] Better shading and lighting.
 
 ### Documentation
 - [x] Think about and clean-up public API.

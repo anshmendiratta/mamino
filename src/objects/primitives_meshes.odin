@@ -1,3 +1,5 @@
+#+feature global-context
+
 package objects
 
 import glm "core:math/linalg/glsl"
