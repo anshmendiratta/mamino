@@ -7,7 +7,7 @@ VALID_ENCODINGS: []string : {"av1", "libx264", "libx265"}
 VALID_OUT_FORMATS: []string : {".mp4", ".mov", ".mkv", ".h264"}
 
 VideoOptions :: struct {
-	resolution: []u32,
+	resolution: [2]u32,
 	framerate:  int,
 	encoding:   string,
 	out_name:   string,
