@@ -12,4 +12,3 @@ MaminoConfigurationEnum :: enum {
 MaminoConfiguration :: bit_set[MaminoConfigurationEnum]
 
 mamino_configuration: MaminoConfiguration
-

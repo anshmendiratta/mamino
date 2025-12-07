@@ -1,3 +1,5 @@
+#+feature global-context
+
 package sequencing
 
 import "core:fmt"
