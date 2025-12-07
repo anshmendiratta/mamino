@@ -52,4 +52,3 @@ mamino_deinit_imgui :: proc(im_context: ^im.Context) {
 	imfw.Shutdown()
 	im.DestroyContext(im_context)
 }
-

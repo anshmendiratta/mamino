@@ -74,7 +74,7 @@ Finally, execute `odin run` with no additional flags.
 - [x] Allow a sequence of animations/movements to be programmed and ran.
 - [ ] Increase render and video resolution.
 - [x] Add keyframe interpolation.
-- [ ] Import models.
+- [x] Import models.
 - [x] Camera panning (and other sequences).
 - [x] Camera mouse dragging behavior.
 - [x] Allow the coloring of objects.
