@@ -5,11 +5,8 @@ src.bin.dSYM/
 
 # Executables
 src.*
-<<<<<<< HEAD
 *.bin
-=======
 *.exe
->>>>>>> c1fe9b8 ([docs] remove random files)
 
 .idea
 # Test video exports
