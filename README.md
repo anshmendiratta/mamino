@@ -25,6 +25,7 @@ This project may be rewritten in Vulkan in the future if deemed necesssary.
 - [imgui](https://github.com/ocornut/imgui) (for rendering the debugger)
 
 (Automatic setup) For ease, we've included a [bash script](init_imgui.sh) to setup ImGui's bindings to Odin.
+
 (Manual setup) `imgui` is imported from the `shared/` directory. Odin has imgui binds in progress, but for the time being, we've used the ones generated using https://gitlab.com/L-4/odin-imgui. Place the base imgui files in `dear_imgui` inside `shared/` and create subfolders `gl/` and `glfw/` for the library specific imgui files. Don't forget to move your OS's static libraries too (such as `imgui_linux_x64.a`).
 
 Example structure:
