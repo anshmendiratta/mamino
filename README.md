@@ -24,7 +24,10 @@ This project may be rewritten in Vulkan in the future if deemed necesssary.
 - [ffmpeg](https://www.ffmpeg.org/) (for exporting videos)
 - [imgui](https://github.com/ocornut/imgui) (for rendering the debugger)
 
+For ease, we've included a [bash script](init_imgui.sh) to do setup ImGui's bindings to Odin.
+
 `freetype` is imported from the `shared/` directory -- this is located in `ODIN_ROOT` (to find out where this is, you can use `odin root`). Place your files inside the `freetype/` directory after creating it, and things should just work. For this project, we used [odin-freetype](https://github.com/englerj/odin-freetype).
+
 
 `imgui` is imported from the `shared/` directory. Odin has imgui binds in progress, but for the time being, we've used the ones generated using https://gitlab.com/L-4/odin-imgui. Place the base imgui files in `dear_imgui` inside `shared/` and create subfolders `gl/` and `glfw/` for the library specific imgui files. Don't forget to move your OS's static libraries too (such as `imgui_linux_x64.a`).
 
