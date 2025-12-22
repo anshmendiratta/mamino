@@ -23,14 +23,21 @@ This project may be rewritten in Vulkan in the future if deemed necesssary.
 - [OpenGL 4.1](https://www.opengl.org/)
 - [ffmpeg](https://www.ffmpeg.org/) (for exporting videos)
 - [imgui](https://github.com/ocornut/imgui) (for rendering the debugger)
+- []()
 
-(Automatic setup) For ease, we've included a [bash script](init_imgui.sh) to setup ImGui's bindings to Odin.
+(Automatic setup) For ease, we've included a [bash script](init_imgui.sh) to setup the bindings of [tinyobj, ImGui] to Odin.
 
-(Manual setup) `imgui` is imported from the `shared/` directory. Odin has imgui binds in progress, but for the time being, we've used the ones generated using https://gitlab.com/L-4/odin-imgui. Place the base imgui files in `dear_imgui` inside `shared/` and create subfolders `gl/` and `glfw/` for the library specific imgui files. Don't forget to move your OS's static libraries too (such as `imgui_linux_x64.a`).
+(Manual setup)
+- ImGUI: https://gitlab.com/L-4/odin-imgui
+- tinyobj: https://github.com/algo-boyz/tinyobj
 
 Example structure:
 ```
 shared/
+ tinyobj/
+    tinyobj_loader.odin
+    tinyobj_memory.odin
+
  dear_imgui/
     imgui.odin
     imconfig.odin

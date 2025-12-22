@@ -51,7 +51,7 @@ scene_render :: proc(scene: ^Scene, configuration: MaminoConfiguration) {
 				normal_vao, normal_vbo, normal_ebo := get_buffer_objects()
 				face_normals := objects.get_cube_normals_coordinates(object)
 				bind_data(normal_vao, normal_vbo, normal_ebo, face_normals, {0, 1, 2, 3, 4, 5})
-				draw_lines(face_normals, 6)
+				draw_lines(6)
 
 				gl.DeleteVertexArrays(1, &normal_vao)
 				gl.DeleteBuffers(1, &normal_vbo)
@@ -121,17 +121,17 @@ scene_render_cube :: proc(object: ^objects.Object, cube: ^objects.Cube) {
 	}
 	cube_vao, cube_vbo, cube_ebo := get_buffer_objects()
 	bind_data(cube_vao, cube_vbo, cube_ebo, vertices, indices)
-	draw_object(vertices, i32(len(indices)))
+	draw_object(i32(len(indices)))
 	// Points.
 	point_vao, point_vbo, point_ebo := get_buffer_objects()
 	objects.color_vertices(&vertices, objects.point_color)
 	bind_data(point_vao, point_vbo, point_ebo, vertices, indices)
-	draw_points(vertices, indices)
+	draw_points(indices)
 	// Lines.
 	line_vao, line_vbo, line_ebo := get_buffer_objects()
 	objects.color_vertices(&vertices, objects.line_color)
 	bind_data(line_vao, line_vbo, line_ebo, vertices, line_indices)
-	draw_lines(vertices, i32(len(line_indices)))
+	draw_lines(i32(len(line_indices)))
 
 	gl.DeleteVertexArrays(1, &cube_vao)
 	gl.DeleteBuffers(1, &cube_vbo)
@@ -168,17 +168,17 @@ scene_render_sphere :: proc(object: ^objects.Object, sphere: ^objects.Sphere) {
 	}
 	sphere_vao, sphere_vbo, sphere_ebo := get_buffer_objects()
 	bind_data(sphere_vao, sphere_vbo, sphere_ebo, vertices, indices)
-	draw_object(vertices, i32(len(indices)))
+	draw_object(i32(len(indices)))
 	// Points.
 	point_vao, point_vbo, point_ebo := get_buffer_objects()
 	objects.color_vertices(&vertices, objects.point_color)
 	bind_data(point_vao, point_vbo, point_ebo, vertices, indices)
-	draw_points(vertices, indices)
+	draw_points(indices)
 	// Lines.
 	line_vao, line_vbo, line_ebo := get_buffer_objects()
 	objects.color_vertices(&vertices, objects.line_color)
 	bind_data(line_vao, line_vbo, line_ebo, vertices, line_indices)
-	draw_lines(vertices, i32(len(line_indices)))
+	draw_lines(i32(len(line_indices)))
 
 	gl.DeleteVertexArrays(1, &sphere_vao)
 	gl.DeleteBuffers(1, &sphere_vbo)
