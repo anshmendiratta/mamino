@@ -11,14 +11,14 @@ Cube :: struct {
 	id:               ObjectID,
 	keyframes:        [dynamic]ModelKeyFrame,
 	current_keyframe: uint,
-	color:            int "Hex code",
+	color:            uint "Hex code",
 }
 
 create_cube :: proc(
 	starting_position: glm.vec3 = {0., 0., 0.},
 	starting_scale: Scale = {1., 1., 1.},
 	starting_orientation: Orientation = Orientation(glm.quat(1)), // Multiplicative identity quaternion.
-	color: int = 0xd6_76_22,
+	color: uint = 0xd6_76_22,
 ) -> Object {
 	keyframes: [dynamic]ModelKeyFrame
 	append(

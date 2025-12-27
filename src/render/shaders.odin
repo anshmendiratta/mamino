@@ -1,6 +1,6 @@
 package render
 
-mamino_vertex_shader := `
+mamino_render_vert := `
 	#version 410 core
 
 	layout(location = 0) in vec3 position;
@@ -25,7 +25,7 @@ mamino_vertex_shader := `
 `
 
 
-mamino_fragment_shader := `
+mamino_render_frag := `
 	#version 410 core
 
 	in vec3 v_coord;
@@ -34,6 +34,39 @@ mamino_fragment_shader := `
 
 	void main() {
 		out_color = f_color;
+	}
+`
+
+
+mamino_shadow_vert := `
+	#version 410 core
+
+	layout(location = 0) in vec3 position;
+	layout(location = 1) in vec4 color;
+	out vec4 f_color;
+	out vec3 v_coord;
+
+	uniform float aspect_ratio;
+	uniform mat4 proj;
+	uniform mat4 view;
+	uniform mat4 model;
+
+	void main() {
+		mat4 v_transform = proj * view * model;
+		gl_Position.x /= aspect_ratio;
+		gl_Position = v_transform * vec4(position, 1.0);
+
+		f_color = color;
+		v_coord = position;
+	}
+`
+
+
+mamino_shadow_frag := `
+	#version 410 core
+
+	void main() {
+		
 	}
 `
 

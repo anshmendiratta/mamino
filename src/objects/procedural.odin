@@ -22,7 +22,7 @@ generate_n_colors :: proc(n: u32) -> [dynamic]glm.vec3 {
 	return colors
 }
 
-rgb_hex_to_color :: proc(hex_color: int, alpha: f32 = 1.) -> (result: glm.vec4) {
+rgb_hex_to_color :: proc(hex_color: uint, alpha: f32 = 1.) -> (result: glm.vec4) {
 	result =
 		{
 			f32((hex_color & 0x00_FF_00_00) >> 16),

@@ -26,7 +26,7 @@ load_obj_model :: proc(file_path: string) -> (models: tobj.OBJ) {
 
 load_model_data :: proc(
 	models: tobj.OBJ,
-	color: int = 0xaa_aa_aa,
+	color: uint = 0xaa_aa_aa,
 ) -> (
 	vertices: [dynamic]Vertex,
 	indices: [dynamic]u16,

@@ -10,7 +10,7 @@ Sphere :: struct {
 	id:               ObjectID,
 	keyframes:        [dynamic]ModelKeyFrame,
 	current_keyframe: uint,
-	color:            int "Hex code",
+	color:            uint "Hex code",
 	// Sphere specific fields.
 	sectors:          uint, // Number of subidivions for \theta.
 	stacks:           uint, // Number of subidivions for \phi.
@@ -20,7 +20,7 @@ create_sphere :: proc(
 	starting_position: glm.vec3 = {0., 0., 0.},
 	starting_scale: Scale = {1., 1., 1.},
 	starting_orientation: Orientation = Orientation(glm.quat(1)),
-	color: int = 0x22_d6_ac,
+	color: uint = 0x22_d6_ac,
 	sectors: uint = 16,
 	stacks: uint = 16,
 ) -> Object {

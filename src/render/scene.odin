@@ -24,6 +24,7 @@ HIGHLIGHTED_OBJECT_COLOR :: glm.vec4{0.15, 0.83, 1.0, 0.5}
 
 Scene :: struct {
 	objects: [dynamic]^objects.Object,
+	// color_buffer: [dynamic]u32,
 }
 
 create_scene :: proc() -> Scene {
@@ -39,12 +40,53 @@ scene_get_objects_count :: proc(scene: ^Scene) -> uint {
 }
 
 scene_render :: proc(scene: ^Scene, configuration: MaminoConfiguration) {
+	scene_vao, scene_vbo, scene_ebo := get_buffer_objects()
+	scene_vertices: [dynamic]objects.Vertex
+	scene_line_indices: [dynamic]u16
+	scene_indices: [dynamic]u16
+	defer {
+		delete(scene_vertices)
+		delete(scene_indices)
+		delete(scene_line_indices)
+		gl.DeleteVertexArrays(1, &scene_vao)
+		gl.DeleteBuffers(1, &scene_vbo)
+		gl.DeleteBuffers(1, &scene_ebo)
+	}
+
 	render_objects := scene.objects
 	for generic_object in render_objects {
 		#partial switch &object in generic_object {
 		// Do not need to worry about the constant coloring below, as the below call copies over from the base cube, whose color is unchanging.
 		case objects.Cube:
-			scene_render_cube(generic_object, &generic_object.(objects.Cube))
+			vertices, indices, line_indices := scene_get_cube_buffer(
+				generic_object,
+				&generic_object.(objects.Cube),
+			)
+
+			cube_vao, cube_vbo, cube_ebo := get_buffer_objects()
+			bind_data(cube_vao, cube_vbo, cube_ebo, vertices, indices)
+
+			// draw_object(i32(len(indices)))
+			// Points.
+			point_vao, point_vbo, point_ebo := get_buffer_objects()
+			objects.color_vertices(&vertices, objects.point_color)
+			bind_data(point_vao, point_vbo, point_ebo, vertices, indices)
+			// draw_points(indices)
+			// Lines.
+			line_vao, line_vbo, line_ebo := get_buffer_objects()
+			objects.color_vertices(&vertices, objects.line_color)
+			// bind_data(line_vao, line_vbo, line_ebo, vertices, line_indices)
+			// draw_lines(i32(len(line_indices)))
+
+			gl.DeleteVertexArrays(1, &cube_vao)
+			gl.DeleteBuffers(1, &cube_vbo)
+			gl.DeleteBuffers(1, &cube_ebo)
+			gl.DeleteVertexArrays(1, &point_vao)
+			gl.DeleteBuffers(1, &point_vbo)
+			gl.DeleteBuffers(1, &point_ebo)
+			gl.DeleteVertexArrays(1, &line_vao)
+			gl.DeleteBuffers(1, &line_vbo)
+			gl.DeleteBuffers(1, &line_ebo)
 
 			// FIX(Ansh): Normal rendering doesn't want to happen on debug mode. Probably to do with setting the PolygonMode.
 			if ODIN_DEBUG && render_normals {
@@ -58,9 +100,43 @@ scene_render :: proc(scene: ^Scene, configuration: MaminoConfiguration) {
 				gl.DeleteBuffers(1, &normal_ebo)
 			}
 		case objects.Sphere:
-			scene_render_sphere(generic_object, &generic_object.(objects.Sphere))
+			vertices, indices, line_indices := scene_get_sphere_buffer(
+				generic_object,
+				&generic_object.(objects.Sphere),
+			)
+
+			sphere_vao, sphere_vbo, sphere_ebo := get_buffer_objects()
+			bind_data(sphere_vao, sphere_vbo, sphere_ebo, vertices, indices)
+			draw_object(i32(len(indices)))
+			// Points.
+			point_vao, point_vbo, point_ebo := get_buffer_objects()
+			objects.color_vertices(&vertices, objects.point_color)
+			bind_data(point_vao, point_vbo, point_ebo, vertices, indices)
+			draw_points(indices)
+			// Lines.
+			line_vao, line_vbo, line_ebo := get_buffer_objects()
+			objects.color_vertices(&vertices, objects.line_color)
+			bind_data(line_vao, line_vbo, line_ebo, vertices, line_indices)
+			draw_lines(i32(len(line_indices)))
+
+			gl.DeleteVertexArrays(1, &sphere_vao)
+			gl.DeleteBuffers(1, &sphere_vbo)
+			gl.DeleteBuffers(1, &sphere_ebo)
+			gl.DeleteVertexArrays(1, &point_vao)
+			gl.DeleteBuffers(1, &point_vbo)
+			gl.DeleteBuffers(1, &point_ebo)
+			gl.DeleteVertexArrays(1, &line_vao)
+			gl.DeleteBuffers(1, &line_vbo)
+			gl.DeleteBuffers(1, &line_ebo)
+
 		}
 	}
+
+	// Render scene.
+	bind_data(scene_vao, scene_vbo, scene_ebo, scene_vertices[:], scene_indices[:])
+	draw_object(i32(len(scene_vertices)))
+	draw_lines(i32(len(scene_line_indices)))
+	draw_points(scene_indices[:])
 
 	if .render_axes in configuration {
 		scene_render_coordinate_axes()
@@ -100,7 +176,14 @@ scene_update_camera :: proc(camera: ^objects.Camera) {
 	)
 }
 
-scene_render_cube :: proc(object: ^objects.Object, cube: ^objects.Cube) {
+scene_get_cube_buffer :: proc(
+	object: ^objects.Object,
+	cube: ^objects.Cube,
+) -> (
+	vertices: []objects.Vertex,
+	indices: []u16,
+	line_indices: []u16,
+) {
 	objects.object_catch_up_keyframe(object, global_time) // Set appropriate keyframe.
 	// Interpolate between the last and the almost-next frame.
 	last_keyframe: objects.ModelKeyFrame = cube.keyframes[cube.current_keyframe]
@@ -113,38 +196,24 @@ scene_render_cube :: proc(object: ^objects.Object, cube: ^objects.Cube) {
 	next_keyframe: objects.ModelKeyFrame = cube.keyframes[next_keyframe_idx]
 	interpolated_keyframe :=
 		scene_interpolate_model_keyframes(last_keyframe, next_keyframe, global_time) if last_keyframe != next_keyframe else last_keyframe
-	vertices, indices, line_indices := objects.get_cube_data(cube, interpolated_keyframe)
+	vertices, indices, line_indices = objects.get_cube_data(cube, interpolated_keyframe)
 
 	// Cube.
 	if cube.id == highlighted_debug_object_id {
 		objects.color_vertices(&vertices, HIGHLIGHTED_OBJECT_COLOR)
 	}
-	cube_vao, cube_vbo, cube_ebo := get_buffer_objects()
-	bind_data(cube_vao, cube_vbo, cube_ebo, vertices, indices)
-	draw_object(i32(len(indices)))
-	// Points.
-	point_vao, point_vbo, point_ebo := get_buffer_objects()
-	objects.color_vertices(&vertices, objects.point_color)
-	bind_data(point_vao, point_vbo, point_ebo, vertices, indices)
-	draw_points(indices)
-	// Lines.
-	line_vao, line_vbo, line_ebo := get_buffer_objects()
-	objects.color_vertices(&vertices, objects.line_color)
-	bind_data(line_vao, line_vbo, line_ebo, vertices, line_indices)
-	draw_lines(i32(len(line_indices)))
 
-	gl.DeleteVertexArrays(1, &cube_vao)
-	gl.DeleteBuffers(1, &cube_vbo)
-	gl.DeleteBuffers(1, &cube_ebo)
-	gl.DeleteVertexArrays(1, &point_vao)
-	gl.DeleteBuffers(1, &point_vbo)
-	gl.DeleteBuffers(1, &point_ebo)
-	gl.DeleteVertexArrays(1, &line_vao)
-	gl.DeleteBuffers(1, &line_vbo)
-	gl.DeleteBuffers(1, &line_ebo)
+	return
 }
 
-scene_render_sphere :: proc(object: ^objects.Object, sphere: ^objects.Sphere) {
+scene_get_sphere_buffer :: proc(
+	object: ^objects.Object,
+	sphere: ^objects.Sphere,
+) -> (
+	vertices: []objects.Vertex,
+	indices: []u16,
+	line_indices: []u16,
+) {
 	objects.object_catch_up_keyframe(object, global_time) // Set appropriate keyframe.
 	// Interpolate between the last and the almost-next frame.
 	last_keyframe: objects.ModelKeyFrame = sphere.keyframes[sphere.current_keyframe]
@@ -157,38 +226,14 @@ scene_render_sphere :: proc(object: ^objects.Object, sphere: ^objects.Sphere) {
 	next_keyframe: objects.ModelKeyFrame = sphere.keyframes[next_keyframe_idx]
 	interpolated_keyframe :=
 		scene_interpolate_model_keyframes(last_keyframe, next_keyframe, global_time) if last_keyframe != next_keyframe else last_keyframe
-	vertices, indices, line_indices := objects.get_sphere_data(sphere, interpolated_keyframe)
-	defer delete(vertices)
-	defer delete(indices)
-	defer delete(line_indices)
+	vertices, indices, line_indices = objects.get_sphere_data(sphere, interpolated_keyframe)
 
 	// sphere.
 	if sphere.id == highlighted_debug_object_id {
 		objects.color_vertices(&vertices, HIGHLIGHTED_OBJECT_COLOR)
 	}
-	sphere_vao, sphere_vbo, sphere_ebo := get_buffer_objects()
-	bind_data(sphere_vao, sphere_vbo, sphere_ebo, vertices, indices)
-	draw_object(i32(len(indices)))
-	// Points.
-	point_vao, point_vbo, point_ebo := get_buffer_objects()
-	objects.color_vertices(&vertices, objects.point_color)
-	bind_data(point_vao, point_vbo, point_ebo, vertices, indices)
-	draw_points(indices)
-	// Lines.
-	line_vao, line_vbo, line_ebo := get_buffer_objects()
-	objects.color_vertices(&vertices, objects.line_color)
-	bind_data(line_vao, line_vbo, line_ebo, vertices, line_indices)
-	draw_lines(i32(len(line_indices)))
 
-	gl.DeleteVertexArrays(1, &sphere_vao)
-	gl.DeleteBuffers(1, &sphere_vbo)
-	gl.DeleteBuffers(1, &sphere_ebo)
-	gl.DeleteVertexArrays(1, &point_vao)
-	gl.DeleteBuffers(1, &point_vbo)
-	gl.DeleteBuffers(1, &point_ebo)
-	gl.DeleteVertexArrays(1, &line_vao)
-	gl.DeleteBuffers(1, &line_vbo)
-	gl.DeleteBuffers(1, &line_ebo)
+	return
 }
 
 scene_render_coordinate_axes :: proc() {

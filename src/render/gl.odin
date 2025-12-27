@@ -19,7 +19,8 @@ mamino_init_gl :: proc() -> (program_id: u32, uniforms: map[string]gl.Uniform_In
 	gl.Enable(gl.DEPTH_TEST)
 
 	ok: bool
-	program_id, ok = gl.load_shaders_source(mamino_vertex_shader, mamino_fragment_shader)
+	program_id, ok = gl.load_shaders_source(mamino_render_vert, mamino_render_frag)
+
 	if !ok {
 		fmt.eprintln("Failed to load shaders.")
 		return
